@@ -32,7 +32,9 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(122, 90, 248, 0.2);
         }
-        
+        a{
+            cursor: pointer;
+        }
         .badge-promo {
             background: #FF4757;
             color: white;
@@ -63,21 +65,21 @@
             right: 0;
         }
     </style>
+    <link rel="shortcut icon" href="./assets/img/logo.png" type="image/x-icon">
 </head>
 <body class="bg-gray-50">
     <!-- Navbar -->
     <nav class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-4">
             <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-2">
-                    <div class="w-8 h-8 primary-color rounded-lg flex items-center justify-center">
-                        <span class="text-white font-bold text-lg">P</span>
+                <a href="#home" class="flex items-center space-x-2">
+                    <div class="flex items-center space-x-2">
+                        <img class="h-8 flex items-center justify-center" src="./assets/img/Container.png" alt="">
                     </div>
-                    <span class="text-xl font-bold text-gray-800">Promora</span>
-                </div>
+                </a>
                 
                 <div class="hidden md:flex space-x-8">
-                    <a href="#" class="text-purple-600 hover:text-purple-600 font-medium">Home</a>
+                    <a href="#home" class="text-purple-600 hover:text-purple-600 font-medium">Home</a>
                     <a href="explore.html" class="text-gray-700 hover:text-purple-600 font-medium">Explore</a>
                     <a href="#" class="text-gray-700 hover:text-purple-600 font-medium">About</a>
                     <a href="#" class="text-gray-700 hover:text-purple-600 font-medium">Contact</a>
@@ -92,7 +94,7 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="gradient-bg text-white py-16">
+    <section class="gradient-bg text-white py-16" id="home">
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex items-center justify-between">
                 <div class="flex-1">
