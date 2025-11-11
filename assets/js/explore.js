@@ -205,12 +205,12 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                         <p class="text-2xl font-bold text-purple-600 mb-1">${formatRupiah(product.price)}</p>
                         <p class="text-gray-400 text-sm line-through mb-1">${formatRupiah(product.originalPrice)}</p>
                         <p class="text-gray-500 text-xs mb-4">Fee Jastip: ${formatRupiah(product.fee)}</p>
-                        <div class="flex items-center mb-4">
+                        <div class="flex items-center mb-4 gap-1">
                             <span class="text-sm text-gray-700">${product.seller}</span>
-                            ${product.verified ? '<span class="verified-badge ml-2">✓</span>' : ''}
+                            ${product.verified ? '<i class="hgi hgi-stroke hgi-new-releases text-base relative top-[1px]"></i>' : ''}
                         </div>
-                        <button class="w-full primary-color text-white py-3 rounded-lg font-semibold hover:opacity-90 flex items-center justify-center">
-                            <span class="mr-2">🛒</span> Add to Cart
+                        <button class="w-full primary-color text-white gap-2 py-3 rounded-lg font-medium hover:opacity-90 flex items-center justify-center">
+                            <i class="hgi hgi-stroke hgi-shopping-cart-01"></i> Add to Cart
                         </button>
                     </div>
                 `;
