@@ -29,17 +29,17 @@ const observer = new IntersectionObserver((entries) => {
 const products = [
   {
     id: 1,
-    name: "Summer Collection Dress",
+    name: "Tas Zara Leather Mini",
     brand: "Zara",
     category: "fashion",
-    price: 179700,
-    originalPrice: 250000,
+    price: 480000,
+    originalPrice: 1800000,
     discount: 70,
     fee: 25000,
     seller: "Sarah Amelia",
     verified: true,
     location: "jakarta",
-    image: "dress",
+    image: "./assets/img/Tas Zara.png",
   },
   {
     id: 2,
@@ -164,21 +164,6 @@ function formatRupiah(amount) {
   return "Rp " + amount.toLocaleString("id-ID");
 }
 
-// Get product image
-function getProductImage(type) {
-  const images = {
-    dress: "👗",
-    jacket: "🧥",
-    makeup: "💄",
-    cocktail: "👗",
-    handbag: "👜",
-    tshirt: "👕",
-    sneakers: "👟",
-    backpack: "🎒",
-    lipstick: "💋",
-  };
-  return images[type] || "📦";
-}
 
 // Render products
 function renderProducts() {
@@ -198,10 +183,12 @@ function renderProducts() {
     };
     card.innerHTML = `
                     <div class="relative">
-                        <div class="w-full h-64 bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center text-6xl">
-                            ${getProductImage(product.image)}
+                        <div class="w-full h-64 bg-gray-100 flex items-center justify-center">
+                            <img src="${product.image}" 
+                                alt="${product.name}" 
+                                class="w-full h-full object-cover" />
                         </div>
-                        <span class="badge-discount absolute top-4 right-4">Diskon ${
+                        <span class="absolute top-4 right-4 bg-red-500 text-white text-sm font-semibold px-3 py-1 rounded-lg shadow">Diskon ${
                           product.discount
                         }%</span>
                     </div>

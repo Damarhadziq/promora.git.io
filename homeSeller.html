@@ -50,35 +50,56 @@
 <body class="bg-gray-50">
     <!-- Navbar -->
     <nav class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-4">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-2">
-                    <div class="w-10 h-10 primary-color rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                        </svg>
-                    </div>
-                    <span class="text-2xl font-bold" style="color: #7A5AF8;">Promora</span>
-                </div>
-                
-                <div class="hidden md:flex space-x-8">
-                    <a href="#" class="text-gray-700 hover:text-[#7A5AF8] font-medium transition">Home</a>
-                    <a href="#" class="text-gray-700 hover:text-[#7A5AF8] font-medium transition">Categories</a>
-                    <a href="#" class="text-gray-700 hover:text-[#7A5AF8] font-medium transition">How it Works</a>
-                    <a href="#" class="text-gray-700 hover:text-[#7A5AF8] font-medium transition">About</a>
-                    <a href="#" class="text-gray-700 hover:text-[#7A5AF8] font-medium transition">Contact</a>
-                </div>
-                
-                <div class="flex items-center space-x-3">
-                    <button class="px-5 py-2 border border-[#7A5AF8] text-[#7A5AF8] rounded-lg font-medium hover:bg-[#7A5AF8] hover:text-white transition">
-                        Login
-                    </button>
-                    <button class="px-5 py-2 btn-primary text-white rounded-lg font-medium">
-                        Sign Up
-                    </button>
-                </div>
+      <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex justify-between items-center">
+          <a href="index.html" class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2">
+              <img
+                class="h-8 flex items-center justify-center"
+                src="./assets/img/Container.png"
+                alt=""
+              />
             </div>
+          </a>
+
+          <div class="hidden md:flex space-x-8">
+            <a
+              href="index.html"
+              class="text-gray-700 hover:text-purple-600 font-medium"
+              >Home</a
+            >
+            <a
+              href="explore.html"
+              class="text-gray-700 hover:text-purple-600 font-medium"
+              >Explore</a
+            >
+            <a href="about.html" class="text-gray-700 hover:text-purple-600 font-medium"
+              >About</a
+            >
+            <a href="#" class="text-gray-700 hover:text-purple-600 font-medium"
+              >Contact</a
+            >
+          </div>
+
+          <!-- Tombol Setting -->
+            <a href="#setting">
+                <button class="text-gray-600 hover:text-primary transition">
+                    <i class="fas fa-cog text-xl"></i>
+                </button>
+            </a>
+            
+          <div class="flex items-center space-x-4">
+            <!-- PROFILE -->
+            <a href="profile.html"><img  
+              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop" 
+              alt="Profile" 
+              class="h-10 w-10 rounded-full object-cover border hover:opacity-90 cursor-pointer"/>
+            </a>
+            
+             </div>
+          </div>
         </div>
+      </div>
     </nav>
 
     <!-- Profile Section -->
@@ -320,113 +341,6 @@
             </div>
         </div>
     </footer>
-
-    <script>
-        // Sample product data
-        const products = [
-            {
-                id: 1,
-                brand: 'Zara',
-                name: 'Tas Zara Leather Mini',
-                price: 'Rp 480.000',
-                originalPrice: 'Rp 1.200.000',
-                fee: 'Rp 35.000',
-                stock: '8 item',
-                image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop'
-            },
-            {
-                id: 6,
-                brand: 'Casio',
-                name: 'Casio G-Shock Limited',
-                price: 'Rp 990.000',
-                originalPrice: 'Rp 1.800.000',
-                fee: 'Rp 38.000',
-                stock: '3 item',
-                image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop'
-            }
-        ];
-
-        // Render products
-        function renderProducts() {
-            const grid = document.getElementById('products-grid');
-            grid.innerHTML = products.map(product => `
-                <div class="bg-white rounded-2xl shadow-sm overflow-hidden product-card">
-                    <div class="relative h-64 overflow-hidden">
-                        <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">
-                        ${product.stock === '0 item' ? '<div class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">Stok Habis</div>' : ''}
-                    </div>
-                    <div class="p-5">
-                        <p class="text-sm text-gray-500 mb-1">${product.brand}</p>
-                        <h3 class="text-lg font-bold text-gray-900 mb-3">${product.name}</h3>
-                        
-                        <div class="flex items-baseline space-x-2 mb-1">
-                            <span class="text-2xl font-bold text-[#7A5AF8]">${product.price}</span>
-                            <span class="text-sm text-gray-400 line-through">${product.originalPrice}</span>
-                        </div>
-                        
-                        <p class="text-sm text-gray-600 mb-1">Fee: ${product.fee}</p>
-                        <p class="text-sm ${product.stock === '0 item' ? 'text-red-600' : 'text-green-600'} font-semibold mb-4">Stok: ${product.stock}</p>
-                        
-                        <div class="flex space-x-2">
-                            <button onclick="editProduct(${product.id})" class="flex-1 px-4 py-2 border border-[#7A5AF8] text-[#7A5AF8] rounded-lg font-medium hover:bg-[#7A5AF8] hover:text-white transition">
-                                Edit
-                            </button>
-                            <button onclick="deleteProduct(${product.id})" class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition">
-                                Hapus
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Switch tabs
-        function switchTab(tabName) {
-            // Hide all content
-            document.getElementById('content-produk').classList.add('hidden');
-            document.getElementById('content-order').classList.add('hidden');
-            document.getElementById('content-statistik').classList.add('hidden');
-            document.getElementById('content-pengaturan').classList.add('hidden');
-            
-            // Remove active class from all tabs
-            document.getElementById('tab-produk').className = 'tab-inactive px-8 py-3 rounded-full font-semibold transition hover:bg-gray-200';
-            document.getElementById('tab-order').className = 'tab-inactive px-8 py-3 rounded-full font-semibold transition hover:bg-gray-200';
-            document.getElementById('tab-statistik').className = 'tab-inactive px-8 py-3 rounded-full font-semibold transition hover:bg-gray-200';
-            document.getElementById('tab-pengaturan').className = 'tab-inactive px-8 py-3 rounded-full font-semibold transition hover:bg-gray-200';
-            
-            // Show selected content and activate tab
-            document.getElementById('content-' + tabName).classList.remove('hidden');
-            document.getElementById('tab-' + tabName).className = 'tab-active px-8 py-3 rounded-full font-semibold transition';
-        }
-
-        // Add product
-        function tambahProduk() {
-            alert('Fitur tambah produk akan membuka form untuk menambahkan produk baru.\n\nForm akan berisi:\n- Upload gambar produk\n- Nama brand\n- Nama produk\n- Harga\n- Harga coret\n- Fee jastip\n- Stok\n- Deskripsi');
-        }
-
-        // Edit product
-        function editProduct(id) {
-            const product = products.find(p => p.id === id);
-            alert(`Edit produk: ${product.name}\n\nFitur ini akan membuka form edit dengan data produk yang sudah ada.`);
-        }
-
-        // Delete product
-        function deleteProduct(id) {
-            const product = products.find(p => p.id === id);
-            if (confirm(`Apakah Anda yakin ingin menghapus produk "${product.name}"?`)) {
-                const index = products.findIndex(p => p.id === id);
-                if (index > -1) {
-                    products.splice(index, 1);
-                    renderProducts();
-                    alert('Produk berhasil dihapus!');
-                }
-            }
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            renderProducts();
-        });
-    </script>
+    <script src="./assets/js/homeSeller.js"></script>
 </body>
 </html>
