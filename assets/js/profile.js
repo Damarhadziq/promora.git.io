@@ -203,3 +203,55 @@
                 showNotification('Profile loaded successfully!');
             }, 500);
         });
+
+        // Script ini WAJIB ada di SETIAP halaman biar status login konsisten
+function checkLoginStatus() {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const userName = localStorage.getItem('userName');
+
+  if (isLoggedIn && userName) {
+    // Sudah login → sembunyiin Login/Sign Up, tampilkan user info
+    const auth = document.getElementById('auth-buttons');
+    const user = document.getElementById('user-info');
+    if (auth) auth.classList.add('hidden');
+    if (user) {
+      user.classList.remove('hidden');
+    }
+  } else {
+    // Belum login
+    const auth = document.getElementById('auth-buttons');
+    const user = document.getElementById('user-info');
+    if (auth) auth.classList.remove('hidden');
+    if (user) user.classList.add('hidden');
+  }
+}
+
+function logout() {
+  localStorage.removeItem('isLoggedIn');
+  localStorage.removeItem('userName');
+  localStorage.removeItem('userRole');
+  
+  // Update UI langsung + tutup dropdown kalau ada
+  const auth = document.getElementById('auth-buttons');
+  const user = document.getElementById('user-info');
+  const dropdown = document.getElementById('dropdown-menu');
+  if (auth) auth.classList.remove('hidden');
+  if (user) user.classList.add('hidden');
+  if (dropdown) dropdown.classList.add('hidden');
+
+  alert('Kamu telah logout 👋');
+}
+
+// Dropdown avatar
+document.getElementById('avatar-button')?.addEventListener('click', function(e) {
+  e.stopPropagation();
+  document.getElementById('dropdown-menu')?.classList.toggle('hidden');
+});
+
+// Tutup dropdown kalau klik luar
+document.addEventListener('click', () => {
+  document.getElementById('dropdown-menu')?.classList.add('hidden');
+});
+
+// Jalankan tiap halaman dibuka
+window.addEventListener('load', checkLoginStatus);

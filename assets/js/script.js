@@ -89,3 +89,46 @@
             this.style.transform = 'scale(1)';
         });
     });
+        // Cek login saat halaman dibuka
+        function checkLoginStatus() {
+        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        const userName = localStorage.getItem('userName');
+
+        if (isLoggedIn && userName) {
+            // Sudah login
+            document.getElementById('auth-buttons').classList.add('hidden');
+            document.getElementById('user-info').classList.remove('hidden');
+        } else {
+            // Belum login
+            document.getElementById('auth-buttons').classList.remove('hidden');
+            document.getElementById('user-info').classList.add('hidden');
+        }
+        }
+
+        // Logout → bersihkan semua + update UI langsung
+        function logout() {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userRole');
+
+        // Update UI langsung tanpa refresh
+        document.getElementById('auth-buttons').classList.remove('hidden');
+        document.getElementById('user-info').classList.add('hidden');
+        document.getElementById('dropdown-menu').classList.add('hidden');
+
+        alert('Kamu telah logout 👋');
+        }
+
+        // Dropdown toggle
+        document.getElementById('avatar-button')?.addEventListener('click', function(e) {
+        e.stopPropagation();
+        document.getElementById('dropdown-menu').classList.toggle('hidden');
+        });
+
+        // Tutup dropdown kalau klik di luar
+        document.addEventListener('click', function() {
+        document.getElementById('dropdown-menu')?.classList.add('hidden');
+        });
+
+        // Jalankan saat halaman loaded
+        window.addEventListener('load', checkLoginStatus);

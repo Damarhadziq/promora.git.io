@@ -295,16 +295,40 @@
             }
         }
 
-        // Dummy submit handlers (bisa diganti dengan fetch ke API nanti)
+        // Ganti fungsi handleLogin
         function handleLogin(e) {
-            e.preventDefault();
-            window.location.href = "homeSeller.html";
-            alert('Login berhasil!');
+        e.preventDefault();
+        
+        // Ambil input (kamu bisa tambah validasi nanti)
+        const emailOrUsername = e.target.querySelector('input[type="text"], input[type="email"]').value.trim();
+        const password = document.getElementById('login-pass').value;
+
+        if (emailOrUsername && password) {
+            // Simpan data user ke localStorage (sementara, nanti bisa diganti API)
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userName', emailOrUsername.split('@')[0] || emailOrUsername); // ambil sebelum @ atau full username
+            localStorage.setItem('userRole', document.querySelector('#login-container .role-card.selected p').textContent.trim());
+
+            alert('Login berhasil! Selamat datang kembali 👋');
+            window.location.href = "index.html"; // balik ke home
         }
+        }
+
+        // Ganti fungsi handleRegister
         function handleRegister(e) {
-            e.preventDefault();
-            alert('Pendaftaran berhasil! Silakan login.');
-            switchToLogin();
+        e.preventDefault();
+        
+        const firstName = e.target.querySelector('input[placeholder="Nama Depan"]').value;
+        const email = e.target.querySelector('input[type="email"]').value;
+
+        if (firstName && email) {
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userName', firstName);
+            localStorage.setItem('userRole', document.querySelector('#register-container .role-card.selected p').textContent.trim());
+
+            alert('Pendaftaran berhasil! Selamat datang di Promora 🎉');
+            window.location.href = "index.html";
+        }
         }
     </script>
 </body>

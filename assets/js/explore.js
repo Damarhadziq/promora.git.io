@@ -164,7 +164,6 @@ function formatRupiah(amount) {
   return "Rp " + amount.toLocaleString("id-ID");
 }
 
-
 // Render products
 function renderProducts() {
   const grid = document.getElementById("productsGrid");
@@ -340,6 +339,48 @@ document.getElementById("nextPage").addEventListener("click", () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 });
+
+
+ // Cek login saat halaman dibuka
+        function checkLoginStatus() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      const userName = localStorage.getItem('userName');
+
+      const authButtons = document.getElementById('auth-buttons');
+      const userInfo = document.getElementById('user-info');
+      const userNameEl = document.getElementById('user-name');
+
+      if (isLoggedIn && userName && authButtons && userInfo && userNameEl) {
+        authButtons.classList.add('hidden');
+        userInfo.classList.remove('hidden');
+      } else if (authButtons && userInfo) {
+        authButtons.classList.remove('hidden');
+        userInfo.classList.add('hidden');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userRole');
+      checkLoginStatus();
+      document.getElementById('dropdown-menu')?.classList.add('hidden');
+      alert('Logout berhasil! 👋');
+    }
+
+        // Dropdown toggle
+        document.getElementById('avatar-button')?.addEventListener('click', function(e) {
+        e.stopPropagation();
+        document.getElementById('dropdown-menu').classList.toggle('hidden');
+        });
+
+        // Tutup dropdown kalau klik di luar
+        document.addEventListener('click', function() {
+        document.getElementById('dropdown-menu')?.classList.add('hidden');
+        });
+
+        // Jalankan saat halaman loaded
+        window.addEventListener('load', checkLoginStatus);
 
 // Initial render
 renderProducts();
