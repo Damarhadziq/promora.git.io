@@ -15,99 +15,77 @@ try {
     // Pastikan method POST
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(405);
-        echo json_encode(array("message" => "Method not allowed"));
+        echo json_encode(["message" => "Method not allowed"]);
         exit();
     }
 
-    // Ambil data POST
     $json = file_get_contents("php://input");
     $data = json_decode($json);
-    
-    // Debug: log data yang diterima
-    error_log("Received data: " . $json);
 
     // Validasi input
-    if (empty($data->first_name) || empty($data->email) || empty($data->username) || 
-        empty($data->password) || empty($data->role)) {
+    if (
+        empty($data->first_name) || empty($data->email) ||
+        empty($data->username) || empty($data->password) ||
+        empty($data->role)
+    ) {
         http_response_code(400);
-        echo json_encode(array(
-            "message" => "Data tidak lengkap",
-            "received" => array(
-                "first_name" => isset($data->first_name) ? "OK" : "MISSING",
-                "email" => isset($data->email) ? "OK" : "MISSING",
-                "username" => isset($data->username) ? "OK" : "MISSING",
-                "password" => isset($data->password) ? "OK" : "MISSING",
-                "role" => isset($data->role) ? "OK" : "MISSING"
-            )
-        ));
+        echo json_encode(["message" => "Data tidak lengkap"]);
         exit();
     }
 
     // Validasi email
     if (!filter_var($data->email, FILTER_VALIDATE_EMAIL)) {
         http_response_code(400);
-        echo json_encode(array("message" => "Format email tidak valid"));
+        echo json_encode(["message" => "Format email tidak valid"]);
         exit();
     }
 
     // Validasi password minimal 8 karakter
     if (strlen($data->password) < 8) {
         http_response_code(400);
-        echo json_encode(array("message" => "Password minimal 8 karakter"));
+        echo json_encode(["message" => "Password minimal 8 karakter"]);
         exit();
     }
 
-    // Validasi role
+    // Validasi role → (PASTIKAN database kamu role-nya customer / seller)
     if (!in_array($data->role, ['customer', 'seller'])) {
         http_response_code(400);
-        echo json_encode(array("message" => "Role tidak valid: " . $data->role));
+        echo json_encode(["message" => "Role tidak valid: " . $data->role]);
         exit();
     }
 
     $database = new Database();
     $db = $database->getConnection();
-    
-    if (!$db) {
-        throw new Exception("Database connection failed");
-    }
 
-    // Cek apakah email sudah terdaftar
-    $query_check_email = "SELECT id FROM users WHERE email = :email LIMIT 1";
-    $stmt_check_email = $db->prepare($query_check_email);
-    $stmt_check_email->bindParam(":email", $data->email);
-    $stmt_check_email->execute();
-
-    if ($stmt_check_email->rowCount() > 0) {
+    // Cek email
+    $stmt = $db->prepare("SELECT id FROM users WHERE email=:email LIMIT 1");
+    $stmt->bindParam(":email", $data->email);
+    $stmt->execute();
+    if ($stmt->rowCount() > 0) {
         http_response_code(409);
-        echo json_encode(array("message" => "Email sudah terdaftar"));
+        echo json_encode(["message" => "Email sudah terdaftar"]);
         exit();
     }
 
-    // Cek apakah username sudah terdaftar
-    $query_check_username = "SELECT id FROM users WHERE username = :username LIMIT 1";
-    $stmt_check_username = $db->prepare($query_check_username);
-    $stmt_check_username->bindParam(":username", $data->username);
-    $stmt_check_username->execute();
-
-    if ($stmt_check_username->rowCount() > 0) {
+    // Cek username
+    $stmt = $db->prepare("SELECT id FROM users WHERE username=:username LIMIT 1");
+    $stmt->bindParam(":username", $data->username);
+    $stmt->execute();
+    if ($stmt->rowCount() > 0) {
         http_response_code(409);
-        echo json_encode(array("message" => "Username sudah digunakan"));
+        echo json_encode(["message" => "Username sudah digunakan"]);
         exit();
     }
 
-    // Insert user baru
-    $query = "INSERT INTO users (first_name, last_name, email, username, phone, password, role) 
+    // Insert user
+    $query = "INSERT INTO users (first_name, last_name, email, username, phone, password, role)
               VALUES (:first_name, :last_name, :email, :username, :phone, :password, :role)";
-
     $stmt = $db->prepare($query);
 
-    // Hash password
     $password_hash = password_hash($data->password, PASSWORD_BCRYPT);
+    $last_name = $data->last_name ?? '';
+    $phone = $data->phone ?? '';
 
-    // Bind parameters
-    $last_name = isset($data->last_name) ? $data->last_name : '';
-    $phone = isset($data->phone) ? $data->phone : '';
-    
     $stmt->bindParam(":first_name", $data->first_name);
     $stmt->bindParam(":last_name", $last_name);
     $stmt->bindParam(":email", $data->email);
@@ -117,36 +95,41 @@ try {
     $stmt->bindParam(":role", $data->role);
 
     if ($stmt->execute()) {
-        http_response_code(201);
-        
-        // Ambil data user yang baru dibuat
+
+        session_start();
         $user_id = $db->lastInsertId();
-        
-        echo json_encode(array(
+
+        $_SESSION['user_id'] = $user_id;
+        $_SESSION['username'] = $data->username;
+        $_SESSION['email'] = $data->email;
+        $_SESSION['first_name'] = $data->first_name;
+        $_SESSION['last_name'] = $last_name;
+        $_SESSION['role'] = $data->role;
+        $_SESSION['phone'] = $phone;
+        $_SESSION['logged_in'] = true;
+
+        http_response_code(201);
+        echo json_encode([
             "message" => "Registrasi berhasil",
-            "user" => array(
+            "user" => [
                 "id" => $user_id,
                 "username" => $data->username,
                 "email" => $data->email,
                 "first_name" => $data->first_name,
                 "last_name" => $last_name,
                 "role" => $data->role
-            )
-        ));
+            ],
+            "session_id" => session_id()
+        ]);
     } else {
         http_response_code(500);
-        $errorInfo = $stmt->errorInfo();
-        echo json_encode(array(
-            "message" => "Registrasi gagal",
-            "error" => $errorInfo[2]
-        ));
+        echo json_encode(["message" => "Gagal registrasi"]);
     }
-    
+
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(array(
-        "message" => "Error: " . $e->getMessage(),
-        "trace" => $e->getTraceAsString()
-    ));
+    echo json_encode([
+        "message" => "Error: " . $e->getMessage()
+    ]);
 }
 ?>

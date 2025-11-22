@@ -1,257 +1,308 @@
-        // Tab Switching
-        function switchTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.add('hidden');
-            });
-            
-            // Remove active class from all buttons
-            document.querySelectorAll('.tab-button').forEach(btn => {
-                btn.classList.remove('active');
-                btn.classList.add('text-gray-500');
-            });
-            
-            // Show selected tab
-            const tabs = {
-                'overview': 'overviewTab',
-                'edit': 'editTab',
-                'security': 'securityTab',
-                'activity': 'activityTab'
-            };
-            
-            document.getElementById(tabs[tabName]).classList.remove('hidden');
-            
-            // Add active class to clicked button
-            const activeButton = document.querySelector(`[data-tab="${tabName}"]`);
-            activeButton.classList.add('active');
-            activeButton.classList.remove('text-gray-500');
-        }
+// assets/js/profile.js
+const API_BASE_URL = 'backend/api';
 
-        // Image Upload Handler
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('profileImage').src = e.target.result;
-                    showNotification('Profile picture updated successfully!');
-                }
-                reader.readAsDataURL(file);
-            }
-        }
+// Load user profile saat page load
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadUserProfile();
+});
 
-        // Save Profile
-        function saveProfile(event) {
-            event.preventDefault();
+// Fungsi untuk load data profile
+async function loadUserProfile() {
+    try {
+        const response = await fetch(API_BASE_URL + '/get_profile.php', {
+            method: 'GET',
+            credentials: 'include' // Penting untuk kirim session cookie
+        });
+        
+        const result = await response.json();
+        
+        if (result.logged_in && result.user) {
+            const user = result.user;
             
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            const email = document.getElementById('email').value;
+            // Update display name dan email di sidebar
+            document.getElementById('displayName').textContent = user.full_name;
+            document.getElementById('displayEmail').textContent = user.email;
             
-            // Update display name
-            document.getElementById('displayName').textContent = `${firstName} ${lastName}`;
-            document.getElementById('displayEmail').textContent = email;
+            // Update Personal Information di Overview Tab
+            updateOverviewTab(user);
             
-            showNotification('Profile updated successfully!');
+            // Update form Edit Profile
+            updateEditForm(user);
             
-            // Switch back to overview tab
-            setTimeout(() => {
-                switchTab('overview');
-            }, 1500);
+            // Simpan ke localStorage sebagai backup
+            localStorage.setItem('userData', JSON.stringify(user));
+        } else {
+            // User belum login, redirect ke login page
+            alert('Anda belum login. Silakan login terlebih dahulu.');
+            window.location.href = 'login.html';
         }
+    } catch (error) {
+        console.error('Error loading profile:', error);
+        alert('Gagal memuat profil. Silakan refresh halaman.');
+    }
+}
 
-        // Cancel Edit
-        function cancelEdit() {
+// Update Overview Tab
+function updateOverviewTab(user) {
+    const overviewTab = document.getElementById('overviewTab');
+    
+    // Update Personal Information
+    const personalInfo = overviewTab.querySelector('.bg-gray-50.rounded-xl');
+    if (personalInfo) {
+        const infoHTML = `
+            <h4 class="font-bold text-gray-800 mb-4">Personal Information</h4>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-gray-500">Full Name</p>
+                    <p class="font-semibold text-gray-800">${user.full_name}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Email</p>
+                    <p class="font-semibold text-gray-800">${user.email}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Phone Number</p>
+                    <p class="font-semibold text-gray-800">${user.phone || 'Not set'}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Username</p>
+                    <p class="font-semibold text-gray-800">@${user.username}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Role</p>
+                    <p class="font-semibold text-gray-800">${user.role === 'customer' ? 'Customer' : 'Seller'}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Member Since</p>
+                    <p class="font-semibold text-gray-800">${user.member_since}</p>
+                </div>
+            </div>
+        `;
+        personalInfo.innerHTML = infoHTML;
+    }
+}
+
+// Update Edit Form
+function updateEditForm(user) {
+    document.getElementById('firstName').value = user.first_name || '';
+    document.getElementById('lastName').value = user.last_name || '';
+    document.getElementById('email').value = user.email || '';
+    document.getElementById('phone').value = user.phone || '';
+}
+
+// Save Profile Changes
+async function saveProfile(event) {
+    event.preventDefault();
+    
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    
+    if (!firstName || !email) {
+        showNotification('First name and email are required', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch(API_BASE_URL + '/update_profile.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                first_name: firstName,
+                last_name: lastName,
+                email: email,
+                phone: phone
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            showNotification('Profile updated successfully!', 'success');
+            // Reload profile data
+            await loadUserProfile();
+            // Switch ke overview tab
             switchTab('overview');
+        } else {
+            showNotification(result.message || 'Failed to update profile', 'error');
         }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('An error occurred while updating profile', 'error');
+    }
+}
 
-        // Change Password
-        function changePassword(event) {
-            event.preventDefault();
-            
-            const currentPassword = document.getElementById('currentPassword').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            if (!currentPassword || !newPassword || !confirmPassword) {
-                showNotification('Please fill all password fields!', 'error');
-                return;
-            }
-            
-            if (newPassword !== confirmPassword) {
-                showNotification('New passwords do not match!', 'error');
-                return;
-            }
-            
-            if (newPassword.length < 8) {
-                showNotification('Password must be at least 8 characters!', 'error');
-                return;
-            }
-            
-            // Clear form
+// Change Password
+async function changePassword(event) {
+    event.preventDefault();
+    
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        showNotification('All password fields are required', 'error');
+        return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        showNotification('New password and confirmation do not match', 'error');
+        return;
+    }
+    
+    if (newPassword.length < 8) {
+        showNotification('Password must be at least 8 characters', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch(API_BASE_URL + '/change_password.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                current_password: currentPassword,
+                new_password: newPassword
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            showNotification('Password changed successfully!', 'success');
+            // Reset form
             document.getElementById('currentPassword').value = '';
             document.getElementById('newPassword').value = '';
             document.getElementById('confirmPassword').value = '';
-            
-            showNotification('Password changed successfully!');
+        } else {
+            showNotification(result.message || 'Failed to change password', 'error');
         }
-
-        // Toggle 2FA
-        function toggle2FA(checkbox) {
-            if (checkbox.checked) {
-                showNotification('Two-Factor Authentication enabled!');
-            } else {
-                showNotification('Two-Factor Authentication disabled!');
-            }
-        }
-
-        // End Session
-        function endSession(button) {
-            const sessionElement = button.closest('.flex');
-            sessionElement.style.opacity = '0.5';
-            button.disabled = true;
-            button.textContent = 'Ended';
-            showNotification('Session ended successfully!');
-        }
-
-        // Logout
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                showNotification('Logging out...');
-                setTimeout(() => {
-                    window.location.href = '#';
-                }, 1500);
-            }
-        }
-
-        // Load More Activity
-        function loadMoreActivity() {
-            showNotification('Loading more activities...');
-        }
-
-        // Show Notification
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            const notificationText = document.getElementById('notificationText');
-            const icon = notification.querySelector('i');
-            
-            notificationText.textContent = message;
-            
-            if (type === 'success') {
-                icon.className = 'fas fa-check-circle text-green-500 text-xl';
-            } else if (type === 'error') {
-                icon.className = 'fas fa-exclamation-circle text-red-500 text-xl';
-            }
-            
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        // Smooth scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        });
-
-        // Form validation on input
-        document.querySelectorAll('input[type="email"]').forEach(input => {
-            input.addEventListener('blur', function() {
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(this.value) && this.value !== '') {
-                    this.style.borderColor = '#ef4444';
-                    showNotification('Please enter a valid email address!', 'error');
-                } else {
-                    this.style.borderColor = '#7A5AF8';
-                }
-            });
-        });
-
-        document.querySelectorAll('input[type="tel"]').forEach(input => {
-            input.addEventListener('blur', function() {
-                const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
-                if (!phoneRegex.test(this.value.replace(/\s/g, '')) && this.value !== '') {
-                    this.style.borderColor = '#ef4444';
-                    showNotification('Please enter a valid phone number!', 'error');
-                } else {
-                    this.style.borderColor = '#7A5AF8';
-                }
-            });
-        });
-
-        // Auto-resize textarea
-        document.querySelectorAll('textarea').forEach(textarea => {
-            textarea.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = this.scrollHeight + 'px';
-            });
-        });
-
-        // Initialize - load saved data from localStorage simulation
-        window.addEventListener('DOMContentLoaded', function() {
-            // Simulate loading animation
-            setTimeout(() => {
-                showNotification('Profile loaded successfully!');
-            }, 500);
-        });
-
-        // Script ini WAJIB ada di SETIAP halaman biar status login konsisten
-function checkLoginStatus() {
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  const userName = localStorage.getItem('userName');
-
-  if (isLoggedIn && userName) {
-    // Sudah login → sembunyiin Login/Sign Up, tampilkan user info
-    const auth = document.getElementById('auth-buttons');
-    const user = document.getElementById('user-info');
-    if (auth) auth.classList.add('hidden');
-    if (user) {
-      user.classList.remove('hidden');
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('An error occurred while changing password', 'error');
     }
-  } else {
-    // Belum login
-    const auth = document.getElementById('auth-buttons');
-    const user = document.getElementById('user-info');
-    if (auth) auth.classList.remove('hidden');
-    if (user) user.classList.add('hidden');
-  }
 }
 
-function logout() {
-  localStorage.removeItem('isLoggedIn');
-  localStorage.removeItem('userName');
-  localStorage.removeItem('userRole');
-  
-  // Update UI langsung + tutup dropdown kalau ada
-  const auth = document.getElementById('auth-buttons');
-  const user = document.getElementById('user-info');
-  const dropdown = document.getElementById('dropdown-menu');
-  if (auth) auth.classList.remove('hidden');
-  if (user) user.classList.add('hidden');
-  if (dropdown) dropdown.classList.add('hidden');
-
-  alert('Kamu telah logout 👋');
+// Switch Tab Function
+function switchTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.add('hidden');
+    });
+    
+    // Remove active class from all buttons
+    document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active', 'text-primary', 'border-b-2', 'border-primary');
+        btn.classList.add('text-gray-500');
+    });
+    
+    // Show selected tab
+    const tabMap = {
+        'overview': 'overviewTab',
+        'edit': 'editTab',
+        'security': 'securityTab',
+        'activity': 'activityTab'
+    };
+    
+    const selectedTab = document.getElementById(tabMap[tabName]);
+    if (selectedTab) {
+        selectedTab.classList.remove('hidden');
+    }
+    
+    // Add active class to clicked button
+    const activeBtn = document.querySelector(`[data-tab="${tabName}"]`);
+    if (activeBtn) {
+        activeBtn.classList.add('active', 'text-primary', 'border-b-2', 'border-primary');
+        activeBtn.classList.remove('text-gray-500');
+    }
 }
 
-// Dropdown avatar
-document.getElementById('avatar-button')?.addEventListener('click', function(e) {
-  e.stopPropagation();
-  document.getElementById('dropdown-menu')?.classList.toggle('hidden');
-});
+// Show Notification
+function showNotification(message, type = 'success') {
+    const notification = document.getElementById('notification');
+    const notificationText = document.getElementById('notificationText');
+    
+    notificationText.textContent = message;
+    
+    // Change icon based on type
+    const icon = notification.querySelector('i');
+    if (type === 'error') {
+        icon.className = 'fas fa-exclamation-circle text-red-500 text-xl';
+    } else {
+        icon.className = 'fas fa-check-circle text-green-500 text-xl';
+    }
+    
+    notification.classList.add('show');
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 3000);
+}
 
-// Tutup dropdown kalau klik luar
-document.addEventListener('click', () => {
-  document.getElementById('dropdown-menu')?.classList.add('hidden');
-});
+// Cancel Edit
+function cancelEdit() {
+    loadUserProfile(); // Reload original data
+    switchTab('overview');
+}
 
-// Jalankan tiap halaman dibuka
-window.addEventListener('load', checkLoginStatus);
+// Logout Function
+async function logout() {
+    try {
+        const response = await fetch(API_BASE_URL + '/logout.php', {
+            method: 'POST',
+            credentials: 'include'
+        });
+        
+        if (response.ok) {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        localStorage.clear();
+        window.location.href = 'login.html';
+    }
+}
+
+// Upload Image (placeholder)
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('profileImage').src = e.target.result;
+            showNotification('Profile picture updated!', 'success');
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Toggle 2FA (placeholder)
+function toggle2FA(checkbox) {
+    if (checkbox.checked) {
+        showNotification('Two-factor authentication enabled', 'success');
+    } else {
+        showNotification('Two-factor authentication disabled', 'success');
+    }
+}
+
+// End Session (placeholder)
+function endSession(button) {
+    const sessionDiv = button.closest('.flex');
+    sessionDiv.style.opacity = '0.5';
+    showNotification('Session ended', 'success');
+    setTimeout(() => {
+        sessionDiv.remove();
+    }, 1000);
+}
+
+// Load More Activity (placeholder)
+function loadMoreActivity() {
+    showNotification('Loading more activities...', 'success');
+}

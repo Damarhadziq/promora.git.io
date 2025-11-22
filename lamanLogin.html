@@ -405,6 +405,68 @@ async function handleRegister(e) {
         alert('Terjadi kesalahan: ' + error.message);
     }
 }
+
+// Tambahkan di bagian atas script
+const API_BASE_URL = 'backend/api';
+
+// Fungsi untuk cek session saat page load
+async function checkSession() {
+    try {
+        const response = await fetch(API_BASE_URL + '/check_session.php');
+        const result = await response.json();
+        
+        if (result.logged_in) {
+            // User sudah login, sync ke localStorage
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userId', result.user.id);
+            localStorage.setItem('userName', result.user.first_name);
+            localStorage.setItem('userEmail', result.user.email);
+            localStorage.setItem('userRole', result.user.role);
+            return true;
+        } else {
+            // User belum login
+            localStorage.removeItem('isLoggedIn');
+            return false;
+        }
+    } catch (error) {
+        console.error('Error checking session:', error);
+        return false;
+    }
+}
+
+// Panggil saat page load
+window.addEventListener('DOMContentLoaded', async () => {
+    const isLoggedIn = await checkSession();
+    
+    // Jika sudah login dan ada di halaman login, redirect ke home
+    if (isLoggedIn && window.location.pathname.includes('login.html')) {
+        window.location.href = 'index.html';
+    }
+});
+
+// Fungsi logout
+async function handleLogout() {
+    try {
+        const response = await fetch(API_BASE_URL + '/logout.php', {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            // Hapus localStorage
+            localStorage.clear();
+            alert('Logout berhasil!');
+            window.location.href = 'login.html';
+        }
+    } catch (error) {
+        console.error('Error logout:', error);
+        // Tetap hapus localStorage meskipun API error
+        localStorage.clear();
+        window.location.href = 'login.html';
+    }
+}
+
     </script>
 </body>
 </html>

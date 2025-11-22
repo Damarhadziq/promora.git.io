@@ -1,5 +1,7 @@
 <?php
 // api/login.php
+session_start();
+
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
@@ -51,6 +53,17 @@ if ($stmt->rowCount() > 0) {
             exit();
         }
         
+        // Simpan data user ke SESSION
+        $_SESSION['user_id'] = $row['id'];
+        $_SESSION['username'] = $row['username'];
+        $_SESSION['email'] = $row['email'];
+        $_SESSION['first_name'] = $row['first_name'];
+        $_SESSION['last_name'] = $row['last_name'];
+        $_SESSION['role'] = $row['role'];
+        $_SESSION['phone'] = $row['phone'];
+        $_SESSION['logged_in'] = true;
+        $_SESSION['login_time'] = time();
+        
         http_response_code(200);
         echo json_encode(array(
             "message" => "Login berhasil",
@@ -63,7 +76,8 @@ if ($stmt->rowCount() > 0) {
                 "role" => $row['role'],
                 "phone" => $row['phone'],
                 "created_at" => $row['created_at']
-            )
+            ),
+            "session_id" => session_id() // Kirim session ID untuk debug
         ));
     } else {
         http_response_code(401);
