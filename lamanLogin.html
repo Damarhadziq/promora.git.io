@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promora - Login & Daftar</title>
+    <link
+      rel="shortcut icon"
+      href="./assets/img/logo.png"
+      type="image/x-icon"
+    />
+    <!-- --------- UNICONS ---------- -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #7A5AF8 0%, #9B7EF9 100%); }
+        ::-webkit-scrollbar{
+    width: 10px;
+    border-radius: 25px;
+    display: none;
+    }
+    ::-webkit-scrollbar-track{
+        background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb{
+        background: #ccc;
+        border-radius: 30px;
+    }
+    ::-webkit-scrollbar-thumb:hover{
+        background: #bbb;
+    }
+    i{
+        font-size: 24px;
+    }
+    #logo img{
+        width: 50px;
+    }
+        .btn-primary { 
+            background-color: #7A5AF8; 
+            transition: all 0.3s ease; 
+        }
+        .role-card { 
+            transition: all 0.3s ease; 
+            cursor: pointer; 
+            border: 2px solid transparent;
+        }
+        .role-card.selected { 
+            border: 3px solid #7A5AF8; 
+            background: linear-gradient(135deg, rgba(122, 90, 248, 0.05) 0%, rgba(155, 126, 249, 0.05) 100%); 
+        }
+        .input-field:focus { 
+            border-color: #7A5AF8; 
+            box-shadow: 0 0 0 3px rgba(122, 90, 248, 0.1); 
+        }
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .slide-in { animation: slideIn 0.5s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-6xl min-h-screen bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row">
+
+        <!-- Left Side - Branding (Desktop) -->
+        <div class="hidden lg:block lg:w-1/2 gradient-bg relative overflow-hidden">
+            <div class="absolute inset-0 opacity-20">
+                <div class="absolute top-20 left-20 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+                <div class="absolute bottom-20 right-20 w-80 h-80 bg-white rounded-full blur-3xl"></div>
+            </div>
+            <div class="relative z-10 p-16 text-white flex flex-col justify-center">
+                <div class="flex items-center space-x-4 mb-4" id="logo">
+                    <img src="./assets/img/logo.png" alt="">
+                </div>
+
+                <h1 class="text-2xl font-bold mb-2 leading-tight">Jastip Terpercaya,<br/>Promo Terbaik</h1>
+                <p class="text-l text-purple-100 mb-6">Platform digital yang menghubungkan pencari promo dengan jastip terverifikasi dari seluruh dunia.</p>
+
+                <div class="space-y-8">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                            <i class="hgi hgi-stroke hgi-checkmark-badge-01"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-l font-semibold">Seller Terverifikasi</h3>
+                            <p class="text-purple-200">Keamanan terjamin 100%</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                            <i class="hgi hgi-stroke hgi-money-04"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-l font-semibold">Harga Termurah</h3>
+                            <p class="text-purple-200">Langsung dari traveller</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                            <i class="hgi hgi-stroke hgi-zap"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-l font-semibold">Proses Cepat</h3>
+                            <p class="text-purple-200">Order langsung masuk</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-10 grid grid-cols-3 gap-6 text-left max-w-md gap-x-0">
+                <div>
+                    <p class="text-3xl font-bold">10K+</p>
+                    <p class="text-xs text-purple-200 mt-1">Happy Customers</p>
+                </div>
+                <div>
+                    <p class="text-3xl font-bold">500+</p>
+                    <p class="text-xs text-purple-200 mt-1">Trusted Sellers</p>
+                </div>
+                <div>
+                    <p class="text-3xl font-bold">4.9</p>
+                    <p class="text-xs text-purple-200 mt-1">Rating</p>
+                </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Right Side - Form -->
+        <div class="w-full lg:w-1/2 p-8 lg:p-16 flex items-center h-full overflow-y-auto">
+
+
+            <!-- Mobile Logo -->
+            <div class="lg:hidden flex items-center justify-center mb-10">
+                <div class="w-14 h-14 bg-[#7A5AF8] rounded-2xl flex items-center justify-center">
+                    <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                    </svg>
+                </div>
+                <span class="ml-3 text-3xl font-bold text-[#7A5AF8]">Promora</span>
+            </div>
+
+            <div class="w-full max-w-md mx-auto">
+
+                <!-- Login Form -->
+                <div id="login-container" class="fade-in">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-1 text-center lg:text-left">Selamat Datang Kembali!</h2>
+                    <p class="text-l text-gray-600 mb-4 text-center lg:text-left">Masuk untuk melanjutkan berbelanja atau jualan</p>
+
+                    <!-- Role Selection -->
+                    <div class="mb-4">
+                        <p class="text-sm font-semibold text-gray-700 mb-4">Masuk sebagai:</p>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="role-card selected rounded-2xl p-6 text-center" onclick="selectRole('customer')">
+                                <div class="w-14 h-14 bg-[#7A5AF8] bg-opacity-10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-[#7A5AF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                </div>
+                                <p class="font-bold text-gray-900">Customer</p>
+                            </div>
+                            <div class="role-card rounded-2xl p-6 text-center border-2 border-gray-200" onclick="selectRole('seller')">
+                                <div class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    </svg>
+                                </div>
+                                <p class="font-bold text-gray-900">Seller</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form onsubmit="handleLogin(event)">
+                        <div class="space-y-2">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Email atau Username</label>
+                                <input type="text" required class="text-sm w-full px-4 py-4 border-2 border-gray-200 rounded-xl input-field outline-none" placeholder="Masukkan email / username">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                                <div class="relative">
+                                    <input type="password" id="login-pass" required class="text-sm w-full px-5 py-4 border-2 border-gray-200 rounded-xl input-field outline-none pr-14" placeholder="Masukkan password">
+                                    <button type="button" onclick="togglePass('login-pass')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <label class="flex items-center"><input type="checkbox" class="w-5 h-5 text-[#7A5AF8] rounded"><span class="ml-3 text-sm text-gray-600">Ingat saya</span></label>
+                                <a href="#" class="text-sm font-semibold text-[#7A5AF8] hover:text-[#6346E8]">Lupa password?</a>
+                            </div>
+
+                           <button type="submit" class="mt-4 w-full btn-primary text-white font-bold py-4 rounded-xl text-lg">Masuk</button>
+                        </div>
+                    </form>
+
+                    <p class="mt-4 text-center text-gray-600">
+                        Belum punya akun? <button onclick="switchToRegister()" class="font-bold text-[#7A5AF8] hover:text-[#6346E8]">Daftar sekarang</button>
+                    </p>
+                    <p class="mt-4 text-center text-gray-600">
+                        Masuk sebagai admin? <button onclick="window.location.href='loginAdmin.html'" class="font-bold text-[#7A5AF8] hover:text-[#6346E8]">Masuk</button>
+                    </p>
+                </div>
+
+                <!-- Register Form (Hidden by default) -->
+                <div id="register-container" class="hidden">
+                    <h2 class="text-4xl font-bold text-gray-900 mb-3 text-center lg:text-left">Buat Akun Baru</h2>
+                    <p class="text-gray-600 mb-10 text-center lg:text-left">Pilih role dan mulai berjualan atau berbelanja</p>
+
+                    <!-- Role Selection Register -->
+                    <div class="mb-8">
+                        <p class="text-sm font-semibold text-gray-700 mb-4">Daftar sebagai:</p>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="role-card selected rounded-2xl p-6 text-center" onclick="selectRoleReg('customer')">
+                                <div class="w-14 h-14 bg-[#7A5AF8] bg-opacity-10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-[#7A5AF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                </div>
+                                <p class="font-bold text-gray-900">Customer</p>
+                            </div>
+                            <div class="role-card rounded-2xl p-6 text-center border-2 border-gray-200" onclick="selectRoleReg('seller')">
+                                <div class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    </svg>
+                                </div>
+                                <p class="font-bold text-gray-900">Seller</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form onsubmit="handleRegister(event)" class="space-y-5">
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="text" required placeholder="Nama Depan" class="px-5 py-4 border-2 border-gray-200 rounded-xl input-field">
+                            <input type="text" required placeholder="Nama Belakang" class="px-5 py-4 border-2 border-gray-200 rounded-xl input-field">
+                        </div>
+                        <input type="email" required placeholder="Email" class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl input-field">
+                        <input type="text" required placeholder="Username" class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl input-field">
+                        <input type="tel" required placeholder="Nomor WhatsApp (+62...)" class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl input-field">
+                        
+                        <div class="relative">
+                            <input type="password" id="reg-pass" required placeholder="Password (min. 8 karakter)" class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl input-field pr-14">
+                            <button type="button" onclick="togglePass('reg-pass')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            </button>
+                        </div>
+                        
+                        <div class="relative">
+                            <input type="password" required placeholder="Konfirmasi Password" class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl input-field pr-14">
+                        </div>
+
+                        <!-- CARD UPLOAD KTP (Hanya muncul jika role = seller) -->
+                        <div id="ktp-upload-section" class="hidden mt-6">
+                            <p class="text-sm font-semibold text-gray-700 mb-3">Upload KTP <span class="text-red-500">*</span></p>
+                            <div class="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-[#7A5AF8] transition-colors" 
+                                onclick="document.getElementById('ktp-input').click()">
+                                <input type="file" id="ktp-input" name="ktp" accept="image/*" required class="hidden">
+                                
+                                <div id="ktp-preview" class="mt-4 hidden">
+                                    <img id="ktp-img" class="max-h-64 mx-auto rounded-xl shadow-lg">
+                                    <p class="mt-3 text-sm text-gray-600" id="ktp-filename"></p>
+                                </div>
+
+                                <div id="ktp-placeholder">
+                                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"></path>
+                                    </svg>
+                                    <p class="text-gray-600 font-medium">Klik untuk upload foto/scan KTP</p>
+                                    <p class="text-xs text-gray-500 mt-2">Format: JPG, PNG (max 5MB)</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">Diperlukan untuk verifikasi penjual</p>
+                        </div>
+
+                        <label class="flex items-start space-x-3">
+                            <input type="checkbox" required class="mt-1">
+                            <span class="text-sm text-gray-600">Saya setuju dengan <a href="#" class="text-[#7A5AF8] font-bold">Syarat & Ketentuan</a> serta <a href="#" class="text-[#7A5AF8] font-bold">Kebijakan Privasi</a></span>
+                        </label>
+
+                        <button type="submit" class="w-full btn-primary text-white font-bold py-4 rounded-xl text-lg">Daftar Sekarang</button>
+                    </form>
+
+                    <p class="mt-8 text-center text-gray-600">
+                        Sudah punya akun? <button onclick="switchToLogin()" class="font-bold text-[#7A5AF8] hover:text-[#6346E8]">Masuk di sini</button>
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+<script>
+// ============ TOGGLE LOGIN ↔ REGISTER ============
+function switchToRegister() {
+    document.getElementById('login-container').classList.add('hidden');
+    document.getElementById('register-container').classList.remove('hidden');
+    // Reset ke customer saat buka register
+    selectRoleReg('customer');
+}
+
+function switchToLogin() {
+    document.getElementById('register-container').classList.add('hidden');
+    document.getElementById('login-container').classList.remove('hidden');
+}
+
+// ============ ROLE SELECTION - LOGIN ============
+function selectRole(role) {
+    const cards = document.querySelectorAll('#login-container .role-card');
+    cards.forEach(c => {
+        c.classList.remove('selected');
+        c.classList.add('border-2', 'border-gray-200');
+        const div = c.querySelector('div');
+        const svg = c.querySelector('svg');
+        div.classList.remove('bg-[#7A5AF8]', 'bg-opacity-10');
+        div.classList.add('bg-gray-100');
+        svg.classList.remove('text-[#7A5AF8]');
+        svg.classList.add('text-gray-500');
+    });
+
+    const selected = role === 'customer' ? cards[0] : cards[1];
+    selected.classList.add('selected');
+    selected.classList.remove('border-gray-200');
+    const div = selected.querySelector('div');
+    const svg = selected.querySelector('svg');
+    div.classList.remove('bg-gray-100');
+    div.classList.add('bg-[#7A5AF8]', 'bg-opacity-10');
+    svg.classList.add('text-[#7A5AF8]');
+}
+
+// ============ ROLE SELECTION - REGISTER + KTP CONTROL ============
+let currentRegisterRole = 'customer'; // default
+
+function selectRoleReg(role) {
+    currentRegisterRole = role;
+
+    const cards = document.querySelectorAll('#register-container .role-card');
+    cards.forEach(c => {
+        c.classList.remove('selected');
+        c.classList.add('border-2', 'border-gray-200');
+        const div = c.querySelector('div');
+        const svg = c.querySelector('svg');
+        div.classList.remove('bg-[#7A5AF8]', 'bg-opacity-10');
+        div.classList.add('bg-gray-100');
+        svg.classList.remove('text-[#7A5AF8]');
+        svg.classList.add('text-gray-500');
+    });
+
+    const selected = role === 'customer' ? cards[0] : cards[1];
+    selected.classList.add('selected');
+    selected.classList.remove('border-gray-200');
+    const div = selected.querySelector('div');
+    const svg = selected.querySelector('svg');
+    div.classList.remove('bg-gray-100');
+    div.classList.add('bg-[#7A5AF8]', 'bg-opacity-10');
+    svg.classList.add('text-[#7A5AF8]');
+
+    // KONTROL UPLOAD KTP
+    const ktpSection = document.getElementById('ktp-upload-section');
+    const ktpInput = document.getElementById('ktp-input');
+
+    if (role === 'seller') {
+        ktpSection.classList.remove('hidden');
+        ktpInput.setAttribute('required', 'required');
+    } else {
+        ktpSection.classList.add('hidden');
+        ktpInput.removeAttribute('required');
+        ktpInput.value = ''; // reset file
+        document.getElementById('ktp-preview').classList.add('hidden');
+        document.getElementById('ktp-placeholder').classList.remove('hidden');
+    }
+}
+
+// ============ PREVIEW & VALIDASI KTP ============
+document.getElementById('ktp-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('ktp-preview');
+    const placeholder = document.getElementById('ktp-placeholder');
+    const img = document.getElementById('ktp-img');
+    const filename = document.getElementById('ktp-filename');
+
+    if (file) {
+        // Validasi ukuran max 5MB
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Ukuran file maksimal 5MB!');
+            e.target.value = '';
+            preview.classList.add('hidden');
+            placeholder.classList.remove('hidden');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            img.src = ev.target.result;
+            preview.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+            filename.textContent = file.name;
+        }
+        reader.readAsDataURL(file);
+    } else {
+        // Jika dibatalkan
+        preview.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+    }
+});
+
+// ============ TOGGLE PASSWORD ============
+function togglePass(id) {
+    const input = document.getElementById(id);
+    input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+// ============ HANDLE LOGIN ============
+async function handleLogin(e) {
+    e.preventDefault();
+    const emailOrUsername = e.target.querySelector('input[type="text"]').value.trim();
+    const password = document.getElementById('login-pass').value;
+    const selectedRole = document.querySelector('#login-container .role-card.selected p').textContent.trim().toLowerCase();
+
+    try {
+        const response = await fetch('backend/api/login.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email_or_username: emailOrUsername,
+                password: password,
+                role: selectedRole
+            })
+        });
+
+        const result = await response.json();
+        
+        console.log('Login status:', response.status); // Debug
+        console.log('Login result:', result); // Debug
+
+        if (response.ok && response.status === 200) {
+            // ✅ Login berhasil
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userId', result.user.id);
+            localStorage.setItem('userName', result.user.first_name);
+            localStorage.setItem('userEmail', result.user.email);
+            localStorage.setItem('userRole', result.user.role);
+
+            showCustomAlert('✅ Login berhasil! Selamat datang di Promora', 'success');
+            
+            setTimeout(() => {
+                window.location.href = result.user.role === 'seller' ? 'homeSeller.html' : 'index.html';
+            }, 1000);
+
+        } else if (response.status === 403) {
+            // ✅ Seller belum diverifikasi
+            showCustomAlert(
+                '⏳ Akun Anda Belum Diverifikasi\n\n' +
+                'Akun seller Anda masih menunggu verifikasi dari admin.\n\n' +
+                '📧 Anda akan menerima notifikasi setelah akun diverifikasi.\n\n' +
+                '💡 Proses verifikasi biasanya memakan waktu 1-2 hari kerja.',
+                'warning'
+            );
+        } else if (response.status === 401) {
+            // ✅ Bedakan pesan error antara Role salah vs Password salah
+            if (result.message && result.message.toLowerCase().includes('role')) {
+                showCustomAlert('⚠️ Role yang dipilih tidak sesuai dengan akun Anda!', 'error');
+            } else {
+                showCustomAlert('❌ Password yang Anda masukkan salah!', 'error');
+            }
+        } else if (response.status === 404) {
+            showCustomAlert('❌ Email atau username tidak ditemukan!', 'error');
+        } else if (response.status === 400) {
+            showCustomAlert('⚠️ ' + (result.message || 'Data tidak lengkap'), 'error');
+        } else {
+            showCustomAlert('❌ ' + (result.message || 'Login gagal. Silakan coba lagi.'), 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showCustomAlert('❌ Terjadi kesalahan koneksi. Silakan coba lagi.', 'error');
+    }
+}
+// ============ HANDLE REGISTER (Dengan upload KTP untuk seller) ============
+async function handleRegister(e) {
+    e.preventDefault();
+
+    const formData = new FormData();
+
+    const firstName = e.target.querySelector('input[placeholder="Nama Depan"]').value.trim();
+    const lastName = e.target.querySelector('input[placeholder="Nama Belakang"]').value.trim();
+    const email = e.target.querySelector('input[type="email"]').value.trim();
+    const username = e.target.querySelector('input[placeholder="Username"]').value.trim();
+    const phone = e.target.querySelector('input[placeholder*="WhatsApp"]').value.trim();
+    const password = document.getElementById('reg-pass').value;
+    const confirmPassword = e.target.querySelector('input[placeholder="Konfirmasi Password"]').value;
+
+    if (password !== confirmPassword) {
+        showCustomAlert('Password dan konfirmasi password tidak cocok!', 'error');
+        return;
+    }
+    if (password.length < 8) {
+        showCustomAlert('Password minimal 8 karakter!', 'error');
+        return;
+    }
+
+    formData.append('first_name', firstName);
+    formData.append('last_name', lastName);
+    formData.append('email', email);
+    formData.append('username', username);
+    formData.append('phone', phone);
+    formData.append('password', password);
+    formData.append('role', currentRegisterRole);
+
+    if (currentRegisterRole === 'seller') {
+        const ktpFile = document.getElementById('ktp-input').files[0];
+        if (!ktpFile) {
+            showCustomAlert('KTP wajib diupload untuk seller!', 'error');
+            return;
+        }
+        formData.append('ktp', ktpFile);
+    }
+
+    try {
+        const response = await fetch('backend/api/register.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+        
+        console.log('Register status:', response.status); // Debug
+        console.log('Register result:', result); // Debug
+
+        // ✅ FIX: Cek response.ok ATAU status 201
+        if ((response.ok || response.status === 201) && result.success) {
+            
+            if (result.user.role === 'seller' && result.user.is_verified === 0) {
+                // ✅ Seller belum verified - TAMPILKAN ALERT DAN KEMBALI KE LOGIN
+                showCustomAlert(
+                    '✅ Pendaftaran Berhasil!\n\n' +
+                    '⏳ Akun seller Anda sedang menunggu verifikasi dari admin.\n\n' +
+                    '📧 Anda akan menerima notifikasi setelah akun diverifikasi.\n\n' +
+                    '💡 Silakan login setelah akun Anda diverifikasi.',
+                    'warning'
+                );
+                
+                // Reset form
+                e.target.reset();
+                document.getElementById('ktp-preview').classList.add('hidden');
+                document.getElementById('ktp-placeholder').classList.remove('hidden');
+                
+                // Kembali ke login setelah 3 detik
+                setTimeout(() => {
+                    switchToLogin();
+                }, 3000);
+                
+            } else if (result.user.role === 'customer') {
+                // ✅ Customer langsung verified - REDIRECT KE HOME
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userId', result.user.id);
+                localStorage.setItem('userName', result.user.first_name);
+                localStorage.setItem('userEmail', result.user.email);
+                localStorage.setItem('userRole', result.user.role);
+
+                showCustomAlert('✅ Pendaftaran berhasil! Selamat datang di Promora 🎉', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            }
+        } else {
+            // ✅ Tampilkan error message dari server
+            showCustomAlert(result.message || 'Registrasi gagal. Silakan coba lagi.', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showCustomAlert('Terjadi kesalahan saat registrasi. Silakan coba lagi.', 'error');
+    }
+}
+// ============ CUSTOM ALERT CANTIK ============
+function showCustomAlert(message, type = 'info') {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `fixed top-4 right-4 z-50 p-6 rounded-2xl shadow-2xl max-w-md`;
+    
+    let bgColor = '';
+    let icon = '';
+    
+    if (type === 'success') {
+        bgColor = 'bg-gradient-to-r from-green-500 to-green-600';
+        icon = '✅';
+    } else if (type === 'warning') {
+        bgColor = 'bg-gradient-to-r from-yellow-500 to-orange-500';
+        icon = '⏳';
+    } else if (type === 'error') {
+        bgColor = 'bg-gradient-to-r from-red-500 to-red-600';
+        icon = '❌';
+    } else {
+        bgColor = 'bg-gradient-to-r from-blue-500 to-blue-600';
+        icon = 'ℹ️';
+    }
+    
+    alertDiv.className += ` ${bgColor} text-white`;
+    
+    alertDiv.innerHTML = `
+        <div class="flex items-start space-x-4">
+            <div class="text-3xl">${icon}</div>
+            <div class="flex-1">
+                <p class="text-sm leading-relaxed whitespace-pre-line">${message}</p>
+            </div>
+            <button onclick="this.closest('div').parentElement.remove()" 
+                    class="text-white hover:text-gray-200 text-2xl font-bold leading-none">
+                ×
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    // Auto remove after 6 seconds
+    setTimeout(() => {
+        alertDiv.style.transition = 'all 0.5s ease-out';
+        alertDiv.style.opacity = '0';
+        alertDiv.style.transform = 'translateX(100%)';
+        setTimeout(() => alertDiv.remove(), 500);
+    }, 6000);
+}
+
+// ============ INIT: Pastikan KTP hidden saat pertama load ============
+document.addEventListener('DOMContentLoaded', () => {
+    // Default register role = customer (KTP hidden)
+    selectRoleReg('customer');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+.primary {
+  background-color: #7A5AF8;
+}
+
+.primary-color {
+  background: #7A5AF8;
+}
+
+.primary-color:hover {
+  background: #6346E8; /* warna lebih gelap → hover bayar */
+}
+
+/* tombol kembali */
+.hover-primary-color:hover {
+  background: #7A5AF8;
+  color: white;
+}
+
+.primary-dark {
+  background-color: #6346E8;
+}
+
+.text-primary {
+  color: #7A5AF8;
+}
+
+.text-primary-dark {
+  color: #6346E8;
+}
+
+/* ----- CHANGE THE SCROLL BAR DESIGN ----- */
+::-webkit-scrollbar{
+    width: 10px;
+    border-radius: 25px;
+    display: none;
+}
+::-webkit-scrollbar-track{
+    background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb{
+    background: #ccc;
+    border-radius: 30px;
+}
+::-webkit-scrollbar-thumb:hover{
+    background: #bbb;
+}
+
+.primary-color {
+    background: #7A5AF8;
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, #7A5AF8 0%, #9B7EFF 100%);
+}
+a{
+    cursor: pointer;
+}

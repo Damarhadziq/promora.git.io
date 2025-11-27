@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tentang Promora - Platform Jasa Titip Terpercaya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#7A5AF8",
+            },
+          },
+        },
+      };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./assets/css/about.css" />
+    <link
+      rel="shortcut icon"
+      href="./assets/img/logo.png"
+      type="image/x-icon"
+    />
+    <!-- --------- UNICONS ---------- -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css"
+    />
+  </head>
+  <body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex justify-between items-center">
+          <a href="#home" class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2">
+              <img
+                class="h-8 flex items-center justify-center"
+                src="./assets/img/Container.png"
+                alt=""
+              />
+            </div>
+          </a>
+
+          <div class="hidden md:flex space-x-8">
+            <a
+              href="index.html"
+              class="text-gray-700 hover:text-purple-600 font-medium"
+              >Home</a
+            >
+            <a
+              href="explore.html"
+              class="text-gray-700 hover:text-purple-600 font-medium"
+              >Explore</a
+            >
+            <a href="#contact" class="text-purple-700 hover:text-purple-600 font-medium"
+              >About</a
+            >
+          </div>
+
+          <!-- Keranjang + Auth Area -->
+              <div class="flex items-center space-x-5">
+                <a href="cart.html" class="hover:opacity-80 transition">
+                  <img src="./assets/img/cart.png" alt="Cart" class="h-6 w-6" />
+                </a>
+
+                <!-- LOGIN & SIGN UP (muncul kalau BELUM login) -->
+                <div id="auth-buttons" class="flex items-center space-x-3">
+                  <button onclick="window.location.href='lamanLogin.html'" 
+                          class="text-gray-700 font-medium px-4 py-2 hover:text-purple-600 transition">
+                    Login
+                  </button>
+                  <button onclick="window.location.href='lamanLogin.html'" 
+                          class="bg-purple-600 text-white px-6 py-2 rounded-full font-medium hover:bg-purple-700 transition">
+                    Sign Up
+                  </button>
+                </div>
+
+                <!-- USER INFO (muncul kalau SUDAH login) -->
+                <div id="user-info" class="hidden items-center space-x-4">
+                  <span id="user-name" class="font-medium text-gray-800"></span>
+
+                  <div class="relative">
+                    <button id="avatar-button" class="focus:outline-none flex items-center space-x-3">
+                      <img id="user-avatar" src="./assets/img/user.png" alt="Profile" 
+                          class="h-10 w-10 rounded-full object-cover border-2 border-purple-600 hover:opacity-90 cursor-pointer" />
+                      <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+
+                    <div id="dropdown-menu" class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-50">
+                      <a href="profile.html" class="block px-4 py-3 text-gray-700 hover:bg-purple-50 transition">Profil Saya</a>
+                      <a href="orders.html" class="block px-4 py-3 text-gray-700 hover:bg-purple-50 transition">Pesanan Saya</a>
+                      <hr class="my-1">
+                      <button onclick="logout()" class="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 transition">
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white pt-32 pb-20" id="contact">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+          <div class="animate-fade-in">
+            <h1 class="text-5xl font-bold mb-6">Tentang Promora</h1>
+            <p class="text-lg leading-relaxed opacity-90">
+              Platform digital yang menghubungkan pencari promo dengan jasa
+              titip terpercaya di seluruh Indii.
+            </p>
+          </div>
+          <div class="animate-fade-in">
+            <img
+              src="https://images.unsplash.com/photo-1556155092-490a1ba16284?w=800&h=600&fit=crop"
+              alt="Team Collaboration"
+              class="hero-image w-full"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Visi & Misi Section -->
+    <section class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-6">
+        <h2 class="text-4xl font-bold text-center mb-16 section-title">
+          Visi & Misi
+        </h2>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <!-- Visi Card -->
+          <div
+            class="bg-white border-2 border-purple-100 rounded-2xl p-8 card-hover"
+          >
+            <div class="flex items-center mb-4">
+              <div
+                class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4"
+              >
+                <i class="fas fa-eye text-primary text-xl"></i>
+              </div>
+              <h3 class="text-2xl font-bold text-gray-800">Visi</h3>
+            </div>
+            <p class="text-gray-600 leading-relaxed">
+              Menjadi platform jasa titip terdepan di Indonesia yang
+              menghubungkan orang-orang dengan promo menarik melalui shopper
+              terpercaya, memperkuat ekosistem belanja yang aman, transparan,
+              dan mengguntungkan bagi semua pihak.
+            </p>
+          </div>
+
+          <!-- Misi Card -->
+          <div
+            class="bg-white border-2 border-purple-100 rounded-2xl p-8 card-hover"
+          >
+            <div class="flex items-center mb-4">
+              <div
+                class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4"
+              >
+                <i class="fas fa-bullseye text-primary text-xl"></i>
+              </div>
+              <h3 class="text-2xl font-bold text-gray-800">Misi</h3>
+            </div>
+            <p class="text-gray-600 leading-relaxed">
+              Memfasilitasi akses ke produk-produk berkualitas dengan harga
+              kompetitif, sambil memberdayakan shopper dengan platform titip
+              penitipan, pengalaman berbelanja yang mudah, aman, dan terpercaya
+              dengan teknologi modern dan layanan pelanggan yang responsif.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cerita Promora Section -->
+    <section class="py-20 bg-gray-50">
+      <div class="max-w-5xl mx-auto px-6">
+        <h2 class="text-4xl font-bold text-center mb-16 section-title">
+          Cerita Promora
+        </h2>
+
+        <div class="space-y-6 text-gray-700 leading-relaxed text-lg">
+          <p>
+            Promora lahir dari pengalaman pribadi kami yang paling relevan bagi
+            anak-promo manak di berbagai mall serta kebutuhan untuk berbelanja
+            luar negeri dan dalam negeri. Kami mengerti bahwa hanya inang
+            mengisi waktu senggang, mereka punya skill dan hobi khusus yang bisa
+            dijual: belanja dan berburu promo. Tetapi, bagaimana para
+            <span class="text-primary font-semibold"
+              >shopper dan pemburu promo</span
+            >
+            ini bisa bekerja sambil mendapatkan keuntungan dan komidasi
+            sehari-hari?
+          </p>
+
+          <p>
+            Di sisi lain, kami melihat bahwa banyak orang personal shoppers yang
+            menerasa sulat terpaaya ke mall dan tark bisa berbelanja. Namun,
+            mereka kesulitan menemukan pembeli yang dapat dipercaya, cek
+            lokasinya, penilaian jujur dan dengan kredibilatas pasti.
+          </p>
+
+          <p>
+            Dari sinilah ide Promora muncul—sebuah platform yang tidak hanya
+            menghubungkan kedua pihak, tapi juga yang tetap aman,
+            <span class="text-primary font-semibold">transparan</span>, dapat
+            dipercaya, dan menguntungkan bagi semua pihak.
+          </p>
+
+          <p>
+            Kami percaya bahwa kita belanja promo seharusnya mudah, aman, dan
+            menyenangkan. Itulah mengapa Promora hadir—untuk membantu misi buat
+            tersebut ini sudah setiap pengalaman belanja indii.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tim Kami Section -->
+    <section class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-6">
+        <h2 class="text-4xl font-bold text-center mb-4 section-title">
+          Tim Kami
+        </h2>
+        <p class="text-center text-gray-600 mb-16">
+          Kenalan diri kami orang-orang di balik Promora
+        </p>
+
+        <div class="grid md:grid-cols-4 gap-8">
+          <!-- Team Member 1 -->
+          <div class="text-center team-card">
+            <div class="mb-4">
+              <img
+                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop"
+                alt="Sarah Amanda"
+                class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-purple-100"
+              />
+            </div>
+            <h3 class="text-xl font-bold text-gray-800">Sarah Amanda</h3>
+            <p class="text-primary font-medium mb-3">CEO & Founder</p>
+            <div class="flex justify-center space-x-3">
+              <a
+                href="#"
+                class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition"
+              >
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a
+                href="#"
+                class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition"
+              >
+                <i class="fab fa-linkedin"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Team Member 2 -->
+          <div class="text-center team-card">
+            <div class="mb-4">
+              <img
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop"
+                alt="Rizki Pratama"
+                class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-purple-100"
+              />
+            </div>
+            <h3 class="text-xl font-bold text-gray-800">Rizki Pratama</h3>
+            <p class="text-primary font-medium mb-3">CTO</p>
+            <div class="flex justify-center space-x-3">
+              <a
+                href="#"
+                class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition"
+              >
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a
+                href="#"
+                class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition"
+              >
+                <i class="fab fa-linkedin"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Team Member 3 -->
+          <div class="text-center team-card">
+            <div class="mb-4">
+              <img
+                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop"
+                alt="Dina Kartika"
+                class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-purple-100"
+              />
+            </div>
+            <h3 class="text-xl font-bold text-gray-800">Dina Kartika</h3>
+            <p class="text-primary font-medium mb-3">Head of Operations</p>
+            <div class="flex justify-center space-x-3">
+              <a
+                href="#"
+                class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition"
+              >
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a
+                href="#"
+                class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition"
+              >
+                <i class="fab fa-linkedin"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Team Member 4 -->
+          <div class="text-center team-card">
+            <div class="mb-4">
+              <img
+                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop"
+                alt="Andi Wijaya"
+                class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-purple-100"
+              />
+            </div>
+            <h3 class="text-xl font-bold text-gray-800">Andi Wijaya</h3>
+            <p class="text-primary font-medium mb-3">Marketing Director</p>
+            <div class="flex justify-center space-x-3">
+              <a
+                href="#"
+                class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition"
+              >
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a
+                href="#"
+                class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition"
+              >
+                <i class="fab fa-linkedin"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Nilai Utama Kami Section -->
+    <section class="py-20 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-6">
+        <h2 class="text-4xl font-bold text-center mb-4 section-title">
+          Nilai Utama Kami
+        </h2>
+        <p class="text-center text-gray-600 mb-16">
+          Prinsip-prinsip yang memandu setiap langkah kami
+        </p>
+
+        <div class="grid md:grid-cols-4 gap-8">
+          <!-- Value 1 -->
+          <div class="bg-white rounded-2xl p-8 text-center card-hover">
+            <div
+              class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <i class="fas fa-handshake text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-3">Kepercayaan</h3>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Kami membangun kepercayaan melalui transaksi yang aman dan
+              transparansi penuh dalam setiap proses.
+            </p>
+          </div>
+
+          <!-- Value 2 -->
+          <div class="bg-white rounded-2xl p-8 text-center card-hover">
+            <div
+              class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <i class="fas fa-eye text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-3">Transparansi</h3>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Setiap detail produk, harga dan biaya ditampilkan dengan jelas
+              tanpa ada biaya tersembunyi.
+            </p>
+          </div>
+
+          <!-- Value 3 -->
+          <div class="bg-white rounded-2xl p-8 text-center card-hover">
+            <div
+              class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <i class="fas fa-shield-alt text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-3">Keamanan</h3>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Sistem pembayaran aman dan perlindungan data pelanggan adalah
+              prioritas utama kami.
+            </p>
+          </div>
+
+          <!-- Value 4 -->
+          <div class="bg-white rounded-2xl p-8 text-center card-hover">
+            <div
+              class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <i class="fas fa-rocket text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-3">Kemudahan</h3>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Antarmuka yang intuitif dan proses yang simple membuat transaksi
+              menjadi menyenangkan.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="gradient-bg text-white py-20">
+      <div class="max-w-4xl mx-auto px-6 text-center">
+        <h2 class="text-4xl font-bold mb-4">Bergabung dengan Promora</h2>
+        <p class="text-lg mb-8 opacity-90">
+          Nikmati pengalaman jastip terpercaya di seluruh Indonesia dan dapatkan
+          promo terbaik dari mall favorit Anda.
+        </p>
+        <button
+          onclick="window.location.href = `lamanLogin.html`"
+          class="bg-white text-purple-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition text-lg">Mulai Sekarang
+        </button>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-purple-900 text-white py-12">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          <div>
+            <a href="index.html" class="flex items-center space-x-2 my-4">
+              <div class="flex items-center space-x-2">
+                <img
+                  class="h-8 flex items-center justify-center"
+                  src="./assets/img/Container.png"
+                  alt=""
+                />
+              </div>
+            </a>
+            <p class="text-purple-200 text-sm">
+              Platform digital yang menghubungkan pencari promo dengan jastip
+              terpercaya.
+            </p>
+          </div>
+
+          <div>
+            <h4 class="font-bold mb-4">Quick Links</h4>
+            <ul class="space-y-2 text-purple-200">
+              <li><a href="index.html" class="hover:text-white">Home</a></li>
+              <li><a href="#" class="hover:text-white">Promo</a></li>
+              <li><a href="#" class="hover:text-white">Jastip</a></li>
+              <li><a href="#" class="hover:text-white">About</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-bold mb-4">Support</h4>
+            <ul class="space-y-2 text-purple-200">
+              <li><a href="#" class="hover:text-white">Help Center</a></li>
+              <li><a href="#" class="hover:text-white">FAQ</a></li>
+              <li>
+                <a href="#" class="hover:text-white">Terms & Conditions</a>
+              </li>
+              <li><a href="#" class="hover:text-white">Contact Us</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-bold mb-4">Follow Us</h4>
+            <div class="flex space-x-4">
+              <a
+                href="#"
+                class="w-10 h-10 bg-purple-800 rounded-lg flex items-center justify-center hover:bg-purple-700"
+              >
+                <i class="hgi hgi-stroke hgi-instagram"></i>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 bg-purple-800 rounded-lg flex items-center justify-center hover:bg-purple-700"
+              >
+                <i class="hgi hgi-stroke hgi-twitter"></i>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 bg-purple-800 rounded-lg flex items-center justify-center hover:bg-purple-700"
+              >
+                <i class="hgi hgi-stroke hgi-facebook-02"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="border-t border-purple-800 pt-8 text-center text-purple-200 text-sm"
+        >
+          <p>© 2024 Promora — All rights reserved</p>
+        </div>
+      </div>
+    </footer>
+    <script src="./assets/js/about.js"></script>
+  </body>
+</html>

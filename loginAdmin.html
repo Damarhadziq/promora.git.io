@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login • Promora</title>
+  <link rel="shortcut icon" href="./assets/img/logo.png" type="image/x-icon" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    * { font-family: 'Inter', sans-serif; }
+
+    .gradient-bg { 
+      background: linear-gradient(135deg, #7A5AF8 0%, #9B7EF9 100%); 
+    }
+    .btn-primary { 
+      background-color: #7A5AF8; 
+      transition: all 0.3s ease; 
+    }
+    .btn-primary:hover { 
+      background-color: #6346E8; 
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(122, 90, 248, 0.3);
+    }
+    .input-field:focus { 
+      border-color: #7A5AF8; 
+      box-shadow: 0 0 0 4px rgba(122, 90, 248, 0.15); 
+    }
+    .fade-in { animation: fadeIn 0.8s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+
+  <div class="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row">
+
+    <!-- Left Side - Branding -->
+    <div class="w-full lg:w-1/2 gradient-bg p-12 lg:p-16 text-white flex flex-col justify-center relative overflow-hidden">
+      <div class="absolute inset-0 opacity-20">
+        <div class="absolute top-10 left-10 w-80 h-80 bg-white rounded-full blur-3xl"></div>
+        <div class="absolute bottom-10 right-10 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+      </div>
+
+      <div class="relative z-10">
+        <div class="flex items-center gap-4 mb-8">
+          <div class="w-16 h-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+            <i class="ri-shield-check-line text-4xl"></i>
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold">Admin Panel</h1>
+            <p class="text-purple-100">Promora</p>
+          </div>
+        </div>
+        <h2 class="text-4xl font-bold mb-4">Selamat Datang Kembali,</h2>
+        <p class="text-lg text-purple-100">Kelola platform dengan penuh kendali dan aman.</p>
+      </div>
+
+      <div class="mt-12 space-y-6">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+            <i class="ri-user-search-line text-2xl"></i>
+          </div>
+          <div>
+            <h4 class="font-semibold">Verifikasi Seller</h4>
+            <p class="text-sm text-purple-200">Review KTP & data penjual baru</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+            <i class="ri-shield-user-line text-2xl"></i>
+          </div>
+          <div>
+            <h4 class="font-semibold">Keamanan Tinggi</h4>
+            <p class="text-sm text-purple-200">Akses hanya untuk admin terverifikasi</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="mt-16 text-sm text-purple-200">© 2025 Promora • Admin Access Only</p>
+    </div>
+
+    <!-- Right Side - Login Form -->
+    <div class="w-full lg:w-1/2 p-10 lg:p-20 flex items-center">
+      <div class="w-full max-w-md mx-auto">
+        <div class="text-center mb-10">
+          <h2 class="text-3xl font-bold text-gray-900 mb-2">Masuk sebagai Admin</h2>
+          <p class="text-gray-600">Gunakan username dan password admin resmi</p>
+        </div>
+
+        <form onsubmit="handleAdminLogin(event)" class="space-y-7">
+          <!-- Username Field -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              Username Admin
+            </label>
+            <div class="relative">
+              <i class="ri-user-3-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl"></i>
+              <input 
+                type="text" 
+                id="admin-username" 
+                required 
+                autocomplete="username"
+                placeholder="Masukkan username" 
+                class="w-full pl-12 pr-5 py-4 border-2 border-gray-200 rounded-xl input-field outline-none transition-all text-gray-800"
+              >
+            </div>
+          </div>
+
+          <!-- Password Field -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+            <div class="relative">
+              <i class="ri-lock-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl"></i>
+              <input 
+                type="password" 
+                id="admin-pass" 
+                required 
+                autocomplete="current-password"
+                placeholder="Masukkan password" 
+                class="w-full pl-12 pr-14 py-4 border-2 border-gray-200 rounded-xl input-field outline-none transition-all"
+              >
+              <button type="button" onclick="togglePass('admin-pass')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                <i class="ri-eye-line text-xl"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-sm">
+            <label class="flex items-center cursor-pointer">
+              <input type="checkbox" id="remember" class="w-5 h-5 text-[#7A5AF8] rounded focus:ring-[#7A5AF8]">
+              <span class="ml-3 text-gray-600">Ingat saya</span>
+            </label>
+            <a href="#" class="font-semibold text-[#7A5AF8] hover:text-[#6346E8]">Lupa password?</a>
+          </div>
+
+          <button type="submit" class="w-full btn-primary text-white font-bold py-4 rounded-xl text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all mt-8">
+            Masuk ke Dashboard Admin
+          </button>
+        </form>
+
+        <div class="mt-10 text-center">
+          <p class="text-sm text-gray-500">
+            Bukan admin? 
+            <a href="lamanLogin.html" class="font-bold text-[#7A5AF8] hover:text-[#6346E8] hover:underline">
+              Kembali ke login pengguna
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+    function togglePass(id) {
+      const input = document.getElementById(id);
+      const icon = input.nextElementSibling.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('ri-eye-line', 'ri-eye-off-line');
+      } else {
+        input.type = 'password';
+        icon.classList.replace('ri-eye-off-line', 'ri-eye-line');
+      }
+    }
+
+    async function handleAdminLogin(e) {
+      e.preventDefault();
+
+      const username = document.getElementById('admin-username').value.trim();
+      const password = document.getElementById('admin-pass').value;
+      const remember = document.getElementById('remember').checked;
+
+      if (!username || !password) {
+        alert('Username dan password wajib diisi!');
+        return;
+      }
+
+      try {
+        const response = await fetch('backend/api/admin_login.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          if (remember) {
+            localStorage.setItem('adminRemember', 'true');
+          }
+          localStorage.setItem('adminLoggedIn', 'true');
+          alert('Login berhasil! Selamat datang, ' + result.data.full_name);
+          window.location.href = 'admin.html';
+        } else {
+          alert(result.message || 'Login gagal!');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan. Silakan coba lagi.');
+      }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Produk Baru - Promora</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#7A5AF8',
+                        'primary-dark': '#6344E6',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        .upload-area {
+            border: 2px dashed #7A5AF8;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area:hover {
+            background: #F8F7FF;
+        }
+        
+        .upload-area.dragover {
+            background: #F0EDFF;
+            border-color: #6344E6;
+        }
+        
+        .preview-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .preview-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .preview-item .remove-btn:hover {
+            background: #FF4444;
+            color: white;
+        }
+        
+        .preview-item .cover-badge {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            background: #7A5AF8;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex justify-between items-center">
+          <a href="index.html" class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2">
+              <img
+                class="h-8 flex items-center justify-center"
+                src="./assets/img/Container.png"
+                alt=""
+              />
+            </div>
+          </a>
+
+          <!-- Tombol Setting -->
+            <a href="#setting">
+                <button class="text-gray-600 hover:text-primary transition">
+                    <i class="fas fa-cog text-xl"></i>
+                </button>
+            </a>
+            
+          <div class="flex items-center space-x-4">
+            <!-- PROFILE -->
+            <a href="profile.html"><img  
+              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop" 
+              alt="Profile" 
+              class="h-10 w-10 rounded-full object-cover border hover:opacity-90 cursor-pointer"/>
+            </a>
+            
+             </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="max-w-5xl mx-auto px-6 py-6">
+        <div class="flex items-center space-x-2 text-sm text-gray-600">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+            <span>Toko</span>
+            <span>›</span>
+            <a href="homeSeller.html"><span>Produk Saya</span></a>
+            <span>›</span>
+            <span class="text-primary font-medium">Tambah Produk Baru</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-5xl mx-auto px-6 pb-20">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-primary mb-2">Tambah Produk Baru</h1>
+            <p class="text-gray-600">Lengkapi informasi produk untuk ditampilkan di Promora.</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm p-8">
+            <form id="productForm">
+                <!-- Upload Foto -->
+                <div class="mb-6">
+                    <label class="block text-gray-800 font-semibold mb-3">Upload Foto Produk</label>
+                    <div class="upload-area rounded-xl p-12 text-center cursor-pointer" id="uploadArea">
+                        <div class="flex flex-col items-center">
+                            <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
+                                <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                </svg>
+                            </div>
+                            <p class="text-gray-800 font-medium mb-2">Unggah foto produk</p>
+                            <p class="text-gray-500 text-sm mb-1">Format JPG/PNG, maksimal 5MB</p>
+                            <p class="text-gray-400 text-xs">Kamu bisa upload hingga 5 foto (foto pertama akan jadi cover)</p>
+                        </div>
+                        <input type="file" id="fileInput" class="hidden" accept="image/jpeg,image/png" multiple>
+                    </div>
+                    <div id="previewContainer" class="preview-container"></div>
+                </div>
+
+                <!-- Nama Produk -->
+                <div class="mb-6">
+                    <label class="block text-gray-800 font-semibold mb-3">Nama Produk</label>
+                    <input type="text" id="productName" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Contoh: Tas Zara Leather Mini">
+                </div>
+
+                <!-- Brand/Merek -->
+                <div class="mb-6">
+                    <label class="block text-gray-800 font-semibold mb-3">Brand / Merek</label>
+                    <input type="text" id="brand" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Contoh: Zara">
+                </div>
+
+                <!-- Harga Original, Diskon, Harga Promo, dan Fee -->
+                <div class="grid grid-cols-4 gap-4 mb-6">
+                    <div>
+                        <label class="block text-gray-800 font-semibold mb-3">Harga Original</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-3 text-gray-500">Rp</span>
+                            <input type="text" id="originalPrice" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="550000">
+                        </div>
+                        <p class="text-gray-500 text-sm mt-2">Harga sebelum promo</p>
+                    </div>
+                    <div>
+                        <label class="block text-gray-800 font-semibold mb-3">Diskon (%)</label>
+                        <input type="number" id="discount" min="0" max="100" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="15">
+                        <p class="text-gray-500 text-sm mt-2">Persentase diskon</p>
+                    </div>
+                    <div>
+                        <label class="block text-gray-800 font-semibold mb-3">Harga Promo</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-3 text-gray-500">Rp</span>
+                            <input type="text" id="price" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="480000">
+                        </div>
+                        <p class="text-gray-500 text-sm mt-2">Harga setelah diskon</p>
+                    </div>
+                    <div>
+                        <label class="block text-gray-800 font-semibold mb-3">Fee Jastip</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-3 text-gray-500">Rp</span>
+                            <input type="text" id="fee" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="35000">
+                        </div>
+                        <p class="text-gray-500 text-sm mt-2">Fee akan ditambahkan</p>
+                    </div>
+                </div>
+
+                <!-- Stok dan Kategori -->
+                <div class="grid grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-gray-800 font-semibold mb-3">Stok Barang</label>
+                        <input type="number" id="stock" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="10">
+                    </div>
+                    <div>
+                        <label class="block text-gray-800 font-semibold mb-3">Kategori</label>
+                        <select id="category" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-gray-700">
+                            <option value="">Pilih Kategori</option>
+                            <option value="fashion">Fashion</option>
+                            <option value="elektronik">Elektronik</option>
+                            <option value="makanan">Makanan & Minuman</option>
+                            <option value="kecantikan">Kecantikan</option>
+                            <option value="olahraga">Olahraga</option>
+                            <option value="mainan">Mainan & Hobi</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Deskripsi -->
+                <div class="mb-8">
+                    <label class="block text-gray-800 font-semibold mb-3">Deskripsi Produk</label>
+                    <textarea id="description" rows="5" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none" placeholder="Tuliskan detail produk, kondisi, info promo mall, dsb."></textarea>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex items-center justify-between">
+                    <button type="button" id="cancelBtn" class="px-8 py-3 text-primary font-medium hover:bg-purple-50 rounded-lg transition">Batal</button>
+                    <button type="submit" class="px-8 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-dark transition flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>Simpan Produk</span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="text-center mt-6">
+                <p class="text-gray-600">Butuh bantuan? <a href="#" class="text-primary hover:underline">Lihat panduan upload produk</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-primary text-white py-12 mt-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-2xl font-bold">Promora</span>
+                    </div>
+                    <p class="text-purple-200 text-sm">Platform digital yang menghubungkan pencari promo dengan jastip terverifikasi.</p>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-purple-200">
+                        <li><a href="#" class="hover:text-white transition">Home</a></li>
+                        <li><a href="#" class="hover:text-white transition">Promo</a></li>
+                        <li><a href="#" class="hover:text-white transition">Jastip</a></li>
+                        <li><a href="#" class="hover:text-white transition">About</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold mb-4">Support</h3>
+                    <ul class="space-y-2 text-purple-200">
+                        <li><a href="#" class="hover:text-white transition">Help Center</a></li>
+                        <li><a href="#" class="hover:text-white transition">FAQ</a></li>
+                        <li><a href="#" class="hover:text-white transition">Terms & Conditions</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contact Us</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold mb-4">Follow Us</h3>
+                    <div class="flex space-x-3">
+                        <a href="#" class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center hover:bg-opacity-30 transition">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z"/><path d="M12 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center hover:bg-opacity-30 transition">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center hover:bg-opacity-30 transition">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-purple-400 mt-8 pt-8 text-center text-purple-200 text-sm">
+                © 2025 Promora — All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // State untuk menyimpan file yang diupload
+        let uploadedFiles = [];
+        
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const productForm = document.getElementById('productForm');
+        
+        // Click to upload
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        // File input change
+        fileInput.addEventListener('change', handleFiles);
+        
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files).filter(file => 
+                file.type === 'image/jpeg' || file.type === 'image/png'
+            );
+            handleFiles({ target: { files } });
+        });
+        
+        // Handle file uploads
+        function handleFiles(e) {
+            const files = Array.from(e.target.files);
+            
+            // Validasi maksimal 5 foto
+            if (uploadedFiles.length + files.length > 5) {
+                alert('Maksimal 5 foto yang dapat diupload!');
+                return;
+            }
+            
+            files.forEach(file => {
+                // Validasi ukuran file (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`File ${file.name} terlalu besar! Maksimal 5MB.`);
+                    return;
+                }
+                
+                // Validasi tipe file
+                if (!['image/jpeg', 'image/png'].includes(file.type)) {
+                    alert(`File ${file.name} bukan format JPG/PNG!`);
+                    return;
+                }
+                
+                uploadedFiles.push(file);
+                displayPreview(file, uploadedFiles.length - 1);
+            });
+            
+            fileInput.value = ''; // Reset input
+        }
+        
+        // Display preview
+        function displayPreview(file, index) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                div.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview">
+                    <div class="remove-btn" onclick="removeImage(${index})">×</div>
+                    ${index === 0 ? '<div class="cover-badge">Cover</div>' : ''}
+                `;
+                previewContainer.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Remove image
+        window.removeImage = function(index) {
+            uploadedFiles.splice(index, 1);
+            previewContainer.innerHTML = '';
+            uploadedFiles.forEach((file, i) => displayPreview(file, i));
+        };
+        
+        // Format currency input
+        function formatCurrency(input) {
+            let value = input.value.replace(/\D/g, '');
+            input.value = value;
+        }
+        
+        document.getElementById('originalPrice').addEventListener('input', function() {
+            formatCurrency(this);
+        });
+
+        document.getElementById('price').addEventListener('input', function() {
+            formatCurrency(this);
+        });
+        
+        document.getElementById('fee').addEventListener('input', function() {
+            formatCurrency(this);
+        });
+        
+        // Tambahkan di awal script, sebelum form submission
+        let currentUserId = null;
+
+        // Fetch user session
+        async function getUserSession() {
+            try {
+                const response = await fetch('backend/api/get_profile.php');
+                const data = await response.json();
+                if (data.logged_in && data.user) {
+                    currentUserId = data.user.id;
+                } else {
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Panggil saat page load
+        document.addEventListener('DOMContentLoaded', function() {
+            getUserSession();
+        });
+
+        // Form submission
+        productForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Validasi
+            const productName = document.getElementById('productName').value;
+            const brand = document.getElementById('brand').value;
+            const originalPrice = document.getElementById('originalPrice').value;
+            const price = document.getElementById('price').value;
+            const fee = document.getElementById('fee').value;
+            const stock = document.getElementById('stock').value;
+            const category = document.getElementById('category').value;
+            const description = document.getElementById('description').value;
+
+            const discount = document.getElementById('discount').value;
+
+            if (!productName || !brand || !originalPrice || !price || !fee || !stock || !category || !description) {
+                alert('Mohon lengkapi semua field!');
+                return;
+            }
+    
+            
+            // Kirim ke API
+            const formData = new FormData();
+            formData.append("seller_id", currentUserId);
+            formData.append("name", productName);
+            formData.append("brand", brand);
+            formData.append("category", category);
+            formData.append("price", price);
+            formData.append("original_price", originalPrice);
+            formData.append("discount", discount || 0);
+            formData.append("fee", fee);
+            formData.append("stock", stock);
+            formData.append("description", description);
+            formData.append("location", "Bangkok");
+
+            uploadedFiles.forEach(file => {
+                formData.append("images[]", file);
+            });
+
+            fetch("backend/api/products/create.php", {
+            method: "POST",
+            body: formData
+        })
+        .then(res => {
+            console.log('Response status:', res.status);
+            console.log('Response headers:', res.headers);
+            return res.text(); // Ubah ke text dulu untuk lihat response mentah
+        })
+        .then(text => {
+            console.log('Raw response:', text);
+            try {
+                const data = JSON.parse(text);
+                if (data.success) {
+                    alert("Produk berhasil disimpan ke database!");
+                    window.location.href = 'homeSeller.html';
+                } else {
+                    alert("Gagal menyimpan produk: " + (data.message || data.error));
+                }
+            } catch (e) {
+                console.error('Parse error:', e);
+                alert("Server response error: " + text);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("Terjadi kesalahan server: " + error.message);
+        });
+
+        });
+        
+        // Cancel button - UBAH BAGIAN INI
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            if (confirm('Apakah Anda yakin ingin membatalkan? Data yang sudah diisi akan hilang.')) {
+                window.location.href = 'homeSeller.html'; // Redirect ke halaman seller
+            }
+        });
+        
+    </script>
+</body>
+</html>

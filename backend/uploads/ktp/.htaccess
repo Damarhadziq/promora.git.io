@@ -1,0 +1,11 @@
+# Cegah akses langsung ke folder KTP
+<Files *>
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+# Izinkan hanya admin yang bisa akses
+<FilesMatch "\.(jpg|jpeg|png)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>

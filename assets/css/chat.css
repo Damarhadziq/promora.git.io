@@ -1,0 +1,206 @@
+/* Font */
+* {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Gradient Background */
+.chat-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Glass Effect */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+}
+
+/* Gradient Text */
+.gradient-text {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Chat Background Pattern */
+.bg-pattern {
+    background-color: #f0f2f5;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23667eea' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+/* Message Bubble Slide Up */
+.message-bubble {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Typing Indicator Bounce */
+.typing-dot {
+    animation: typingBounce 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.typing-dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typingBounce {
+    0%, 60%, 100% {
+        transform: translateY(0);
+    }
+    30% {
+        transform: translateY(-8px);
+    }
+}
+
+/* Online Status Pulse */
+.pulse-online {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* ============================================
+   MODAL OVERLAY & CONTENT
+   ============================================ */
+
+/* Modal Overlay Animation */
+/* MODAL YANG BENAR-BENAR TIDAK BISA BOCOR – VERSI FINAL */
+/* ============================================
+   MODAL OVERLAY & CONTENT — FIX POSISI KE KANAN
+   ============================================ */
+
+#chatModal {
+    position: fixed !important;
+    inset: 0 !important;                         /* ganti top + left + width + height */
+    display: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 10000 !important;
+    background: rgba(0,0,0,0.45) !important;
+    backdrop-filter: blur(3px);
+}
+
+/* Geser chat ke kanan */
+#chatModal .modal-content {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 6%;           /* <<< nilai ini membuat modal bergeser ke kanan */
+    width: 420px;        /* sesuaikan lebar card chat */
+    max-width: 90%;
+}
+
+/* Tampilkan modal ketika aktif */
+#chatModal.active {
+    display: flex !important;
+}
+
+/* Tambahan opsional agar responsif */
+@media (max-width: 640px) {
+    #chatModal .modal-content {
+        right: 0% !important;   /* biar kembali ke tengah saat HP */
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+
+
+
+/* ============================================
+   BUTTON STYLES
+   ============================================ */
+
+/* Question Button Hover Effect */
+.question-btn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.question-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px -5px rgba(102, 126, 234, 0.4);
+}
+
+.question-btn:active {
+    transform: scale(0.95);
+}
+
+/* ============================================
+   SCROLLBAR STYLES
+   ============================================ */
+
+.chat-scroll::-webkit-scrollbar {
+    width: 5px;
+}
+
+.chat-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb {
+    background: grey;
+    border-radius: 10px;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 640px) {
+    .modal-content {
+        max-height: 95vh !important;
+    }
+}
+
+/* Background halaman detail (produk) */
+/* DETAIL — background gambar */
+
+/* Geser kartu chat ke kanan */
+.chat-wrapper {
+    position: absolute;
+    top: 47%;
+    right: 4%;       /* ubah angka untuk sesuaikan posisi */
+    transform: translateY(-50%);
+    width: 420px;
+    max-width: 90%;
+}
+
+.blur-overlay {
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(6px);      /* >>> tingkat blur */
+    background: rgba(255, 255, 255, 0.25); /* opsional: supaya lebih soft */
+    z-index: 0;
+}

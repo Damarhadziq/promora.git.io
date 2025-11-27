@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promora - Platform Jasa Titip Terpercaya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .primary-color {
+            background-color: #7A5AF8;
+        }
+        
+        .tab-active {
+            background-color: #7A5AF8;
+            color: white;
+        }
+        
+        .tab-inactive {
+            background-color: #F3F4F6;
+            color: #6B7280;
+        }
+        
+        .product-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(122, 90, 248, 0.15);
+        }
+        
+        .btn-primary {
+            background-color: #7A5AF8;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #6346E8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(122, 90, 248, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex justify-between items-center">
+          <a href="index.html" class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2">
+              <img
+                class="h-8 flex items-center justify-center"
+                src="./assets/img/Container.png"
+                alt=""
+              />
+            </div>
+          </a>
+
+          <div class="hidden md:flex space-x-8">
+            <button onclick="switchTab('produk')" id="tab-produk" class="text-grey-700 hover:text-purple-700 font-medium">
+              Produk Saya
+            </button>
+
+            <button onclick="switchTab('order')" id="tab-order" class="text-grey-700 hover:text-purple-700 font-medium">
+                Order Masuk
+            </button>
+
+            <button onclick="switchTab('statistik')" id="tab-statistik" class="text-grey-700 hover:text-purple-700 font-medium">
+                Statistik Toko
+            </button>
+
+            <button onclick="switchTab('pengaturan')" id="tab-pengaturan" class="text-grey-700 hover:text-purple-700 font-medium">
+                Pengaturan Toko
+            </button>
+          </div>
+
+          <!-- Tombol Setting -->
+            <a href="#setting">
+                <button class="text-gray-600 hover:text-primary transition">
+                    <i class="fas fa-cog text-xl"></i>
+                </button>
+            </a>
+            
+          <div class="flex items-center space-x-4">
+            <!-- PROFILE -->
+            <a href="profileSeller.html"><img  
+              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop" 
+              alt="Profile" 
+              class="h-10 w-10 rounded-full object-cover border hover:opacity-90 cursor-pointer"/>
+            </a>
+            
+             </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Profile Section -->
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <div class="bg-white rounded-2xl shadow-sm p-8">
+            <div class="flex items-start justify-between">
+                <div class="flex items-center space-x-6">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop" 
+                             alt="Profile" 
+                             class="w-20 h-20 rounded-2xl object-cover">
+                        <div class="absolute -bottom-1 -right-1 w-7 h-7 bg-[#7A5AF8] rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex items-center space-x-3 mb-2">
+                            <h1 class="text-2xl font-bold text-gray-900">Nadia Jastip Bangkok</h1>
+                            <span class="px-3 py-1 bg-blue-100 text-blue-600 text-xs font-semibold rounded-full">Verified Seller</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Melayani jastip mall Bangkok setiap hari. Trusted seller dengan pengalaman 3+ tahun.</p>
+                        
+                        <div class="flex items-center space-x-6">
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                </svg>
+                                <span class="font-semibold text-gray-900">4.8</span>
+                                <span class="text-gray-600">Rating</span>
+                            </div>
+                            
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-5 h-5 text-[#7A5AF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                </svg>
+                                <span class="font-semibold text-gray-900">156</span>
+                                <span class="text-gray-600">Total Order</span>
+                            </div>
+                            
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-5 h-5 text-[#7A5AF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                </svg>
+                                <span class="font-semibold text-gray-900">24</span>
+                                <span class="text-gray-600">Produk</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="px-5 py-2 border border-[#7A5AF8] text-[#7A5AF8] rounded-lg font-medium hover:bg-[#7A5AF8] hover:text-white transition flex items-center space-x-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                    </svg>
+                    <a href="profileSeller.html"><span>Edit Profil Toko</span></a>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="max-w-7xl mx-auto px-6 pb-12">
+        <!-- Produk Section -->
+        <div id="content-produk">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Produk Kamu</h2>
+                <button onclick="window.location.href='uploadProduk.html'" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span>Tambah Produk Baru</span>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="products-grid">
+                <!-- Products will be inserted here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Order Section (Hidden by default) -->
+        <div id="content-order" class="hidden">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Order Masuk</h2>
+            <div class="bg-white rounded-2xl shadow-sm p-8 text-center">
+                <svg class="w-20 h-20 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
+                <p class="text-gray-600 text-lg">Belum ada order masuk</p>
+            </div>
+        </div>
+
+        <!-- Statistik Section (Hidden by default) -->
+        <div id="content-statistik" class="hidden">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Statistik Toko</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-2xl shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-gray-600 font-medium">Total Penjualan</h3>
+                        <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <p class="text-3xl font-bold text-gray-900">Rp 15.750.000</p>
+                    <p class="text-sm text-green-600 mt-2">+12% dari bulan lalu</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-gray-600 font-medium">Total Order</h3>
+                        <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                        </svg>
+                    </div>
+                    <p class="text-3xl font-bold text-gray-900">156</p>
+                    <p class="text-sm text-green-600 mt-2">+8% dari bulan lalu</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-gray-600 font-medium">Rating Toko</h3>
+                        <svg class="w-8 h-8 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                        </svg>
+                    </div>
+                    <p class="text-3xl font-bold text-gray-900">4.8/5.0</p>
+                    <p class="text-sm text-gray-600 mt-2">Dari 89 review</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pengaturan Section (Hidden by default) -->
+        <div id="content-pengaturan" class="hidden">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Pengaturan Toko</h2>
+            <div class="bg-white rounded-2xl shadow-sm p-8">
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Toko</label>
+                        <input type="text" value="Nadia Jastip Bangkok" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7A5AF8] focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi Toko</label>
+                        <textarea rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7A5AF8] focus:border-transparent">Melayani jastip mall Bangkok setiap hari. Trusted seller dengan pengalaman 3+ tahun.</textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Nomor WhatsApp</label>
+                        <input type="text" value="+62 812-3456-7890" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7A5AF8] focus:border-transparent">
+                    </div>
+                    
+                <button onclick="saveStoreSettings()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold">
+                    Simpan Perubahan
+                </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-[#7A5AF8] text-white py-12 mt-12">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-[#7A5AF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-2xl font-bold">Promora</span>
+                    </div>
+                    <p class="text-purple-200">Platform digital yang menghubungkan pencari promo dengan jastip terverifikasi.</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-purple-200 hover:text-white transition">Home</a></li>
+                        <li><a href="#" class="text-purple-200 hover:text-white transition">Promo</a></li>
+                        <li><a href="#" class="text-purple-200 hover:text-white transition">Jastip</a></li>
+                        <li><a href="#" class="text-purple-200 hover:text-white transition">About</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Support</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-purple-200 hover:text-white transition">Help Center</a></li>
+                        <li><a href="#" class="text-purple-200 hover:text-white transition">FAQ</a></li>
+                        <li><a href="#" class="text-purple-200 hover:text-white transition">Terms & Conditions</a></li>
+                        <li><a href="#" class="text-purple-200 hover:text-white transition">Contact Us</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Follow Us</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center hover:bg-opacity-30 transition">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z"/><path d="M12 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center hover:bg-opacity-30 transition">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center hover:bg-opacity-30 transition">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-purple-400 mt-8 pt-8 text-center">
+                <p class="text-purple-200">© 2025 Promora — All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <script src="./assets/js/homeSeller.js"></script>
+</body>
+</html>
