@@ -36,53 +36,155 @@
                 nav.classList.remove('shadow-lg');
             }
         });
-// Script ini WAJIB ada di SETIAP halaman biar status login konsisten
-function checkLoginStatus() {
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  const userName = localStorage.getItem('userName');
-
-  if (isLoggedIn && userName) {
-    // Sudah login → sembunyiin Login/Sign Up, tampilkan user info
-    const auth = document.getElementById('auth-buttons');
-    const user = document.getElementById('user-info');
-    if (auth) auth.classList.add('hidden');
-    if (user) {
-      user.classList.remove('hidden');
+// ========== AUTH FUNCTIONS ==========
+// Cek login dari server (bukan localStorage)
+async function checkLoginStatus() {
+    try {
+        const response = await fetch('backend/api/check_session.php', {
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        const cartLink = document.getElementById('cart-link');
+        const authButtons = document.getElementById('auth-buttons');
+        const userInfo = document.getElementById('user-info');
+        const userNameEl = document.getElementById('user-name');
+        
+        if (data.logged_in && data.user) {
+            // User sudah login
+            if (authButtons) authButtons.classList.add('hidden');
+            if (userInfo) {
+                userInfo.classList.remove('hidden');
+                userInfo.classList.add('flex');
+            }
+            
+            // Tampilkan keranjang
+            if (cartLink) {
+                cartLink.classList.remove('hidden');
+            }
+            
+            // Set nama user (username saja)
+            if (userNameEl) {
+                userNameEl.textContent = data.user.username;
+            }
+            
+            // Simpan ke localStorage sebagai backup
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userName', data.user.username);
+            localStorage.setItem('userRole', data.user.role);
+            localStorage.setItem('userId', data.user.id);
+            
+        } else {
+            // User belum login
+            if (authButtons) authButtons.classList.remove('hidden');
+            if (userInfo) userInfo.classList.add('hidden');
+            
+            // Sembunyikan keranjang
+            if (cartLink) {
+                cartLink.classList.add('hidden');
+            }
+            
+            // Bersihkan localStorage
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userId');
+        }
+    } catch (error) {
+        console.error('Error checking session:', error);
+        
+        // Fallback ke localStorage jika server error
+        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        const userName = localStorage.getItem('userName');
+        const cartLink = document.getElementById('cart-link');
+        const authButtons = document.getElementById('auth-buttons');
+        const userInfo = document.getElementById('user-info');
+        const userNameEl = document.getElementById('user-name');
+        
+        if (isLoggedIn && userName) {
+            if (authButtons) authButtons.classList.add('hidden');
+            if (userInfo) {
+                userInfo.classList.remove('hidden');
+                userInfo.classList.add('flex');
+            }
+            if (cartLink) cartLink.classList.remove('hidden');
+            if (userNameEl) userNameEl.textContent = userName;
+        } else {
+            if (authButtons) authButtons.classList.remove('hidden');
+            if (userInfo) userInfo.classList.add('hidden');
+            if (cartLink) cartLink.classList.add('hidden');
+        }
     }
-  } else {
-    // Belum login
-    const auth = document.getElementById('auth-buttons');
-    const user = document.getElementById('user-info');
-    if (auth) auth.classList.remove('hidden');
-    if (user) user.classList.add('hidden');
-  }
 }
 
-function logout() {
-  localStorage.removeItem('isLoggedIn');
-  localStorage.removeItem('userName');
-  localStorage.removeItem('userRole');
-  
-  // Update UI langsung + tutup dropdown kalau ada
-  const auth = document.getElementById('auth-buttons');
-  const user = document.getElementById('user-info');
-  const dropdown = document.getElementById('dropdown-menu');
-  if (auth) auth.classList.remove('hidden');
-  if (user) user.classList.add('hidden');
-  if (dropdown) dropdown.classList.add('hidden');
-
-  alert('Kamu telah logout 👋');
+// Logout dengan request ke server
+async function logout() {
+    try {
+        const response = await fetch('backend/api/logout.php', {
+            method: 'POST',
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Bersihkan localStorage
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('cart');
+            
+            // Update UI
+            const cartLink = document.getElementById('cart-link');
+            const authButtons = document.getElementById('auth-buttons');
+            const userInfo = document.getElementById('user-info');
+            const dropdown = document.getElementById('dropdown-menu');
+            
+            if (authButtons) authButtons.classList.remove('hidden');
+            if (userInfo) userInfo.classList.add('hidden');
+            if (dropdown) dropdown.classList.add('hidden');
+            if (cartLink) cartLink.classList.add('hidden');
+            
+            alert('Kamu telah logout 👋');
+            window.location.href = 'index.html';
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+        
+        // Fallback logout jika server error
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('userId');
+        
+        alert('Kamu telah logout 👋');
+        window.location.href = 'index.html';
+    }
 }
 
 // Dropdown avatar
-document.getElementById('avatar-button')?.addEventListener('click', function(e) {
-  e.stopPropagation();
-  document.getElementById('dropdown-menu')?.classList.toggle('hidden');
-});
+const avatarButton = document.getElementById('avatar-button');
+if (avatarButton) {
+    avatarButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const dropdown = document.getElementById('dropdown-menu');
+        if (dropdown) {
+            dropdown.classList.toggle('hidden');
+        }
+    });
+}
 
-// Tutup dropdown kalau klik luar
-document.addEventListener('click', () => {
-  document.getElementById('dropdown-menu')?.classList.add('hidden');
+// Tutup dropdown kalau klik di luar
+document.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('dropdown-menu');
+    const avatarButton = document.getElementById('avatar-button');
+    
+    if (dropdown && !dropdown.classList.contains('hidden')) {
+        if (!avatarButton?.contains(e.target)) {
+            dropdown.classList.add('hidden');
+        }
+    }
 });
 
 // Jalankan tiap halaman dibuka

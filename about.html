@@ -65,47 +65,48 @@
           </div>
 
           <!-- Keranjang + Auth Area -->
-              <div class="flex items-center space-x-5">
-                <a href="cart.html" class="hover:opacity-80 transition">
-                  <img src="./assets/img/cart.png" alt="Cart" class="h-6 w-6" />
-                </a>
+<div class="flex items-center space-x-5">
+  <!-- KERANJANG (hanya muncul jika SUDAH login) -->
+  <a href="cart.php" id="cart-link" class="hidden hover:opacity-80 transition">
+    <img src="./assets/img/cart.png" alt="Cart" class="h-6 w-6" />
+  </a>
 
-                <!-- LOGIN & SIGN UP (muncul kalau BELUM login) -->
-                <div id="auth-buttons" class="flex items-center space-x-3">
-                  <button onclick="window.location.href='lamanLogin.html'" 
-                          class="text-gray-700 font-medium px-4 py-2 hover:text-purple-600 transition">
-                    Login
-                  </button>
-                  <button onclick="window.location.href='lamanLogin.html'" 
-                          class="bg-purple-600 text-white px-6 py-2 rounded-full font-medium hover:bg-purple-700 transition">
-                    Sign Up
-                  </button>
-                </div>
+  <!-- LOGIN & SIGN UP (muncul kalau BELUM login) -->
+  <div id="auth-buttons" class="flex items-center space-x-3">
+    <button onclick="window.location.href='lamanLogin.html'" 
+            class="text-gray-700 font-medium px-4 py-2 hover:text-purple-600 transition">
+      Login
+    </button>
+    <button onclick="window.location.href='lamanLogin.html'" 
+            class="bg-purple-600 text-white px-6 py-2 rounded-full font-medium hover:bg-purple-700 transition">
+      Sign Up
+    </button>
+  </div>
 
-                <!-- USER INFO (muncul kalau SUDAH login) -->
-                <div id="user-info" class="hidden items-center space-x-4">
-                  <span id="user-name" class="font-medium text-gray-800"></span>
+  <!-- USER INFO (muncul kalau SUDAH login) -->
+  <div id="user-info" class="hidden items-center space-x-4">
+    <span id="user-name" class="font-medium text-gray-800"></span>
 
-                  <div class="relative">
-                    <button id="avatar-button" class="focus:outline-none flex items-center space-x-3">
-                      <img id="user-avatar" src="./assets/img/user.png" alt="Profile" 
-                          class="h-10 w-10 rounded-full object-cover border-2 border-purple-600 hover:opacity-90 cursor-pointer" />
-                      <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
+    <div class="relative">
+      <button id="avatar-button" class="focus:outline-none flex items-center space-x-3">
+        <img id="user-avatar" src="./assets/img/user.png" alt="Profile" 
+            class="h-10 w-10 rounded-full object-cover border-2 border-purple-600 hover:opacity-90 cursor-pointer" />
+        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
 
-                    <div id="dropdown-menu" class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-50">
-                      <a href="profile.html" class="block px-4 py-3 text-gray-700 hover:bg-purple-50 transition">Profil Saya</a>
-                      <a href="orders.html" class="block px-4 py-3 text-gray-700 hover:bg-purple-50 transition">Pesanan Saya</a>
-                      <hr class="my-1">
-                      <button onclick="logout()" class="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 transition">
-                        Logout
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+      <div id="dropdown-menu" class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-50">
+        <a href="profile.html" class="block px-4 py-3 text-gray-700 hover:bg-purple-50 transition">Profil Saya</a>
+        <a href="orders.html" class="block px-4 py-3 text-gray-700 hover:bg-purple-50 transition">Pesanan Saya</a>
+        <hr class="my-1">
+        <button onclick="logout()" class="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 transition">
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
         </div>
       </div>
     </nav>

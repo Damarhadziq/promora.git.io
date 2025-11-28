@@ -1,3 +1,6 @@
+<?php
+session_start(); // PINDAHKAN KE PALING ATAS, SEBELUM <!DOCTYPE html>
+?>
 <!DOCTYPE html>
 <html lang="id">
   <head>
@@ -120,165 +123,112 @@
         </p>
       </div>
 
-      <div class="grid grid-cols-3 gap-8">
+     <div class="grid grid-cols-3 gap-8">
         
         <!-- Cart Items -->
-    <div class="col-span-2">
-    <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div class="col-span-2">
+          <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
 
-        <!-- Table Header -->
-        <div class="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 border-b font-semibold text-gray-700">
-        <div class="col-span-1">Pilih</div>
-        <div class="col-span-3">Produk</div>
-        <div class="col-span-2 text-center">Harga Promo</div>
-        <div class="col-span-2 text-left pl-2">Fee Jastip</div>
-        <div class="col-span-2 text-left pl-2">Jumlah</div>
-        <div class="col-span-1 -ml-4">Subtotal</div>
-        <div class="col-span-1 flex justify-end">Aksi</div>
-        </div>
+            <!-- Table Header -->
+            <div class="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 border-b font-semibold text-gray-700">
+              <div class="col-span-1">Pilih</div>
+              <div class="col-span-3">Produk</div>
+              <div class="col-span-2 text-center">Harga Promo</div>
+              <div class="col-span-2 text-left pl-2">Fee Jastip</div>
+              <div class="col-span-2 text-left pl-2">Jumlah</div>
+              <div class="col-span-1 -ml-4">Subtotal</div>
+              <div class="col-span-1 flex justify-end">Aksi</div>
+            </div>
 
+            <!-- Cart Items -->
+            <div id="cartItems">
+            <?php
+            require_once 'backend/config/db.php';
 
-        <!-- Cart Items -->
-        <div id="cartItems">
-
-        <!-- Item 1 -->
-        <div class="cart-item border-b" data-id="1" data-price="480000" data-fee="35000">
-            <div class="grid grid-cols-12 gap-4 px-6 py-6 items-center">
-
-            <div class="col-span-4 flex items-center space-x-4">
-              <input type="checkbox" class="item-check w-5 h-5 accent-primary" />
-                <img src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=100&h=100&fit=crop"
-                    alt="Tas Zara" class="w-20 h-20 object-cover rounded-lg" />
-                <div>
-                <h3 class="font-semibold text-gray-800">Tas Zara Leather Mini</h3>
-                <p class="text-sm text-gray-500">Zara</p>
+            if(!isset($_SESSION['user_id'])) {
+                echo '<div class="px-6 py-12 text-center text-gray-500">
+                        <p class="text-lg">Silakan login untuk melihat keranjang Anda</p>
+                        <a href="lamanLogin.html" class="text-purple-600 hover:underline mt-2 inline-block">Login Sekarang</a>
+                      </div>';
+            } else {
+                $database = new Database();
+                $db = $database->getConnection();
+                $user_id = $_SESSION['user_id'];
+                
+                // Query untuk mengambil cart items dengan detail produk
+                $query = "SELECT c.id as cart_id, c.quantity, c.product_id,
+                                 p.name, p.brand, p.price, p.fee, p.image
+                          FROM cart c
+                          JOIN products p ON c.product_id = p.id
+                          WHERE c.user_id = :user_id
+                          ORDER BY c.created_at DESC";
+                $stmt = $db->prepare($query);
+                $stmt->bindParam(':user_id', $user_id);
+                $stmt->execute();
+                $cart_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                if(count($cart_items) == 0) {
+                    echo '<div class="px-6 py-12 text-center text-gray-500">
+                            <p class="text-lg">Keranjang Anda masih kosong</p>
+                            <a href="explore.html" class="text-purple-600 hover:underline mt-2 inline-block">Mulai Belanja</a>
+                          </div>';
+                } else {
+                    foreach($cart_items as $item):
+                        $subtotal = ($item['price'] * $item['quantity']) + $item['fee'];
+            ?>
+                <div class="cart-item border-b" data-id="<?php echo $item['cart_id']; ?>" 
+                     data-price="<?php echo $item['price']; ?>" 
+                     data-fee="<?php echo $item['fee']; ?>">
+                    <div class="grid grid-cols-12 gap-4 px-6 py-6 items-center">
+                        
+                        <div class="col-span-4 flex items-center space-x-4">
+                            <input type="checkbox" class="item-check w-5 h-5 accent-primary" />
+                            <img src="<?php echo htmlspecialchars($item['image']); ?>" 
+                                 alt="<?php echo htmlspecialchars($item['name']); ?>" 
+                                 class="w-20 h-20 object-cover rounded-lg" />
+                            <div>
+                                <h3 class="font-semibold text-gray-800"><?php echo htmlspecialchars($item['name']); ?></h3>
+                                <p class="text-sm text-gray-500"><?php echo htmlspecialchars($item['brand']); ?></p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-span-2 text-center">
+                            <span class="text-primary font-semibold">Rp <?php echo number_format($item['price'], 0, ',', '.'); ?></span>
+                        </div>
+                        
+                        <div class="col-span-2 text-left pl-2">
+                            <span class="text-gray-700">Rp <?php echo number_format($item['fee'], 0, ',', '.'); ?></span>
+                        </div>
+                        
+                        <div class="col-span-2 flex justify-start items-center space-x-2 -ml-6">
+                            <button class="qty-btn qty-minus w-8 h-8 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center">−</button>
+                            <input type="number" class="qty-input w-10 text-center border border-gray-300 rounded-lg py-1" 
+                                   value="<?php echo $item['quantity']; ?>" min="1" />
+                            <button class="qty-btn qty-plus w-8 h-8 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center">+</button>
+                        </div>
+                        
+                        <div class="col-span-1 text-center pr-2 -ml-4 whitespace-nowrap">
+                            <span class="item-subtotal text-primary font-bold">Rp <?php echo number_format($subtotal, 0, ',', '.'); ?></span>
+                        </div>
+                        
+                        <div class="col-span-1 flex justify-end">
+                            <button class="delete-btn text-red-500 hover:text-red-700">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                    </div>
                 </div>
+            <?php 
+                    endforeach;
+                }
+            }
+            ?>
             </div>
-
-            <div class="col-span-2 text-center">
-                <span class="text-primary font-semibold">Rp 480.000</span>
-            </div>
-
-            <div class="col-span-2 text-left pl-2">
-                <span class="text-gray-700">Rp 35.000</span>
-            </div>
-
-            <div class="col-span-2 flex justify-start items-center space-x-2 -ml-6">
-                <button class="qty-btn qty-minus w-8 h-8 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center">−</button>
-                <input type="number" class="qty-input w-10 text-center border border-gray-300 rounded-lg py-1" value="1" min="1" />
-                <button class="qty-btn qty-plus w-8 h-8 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center">+</button>
-            </div>
-
-            <div class="col-span-1 text-center pr-2 -ml-4 whitespace-nowrap">
-                <span class="item-subtotal text-primary font-bold">Rp 515.000</span>
-            </div>
-
-            <div class="col-span-1 flex justify-end">
-                <button class="delete-btn text-red-500 hover:text-red-700">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd"
-                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                        clip-rule="evenodd"></path>
-                </svg>
-                </button>
-            </div>
-
-            </div>
+          </div>
         </div>
-
-        <!-- Item 2 -->
-        <div class="cart-item border-b" data-id="2" data-price="649500" data-fee="35000">
-            <div class="grid grid-cols-12 gap-4 px-6 py-6 items-center">
-
-            <div class="col-span-4 flex items-center space-x-4">
-              <input type="checkbox" class="item-check w-5 h-5 accent-primary" />
-                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=100&h=100&fit=crop"
-                    alt="Air Max" class="w-20 h-20 object-cover rounded-lg" />
-                <div>
-                <h3 class="font-semibold text-gray-800">Air Max Sneakers Limited</h3>
-                <p class="text-sm text-gray-500">Nike</p>
-                </div>
-            </div>
-
-            <div class="col-span-2 text-center">
-                <span class="text-primary font-semibold">Rp 649.500</span>
-            </div>
-
-            <div class="col-span-2 text-left pl-2">
-                <span class="text-gray-700">Rp 35.000</span>
-            </div>
-
-            <div class="col-span-2 flex justify-start items-center space-x-2 -ml-6">
-                <button class="qty-btn qty-minus w-8 h-8 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center">−</button>
-                <input type="number" class="qty-input w-10 text-center border border-gray-300 rounded-lg py-1" value="2" min="1" />
-                <button class="qty-btn qty-plus w-8 h-8 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center">+</button>
-            </div>
-
-            <div class="col-span-1 text-center -ml-4 whitespace-nowrap">
-                <span class="item-subtotal text-primary font-bold">Rp 1.369.000</span>
-            </div>
-
-            <div class="col-span-1 flex justify-end">
-                <button class="delete-btn text-red-500 hover:text-red-700">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd"
-                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                        clip-rule="evenodd"></path>
-                </svg>
-                </button>
-            </div>
-
-            </div>
-        </div>
-
-        <!-- Item 3 -->
-        <div class="cart-item" data-id="3" data-price="180000" data-fee="20000">
-            <div class="grid grid-cols-12 gap-4 px-6 py-6 items-center">
-
-            <div class="col-span-4 flex items-center space-x-4">
-              <input type="checkbox" class="item-check w-5 h-5 accent-primary" />
-                <img src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=100&h=100&fit=crop"
-                    alt="Makeup Palette" class="w-20 h-20 object-cover rounded-lg" />
-                <div>
-                <h3 class="font-semibold text-gray-800">Professional Makeup Palette Set</h3>
-                <p class="text-sm text-gray-500">Sephora</p>
-                </div>
-            </div>
-
-            <div class="col-span-2 text-center">
-                <span class="text-primary font-semibold">Rp 180.000</span>
-            </div>
-
-            <div class="col-span-2 text-left pl-2">
-                <span class="text-gray-700">Rp 20.000</span>
-            </div>
-
-            <div class="col-span-2 flex justify-start items-center space-x-2 -ml-6">
-                <button class="qty-btn qty-minus w-8 h-8 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center">−</button>
-                <input type="number" class="qty-input w-10 text-center border border-gray-300 rounded-lg py-1" value="1" min="1" />
-                <button class="qty-btn qty-plus w-8 h-8 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center">+</button>
-            </div>
-
-            <div class="col-span-1 text-center -ml-4 whitespace-nowrap">
-                <span class="item-subtotal text-primary font-bold">Rp 200.000</span>
-            </div>
-
-            <div class="col-span-1 flex justify-end">
-                <button class="delete-btn text-red-500 hover:text-red-700">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd"
-                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                        clip-rule="evenodd"></path>
-                </svg>
-                </button>
-            </div>
-
-            </div>
-        </div>
-
-        </div>
-    </div>
-    </div>
 
 
         <!-- Order Summary -->
@@ -291,11 +241,11 @@
             <div class="space-y-4 mb-6">
               <div class="flex justify-between text-gray-700">
                 <span>Total Harga Promo</span>
-                <span id="totalPromo" class="font-semibold">Rp 1.959.000</span>
+                <span id="totalPromo" class="font-semibold">Rp 0</span>
               </div>
               <div class="flex justify-between text-gray-700">
                 <span>Total Fee Jastip</span>
-                <span id="totalFee" class="font-semibold">Rp 125.000</span>
+                <span id="totalFee" class="font-semibold">Rp 0</span>
               </div>
               <div class="flex justify-between text-gray-700">
                 <span>Ongkir Dummy</span>
@@ -306,16 +256,14 @@
             <div class="border-t pt-4 mb-6">
               <div class="flex justify-between items-center">
                 <span class="text-xl font-bold text-gray-800">Grand Total</span>
-                <span id="grandTotal" class="text-3xl font-bold text-primary"
-                  >Rp 2.134.000</span
-                >
+                <span id="grandTotal" class="text-3xl font-bold text-primary">Rp 50.000</span>
               </div>
             </div>
 
             <a href="pembayaran.html"
                 class="w-full block text-center primary-color text-white py-4 rounded-xl font-semibold text-lg hover:primary-dark transition mb-3">
                 Lanjut Bayar
-                </a>
+            </a>
           </div>
         </div>
       </div>

@@ -148,32 +148,45 @@ function renderProducts() {
     updatePagination();
 }
 
-// Fungsi add to cart dari explore
-function addToCartFromExplore(productId, productName, price) {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    
-    if (!isLoggedIn) {
-        alert('Silakan login terlebih dahulu!');
-        window.location.href = 'lamanLogin.html';
-        return;
-    }
-    
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const existingItem = cart.find(item => item.id === productId);
-    
-    if (existingItem) {
-        existingItem.quantity += 1;
-    } else {
-        cart.push({
-            id: productId,
-            name: productName,
-            price: price,
-            quantity: 1
+async function addToCartFromExplore(productId, productName, price) {
+    try {
+        // Cek session dari server dulu
+        const sessionResponse = await fetch('backend/api/check_session.php', {
+            credentials: 'include'
         });
+        const sessionData = await sessionResponse.json();
+        
+        if (!sessionData.logged_in) {
+            alert('Silakan login terlebih dahulu!');
+            window.location.href = 'lamanLogin.html';
+            return;
+        }
+        
+        // Jika sudah login, kirim ke database (PERBAIKAN DI SINI)
+        const response = await fetch('backend/api/add_to_cart.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                product_id: productId,
+                quantity: 1
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(`✅ ${productName} berhasil ditambahkan ke keranjang!`);
+        } else {
+            alert(data.message || 'Gagal menambahkan ke keranjang');
+        }
+        
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        alert('Terjadi kesalahan. Silakan coba lagi.');
     }
-    
-    localStorage.setItem('cart', JSON.stringify(cart));
-    alert(`✅ ${productName} berhasil ditambahkan ke keranjang!`);
 }
 
 // Update pagination buttons
@@ -316,43 +329,156 @@ document.getElementById("nextPage").addEventListener("click", () => {
 });
 
 
- // Cek login saat halaman dibuka
-        function checkLoginStatus() {
-      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-      const userName = localStorage.getItem('userName');
-
-      const authButtons = document.getElementById('auth-buttons');
-      const userInfo = document.getElementById('user-info');
-      const userNameEl = document.getElementById('user-name');
-
-      if (isLoggedIn && userName && authButtons && userInfo && userNameEl) {
-        authButtons.classList.add('hidden');
-        userInfo.classList.remove('hidden');
-      } else if (authButtons && userInfo) {
-        authButtons.classList.remove('hidden');
-        userInfo.classList.add('hidden');
-      }
+ // ========== AUTH FUNCTIONS ==========
+// Cek login dari server (bukan localStorage)
+async function checkLoginStatus() {
+    try {
+        const response = await fetch('backend/api/check_session.php', {
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        const cartLink = document.getElementById('cart-link');
+        const authButtons = document.getElementById('auth-buttons');
+        const userInfo = document.getElementById('user-info');
+        const userNameEl = document.getElementById('user-name');
+        
+        if (data.logged_in && data.user) {
+            // User sudah login
+            if (authButtons) authButtons.classList.add('hidden');
+            if (userInfo) {
+                userInfo.classList.remove('hidden');
+                userInfo.classList.add('flex');
+            }
+            
+            // Tampilkan keranjang
+            if (cartLink) {
+                cartLink.classList.remove('hidden');
+            }
+            
+            // Set nama user (username saja)
+            if (userNameEl) {
+                userNameEl.textContent = data.user.username;
+            }
+            
+            // Simpan ke localStorage sebagai backup
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userName', data.user.username);
+            localStorage.setItem('userRole', data.user.role);
+            localStorage.setItem('userId', data.user.id);
+            
+        } else {
+            // User belum login
+            if (authButtons) authButtons.classList.remove('hidden');
+            if (userInfo) userInfo.classList.add('hidden');
+            
+            // Sembunyikan keranjang
+            if (cartLink) {
+                cartLink.classList.add('hidden');
+            }
+            
+            // Bersihkan localStorage
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userId');
+        }
+    } catch (error) {
+        console.error('Error checking session:', error);
+        
+        // Fallback ke localStorage jika server error
+        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        const userName = localStorage.getItem('userName');
+        const cartLink = document.getElementById('cart-link');
+        const authButtons = document.getElementById('auth-buttons');
+        const userInfo = document.getElementById('user-info');
+        const userNameEl = document.getElementById('user-name');
+        
+        if (isLoggedIn && userName) {
+            if (authButtons) authButtons.classList.add('hidden');
+            if (userInfo) {
+                userInfo.classList.remove('hidden');
+                userInfo.classList.add('flex');
+            }
+            if (cartLink) cartLink.classList.remove('hidden');
+            if (userNameEl) userNameEl.textContent = userName;
+        } else {
+            if (authButtons) authButtons.classList.remove('hidden');
+            if (userInfo) userInfo.classList.add('hidden');
+            if (cartLink) cartLink.classList.add('hidden');
+        }
     }
+}
 
-    function logout() {
-      localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('userName');
-      localStorage.removeItem('userRole');
-      checkLoginStatus();
-      document.getElementById('dropdown-menu')?.classList.add('hidden');
-      alert('Logout berhasil! 👋');
+// Logout dengan request ke server
+async function logout() {
+    try {
+        const response = await fetch('backend/api/logout.php', {
+            method: 'POST',
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Bersihkan localStorage
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('cart');
+            
+            // Update UI
+            const cartLink = document.getElementById('cart-link');
+            const authButtons = document.getElementById('auth-buttons');
+            const userInfo = document.getElementById('user-info');
+            const dropdown = document.getElementById('dropdown-menu');
+            
+            if (authButtons) authButtons.classList.remove('hidden');
+            if (userInfo) userInfo.classList.add('hidden');
+            if (dropdown) dropdown.classList.add('hidden');
+            if (cartLink) cartLink.classList.add('hidden');
+            
+            alert('Kamu telah logout 👋');
+            window.location.href = 'index.html';
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+        
+        // Fallback logout jika server error
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('userId');
+        
+        alert('Kamu telah logout 👋');
+        window.location.href = 'index.html';
     }
+}
 
-        // Dropdown toggle
-        document.getElementById('avatar-button')?.addEventListener('click', function(e) {
+// Dropdown toggle
+const avatarButton = document.getElementById('avatar-button');
+if (avatarButton) {
+    avatarButton.addEventListener('click', function(e) {
         e.stopPropagation();
-        document.getElementById('dropdown-menu').classList.toggle('hidden');
-        });
+        const dropdown = document.getElementById('dropdown-menu');
+        if (dropdown) {
+            dropdown.classList.toggle('hidden');
+        }
+    });
+}
 
-        // Tutup dropdown kalau klik di luar
-        document.addEventListener('click', function() {
-        document.getElementById('dropdown-menu')?.classList.add('hidden');
-        });
+// Tutup dropdown kalau klik di luar
+document.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('dropdown-menu');
+    const avatarButton = document.getElementById('avatar-button');
+    
+    if (dropdown && !dropdown.classList.contains('hidden')) {
+        if (!avatarButton?.contains(e.target)) {
+            dropdown.classList.add('hidden');
+        }
+    }
+});
 
-        // Jalankan saat halaman loaded
-        window.addEventListener('load', checkLoginStatus);
+// Jalankan checkLoginStatus saat halaman load
+window.addEventListener('load', checkLoginStatus);

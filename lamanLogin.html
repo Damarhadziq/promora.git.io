@@ -557,20 +557,26 @@ async function handleRegister(e) {
                     switchToLogin();
                 }, 3000);
                 
-            } else if (result.user.role === 'customer') {
-                // ✅ Customer langsung verified - REDIRECT KE HOME
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('userId', result.user.id);
-                localStorage.setItem('userName', result.user.first_name);
-                localStorage.setItem('userEmail', result.user.email);
-                localStorage.setItem('userRole', result.user.role);
+        } else if (result.user.role === 'customer') {
+            // ✅ Customer langsung verified - REDIRECT KE HOME
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userId', result.user.id);
+            localStorage.setItem('userName', result.user.first_name);
+            localStorage.setItem('userEmail', result.user.email);
+            localStorage.setItem('userRole', result.user.role);
 
-                showCustomAlert('✅ Pendaftaran berhasil! Selamat datang di Promora 🎉', 'success');
-                
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
-            }
+            showCustomAlert(
+                '✅ Pendaftaran Berhasil!\n\n' +
+                '👤 Username: ' + result.user.username + '\n\n' +
+                '🎉 Selamat datang di Promora!\n\n' +
+                '💡 Gunakan username ini untuk login.',
+                'success'
+            );
+            
+            setTimeout(() => {
+                window.location.href = 'lamanLogin.html';
+            }, 3000);
+        }
         } else {
             // ✅ Tampilkan error message dari server
             showCustomAlert(result.message || 'Registrasi gagal. Silakan coba lagi.', 'error');

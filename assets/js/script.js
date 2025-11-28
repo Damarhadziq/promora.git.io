@@ -91,63 +91,125 @@ document.querySelectorAll('button').forEach(button => {
 });
 
 // Cek login saat halaman dibuka
-function checkLoginStatus() {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    const userName = localStorage.getItem('userName');
-    const cartLink = document.getElementById('cart-link');
-
-    if (isLoggedIn && userName) {
-        // Sudah login
-        document.getElementById('auth-buttons').classList.add('hidden');
-        document.getElementById('user-info').classList.remove('hidden');
-        document.getElementById('user-info').classList.add('flex');
+async function checkLoginStatus() {
+    try {
+        const response = await fetch('backend/api/check_session.php', {
+            credentials: 'include'
+        });
         
-        // TAMPILKAN KERANJANG
-        if (cartLink) {
-            cartLink.classList.remove('hidden');
+        const data = await response.json();
+        const cartLink = document.getElementById('cart-link');
+        
+        if (data.logged_in && data.user) {
+            // User sudah login
+            document.getElementById('auth-buttons').classList.add('hidden');
+            document.getElementById('user-info').classList.remove('hidden');
+            document.getElementById('user-info').classList.add('flex');
+            
+            // TAMPILKAN KERANJANG
+            if (cartLink) {
+                cartLink.classList.remove('hidden');
+            }
+            
+            // Set nama user (username saja)
+            const userNameEl = document.getElementById('user-name');
+            if (userNameEl) {
+                userNameEl.textContent = data.user.username;
+            }
+            
+            // Simpan ke localStorage sebagai backup
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userName', data.user.username);
+            localStorage.setItem('userRole', data.user.role);
+            localStorage.setItem('userId', data.user.id);
+            
+        } else {
+            // User belum login
+            document.getElementById('auth-buttons').classList.remove('hidden');
+            document.getElementById('user-info').classList.add('hidden');
+            
+            // SEMBUNYIKAN KERANJANG
+            if (cartLink) {
+                cartLink.classList.add('hidden');
+            }
+            
+            // Bersihkan localStorage
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userId');
         }
+    } catch (error) {
+        console.error('Error checking session:', error);
         
-        // Set nama user jika ada element
-        const userNameEl = document.getElementById('user-name');
-        if (userNameEl) {
-            userNameEl.textContent = userName;
-        }
-    } else {
-        // Belum login
-        document.getElementById('auth-buttons').classList.remove('hidden');
-        document.getElementById('user-info').classList.add('hidden');
+        // Fallback ke localStorage jika server error
+        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        const userName = localStorage.getItem('userName');
+        const cartLink = document.getElementById('cart-link');
         
-        // SEMBUNYIKAN KERANJANG
-        if (cartLink) {
-            cartLink.classList.add('hidden');
+        if (isLoggedIn && userName) {
+            document.getElementById('auth-buttons').classList.add('hidden');
+            document.getElementById('user-info').classList.remove('hidden');
+            document.getElementById('user-info').classList.add('flex');
+            
+            if (cartLink) {
+                cartLink.classList.remove('hidden');
+            }
+            
+            // Set nama user dari localStorage
+            const userNameEl = document.getElementById('user-name');
+            if (userNameEl) {
+                userNameEl.textContent = userName;
+            }
         }
     }
 }
 
-// Logout → bersihkan semua + update UI langsung
-function logout() {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userName');
-    localStorage.removeItem('userRole');
-    
-    const cartLink = document.getElementById('cart-link');
-
-    // Update UI langsung tanpa refresh
-    document.getElementById('auth-buttons').classList.remove('hidden');
-    document.getElementById('user-info').classList.add('hidden');
-    document.getElementById('dropdown-menu').classList.add('hidden');
-    
-    // SEMBUNYIKAN KERANJANG SAAT LOGOUT
-    if (cartLink) {
-        cartLink.classList.add('hidden');
+// Logout dengan request ke server
+async function logout() {
+    try {
+        const response = await fetch('backend/api/logout.php', {
+            method: 'POST',
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Bersihkan localStorage
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('cart');
+            
+            // Update UI
+            const cartLink = document.getElementById('cart-link');
+            document.getElementById('auth-buttons').classList.remove('hidden');
+            document.getElementById('user-info').classList.add('hidden');
+            const dropdown = document.getElementById('dropdown-menu');
+            if (dropdown) dropdown.classList.add('hidden');
+            
+            if (cartLink) {
+                cartLink.classList.add('hidden');
+            }
+            
+            alert('Kamu telah logout 👋');
+            window.location.href = 'index.html';
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+        
+        // Fallback logout jika server error
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('userId');
+        
+        alert('Kamu telah logout 👋');
+        window.location.href = 'index.html';
     }
-
-    alert('Kamu telah logout 👋');
-    
-    // Optional: redirect ke homepage
-    // window.location.href = 'index.html';
 }
-
 // Dropdown toggle
 document.getElementById('avatar-button')?.addEventListener('click', function(e) {
     e.stopPropagation();

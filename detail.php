@@ -57,47 +57,48 @@
           </div>
 
           <!-- Keranjang + Auth Area -->
-              <div class="flex items-center space-x-5">
-                <a href="cart.html" class="hover:opacity-80 transition">
-                  <img src="./assets/img/cart.png" alt="Cart" class="h-6 w-6" />
-                </a>
+<div class="flex items-center space-x-5">
+  <!-- KERANJANG (hanya muncul jika SUDAH login) -->
+  <a href="cart.php" id="cart-link" class="hidden hover:opacity-80 transition">
+    <img src="./assets/img/cart.png" alt="Cart" class="h-6 w-6" />
+  </a>
 
-                <!-- LOGIN & SIGN UP (muncul kalau BELUM login) -->
-                <div id="auth-buttons" class="flex items-center space-x-3">
-                  <button onclick="window.location.href='lamanLogin.html'" 
-                          class="text-gray-700 font-medium px-4 py-2 hover:text-purple-600 transition">
-                    Login
-                  </button>
-                  <button onclick="window.location.href='lamanLogin.html'" 
-                          class="bg-purple-600 text-white px-6 py-2 rounded-full font-medium hover:bg-purple-700 transition">
-                    Sign Up
-                  </button>
-                </div>
+  <!-- LOGIN & SIGN UP (muncul kalau BELUM login) -->
+  <div id="auth-buttons" class="flex items-center space-x-3">
+    <button onclick="window.location.href='lamanLogin.html'" 
+            class="text-gray-700 font-medium px-4 py-2 hover:text-purple-600 transition">
+      Login
+    </button>
+    <button onclick="window.location.href='lamanLogin.html'" 
+            class="bg-purple-600 text-white px-6 py-2 rounded-full font-medium hover:bg-purple-700 transition">
+      Sign Up
+    </button>
+  </div>
 
-                <!-- USER INFO (muncul kalau SUDAH login) -->
-                <div id="user-info" class="hidden items-center space-x-4">
-                  <span id="user-name" class="font-medium text-gray-800"></span>
+  <!-- USER INFO (muncul kalau SUDAH login) -->
+  <div id="user-info" class="hidden items-center space-x-4">
+    <span id="user-name" class="font-medium text-gray-800"></span>
 
-                  <div class="relative">
-                    <button id="avatar-button" class="focus:outline-none flex items-center space-x-3">
-                      <img id="user-avatar" src="./assets/img/user.png" alt="Profile" 
-                          class="h-10 w-10 rounded-full object-cover border-2 border-purple-600 hover:opacity-90 cursor-pointer" />
-                      <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
+    <div class="relative">
+      <button id="avatar-button" class="focus:outline-none flex items-center space-x-3">
+        <img id="user-avatar" src="./assets/img/user.png" alt="Profile" 
+            class="h-10 w-10 rounded-full object-cover border-2 border-purple-600 hover:opacity-90 cursor-pointer" />
+        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
 
-                    <div id="dropdown-menu" class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-50">
-                      <a href="profile.html" class="block px-4 py-3 text-gray-700 hover:bg-purple-50 transition">Profil Saya</a>
-                      <a href="orders.html" class="block px-4 py-3 text-gray-700 hover:bg-purple-50 transition">Pesanan Saya</a>
-                      <hr class="my-1">
-                      <button onclick="logout()" class="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 transition">
-                        Logout
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+      <div id="dropdown-menu" class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-50">
+        <a href="profile.html" class="block px-4 py-3 text-gray-700 hover:bg-purple-50 transition">Profil Saya</a>
+        <a href="orders.html" class="block px-4 py-3 text-gray-700 hover:bg-purple-50 transition">Pesanan Saya</a>
+        <hr class="my-1">
+        <button onclick="logout()" class="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 transition">
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
         </div>
       </div>
     </nav>
@@ -121,7 +122,7 @@
           <div class="bg-white rounded-2xl p-4 shadow-custom">
             <img
               id="mainImage"
-              src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600&h=600&fit=crop"
+              src=""
               alt="Product"
               class="w-full h-96 object-cover rounded-xl"
             />
@@ -129,22 +130,22 @@
           <div class="grid grid-cols-4 gap-3">
             <img
               onclick="changeImage(this.src)"
-              src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=200&h=200&fit=crop"
+              src=""
               class="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-75 transition border-2 border-primary"
             />
             <img
               onclick="changeImage(this.src)"
-              src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=200&h=200&fit=crop"
+              src=""
               class="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-75 transition border-2 border-transparent hover:border-primary"
             />
             <img
               onclick="changeImage(this.src)"
-              src="https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=200&h=200&fit=crop"
+              src=""
               class="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-75 transition border-2 border-transparent hover:border-primary"
             />
             <img
               onclick="changeImage(this.src)"
-              src="https://images.unsplash.com/photo-1624687943971-e86af76d57de?w=200&h=200&fit=crop"
+              src=""
               class="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-75 transition border-2 border-transparent hover:border-primary"
             />
           </div>
@@ -154,31 +155,31 @@
         <div class="space-y-6">
           <div>
             <h1 class="text-4xl font-bold text-gray-900 mb-3">
-              Tas Zara Leather Mini
+          
             </h1>
             <div class="flex items-center space-x-3">
               <span class="text-gray-600">Zara</span>
               <span
                 class="px-3 py-1 bg-purple-100 text-primary text-xs rounded-full"
-                >Fashion</span
+                ></span
               >
             </div>
           </div>
 
           <div class="space-y-2">
             <div class="flex items-baseline space-x-3">
-              <span class="text-4xl font-bold text-primary">Rp 480.000</span>
+              <span class="text-4xl font-bold text-primary"></span>
               <span class="text-xl text-gray-400 line-through"
-                >Rp 1.200.000</span
+                ></span
               >
             </div>
             <div class="flex items-center space-x-2">
               <span class="text-sm text-gray-600">Fee Jastip:</span>
-              <span class="text-sm font-semibold text-gray-800">Rp 35.000</span>
+              <span class="text-sm font-semibold text-gray-800"></span>
             </div>
             <span
               class="inline-block px-3 py-1 bg-red-100 text-red-600 text-sm font-semibold rounded"
-              >Diskon 60%</span
+              ></span
             >
           </div>
 
@@ -189,7 +190,7 @@
               ></path>
             </svg>
             <span class="text-sm font-medium"
-              >Stok Tersedia: <span id="stock">8</span> item</span
+              >Stok Tersedia: <span id="stock"></span> item</span
             >
           </div>
 
@@ -218,23 +219,23 @@
             <ul class="space-y-3 text-gray-700">
               <li class="flex items-start space-x-2">
                 <span class="text-primary mt-1">•</span>
-                <span>Tas kulit asli dari Zara koleksi terbaru</span>
+                <span> </span>
               </li>
               <li class="flex items-start space-x-2">
                 <span class="text-primary mt-1">•</span>
-                <span>Barang resmi mall Bangkok dengan diskon 60%</span>
+                <span></span>
               </li>
               <li class="flex items-start space-x-2">
                 <span class="text-primary mt-1">•</span>
-                <span>Dilengkapi dengan dustbag dan kartu autentik</span>
+                <span></span>
               </li>
               <li class="flex items-start space-x-2">
                 <span class="text-primary mt-1">•</span>
-                <span>Material: 100% Genuine Leather</span>
+                <span></span>
               </li>
               <li class="flex items-start space-x-2">
                 <span class="text-primary mt-1">•</span>
-                <span>Dimensi: 20cm x 15cm x 8cm</span>
+                <span></span>
               </li>
             </ul>
           </div>
@@ -254,7 +255,7 @@
             <div>
               <div class="flex items-center space-x-2">
                 <h4 class="text-lg font-bold text-gray-900">
-                  Nadia Jastip Bangkok
+                 
                 </h4>
                 <svg
                   class="w-5 h-5 text-blue-500"
