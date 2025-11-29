@@ -11,6 +11,81 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
+// Load random promo products
+async function loadRandomPromos() {
+    try {
+        const response = await fetch('./backend/api/random_promos.php');
+        
+        // CEK apakah response OK
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        // CEK apakah response adalah JSON
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            const text = await response.text();
+            console.error('Server response:', text);
+            throw new Error("Server tidak mengembalikan JSON");
+        }
+        
+        const products = await response.json();
+        const promoGrid = document.getElementById('promo-grid');
+        
+        if (!products || products.length === 0) {
+            promoGrid.innerHTML = '<div class="col-span-3 text-center py-8"><p class="text-gray-500">Belum ada promo tersedia</p></div>';
+            return;
+        }
+        
+        promoGrid.innerHTML = '';
+        
+        products.forEach(product => {
+            const price = parseInt(product.price) || 0;
+            const originalPrice = parseInt(product.original_price) || 0;
+            const discount = parseInt(product.discount) || 0;
+            
+            const card = document.createElement('div');
+            card.className = 'product-card bg-white rounded-xl shadow-md overflow-hidden';
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.6s ease-out';
+            
+            card.innerHTML = `
+                <a href="detail.php?id=${product.id}">
+                    <div class="relative">
+                        <img src="${product.image || './assets/img/placeholder.jpg'}" 
+                             alt="${product.name}"
+                             class="w-full h-64 object-cover"
+                             onerror="this.src='./assets/img/placeholder.jpg'" />
+                        ${discount > 0 ? `<span class="badge-promo absolute top-4 right-4">Promo ${discount}%</span>` : ''}
+                    </div>
+                </a>
+                <div class="p-5">
+                    <p class="text-gray-500 text-sm mb-1">${product.category || 'Produk'}</p>
+                    <h3 class="font-bold text-gray-800 mb-2">${product.name}</h3>
+                    <p class="text-2xl font-bold text-purple-600 mb-3">Rp ${price.toLocaleString('id-ID')}</p>
+                    ${originalPrice > 0 ? `<p class="text-gray-400 text-sm line-through mb-4">Est. dari Rp ${originalPrice.toLocaleString('id-ID')}</p>` : '<p class="mb-4">&nbsp;</p>'}
+                    <button onclick="window.location.href='detail.php?id=${product.id}'"
+                        class="w-full primary-color text-white py-3 rounded-lg font-semibold hover:opacity-90">
+                        Beli Sekarang
+                    </button>
+                </div>
+            `;
+            
+            promoGrid.appendChild(card);
+            
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100);
+        });
+        
+    } catch (error) {
+        console.error('Error loading promos:', error);
+        const promoGrid = document.getElementById('promo-grid');
+        promoGrid.innerHTML = '<div class="col-span-3 text-center py-8"><p class="text-gray-500">Gagal memuat promo. Cek console untuk detail.</p></div>';
+    }
+}
 // Add animation on scroll
 const observerOptions = {
     threshold: 0.1,
@@ -93,7 +168,7 @@ document.querySelectorAll('button').forEach(button => {
 // Cek login saat halaman dibuka
 async function checkLoginStatus() {
     try {
-        const response = await fetch('backend/api/check_session.php', {
+        const response = await fetch('./backend/api/check_session.php', {
             credentials: 'include'
         });
         
@@ -222,4 +297,7 @@ document.addEventListener('click', function() {
 });
 
 // Jalankan saat halaman loaded
-window.addEventListener('load', checkLoginStatus);
+window.addEventListener('load', () => {
+    checkLoginStatus();
+    loadRandomPromos();
+});
