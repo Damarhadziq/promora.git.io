@@ -197,7 +197,7 @@ async function deleteProduct(id) {
     }
 }
 
-// Load store profile
+// ✅ Load store profile - VERSI FINAL
 async function loadStoreProfile() {
     try {
         const response = await fetch('backend/api/get_store_profile.php', {
@@ -238,14 +238,75 @@ async function loadStoreProfile() {
             
             // Update pengaturan form
             const settingsInputs = document.querySelectorAll('#content-pengaturan input[type="text"]');
-            if (settingsInputs.length >= 2) {
+            if (settingsInputs.length >= 1) {
                 settingsInputs[0].value = store.store_name; // Nama Toko
-                settingsInputs[1].value = store.phone || ''; // Nomor WA
             }
             
+            // Update phone number
+            const phoneInput = document.getElementById('storePhone');
+            if (phoneInput) {
+                phoneInput.value = store.phone || '';
+            }
+            
+            // Update logo di semua tempat (termasuk navbar)
+            if (store.logo) {
+                const logoElements = document.querySelectorAll('#storeLogoMain, #storeLogoPreview, #navbarLogo');
+                logoElements.forEach(el => {
+                    el.src = 'backend/uploads/store_logos/' + store.logo;
+                });
+            }
+
+            // Update coordinates dan maps search
+const mapsSearch = document.getElementById('mapsSearch');
+const addressTextarea = document.getElementById('storeAddress');
+
+if (store.latitude && store.longitude) {
+    document.getElementById('latitude').value = store.latitude;
+    document.getElementById('longitude').value = store.longitude;
+    
+    // Update placeholder dengan koordinat
+    if (mapsSearch) {
+        mapsSearch.placeholder = `Lat: ${store.latitude}, Lng: ${store.longitude}`;
+    }
+    
+    // Tampilkan alamat yang tersimpan, atau convert dari koordinat
+    if (addressTextarea) {
+        if (store.address && store.address.trim() !== '') {
+            // Pakai alamat dari database
+            addressTextarea.value = store.address;
+        } else {
+            // Convert koordinat ke alamat
+            addressTextarea.value = 'Memuat alamat dari koordinat...';
+            
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${store.latitude}&lon=${store.longitude}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.display_name) {
+                        addressTextarea.value = data.display_name;
+                        console.log('Alamat dari koordinat:', data.display_name);
+                    } else {
+                        addressTextarea.value = `Koordinat: ${store.latitude}, ${store.longitude}`;
+                    }
+                })
+                .catch(err => {
+                    console.error('Geocoding error:', err);
+                    addressTextarea.value = `Koordinat: ${store.latitude}, ${store.longitude}`;
+                });
+        }
+    }
+} else {
+    // Belum ada koordinat
+    if (mapsSearch) {
+        mapsSearch.placeholder = "Pilih lokasi di peta untuk mendapatkan alamat";
+    }
+    if (addressTextarea) {
+        addressTextarea.value = '';
+        addressTextarea.placeholder = "Alamat akan terisi otomatis setelah memilih lokasi di peta";
+    }
+}
             const settingsTextarea = document.querySelector('#content-pengaturan textarea');
             if (settingsTextarea) {
-                settingsTextarea.value = store.description;
+                settingsTextarea.value = store.description || '';
             }
             
             // Update statistik section
@@ -264,36 +325,214 @@ async function loadStoreProfile() {
     }
 }
 
-// Save store settings
+// Handle logo upload
+let logoFile = null;
+
+function handleLogoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Validasi file
+    if (file.size > 2 * 1024 * 1024) { // 2MB
+        alert('Ukuran file terlalu besar! Maksimal 2MB');
+        return;
+    }
+    
+    if (!file.type.match('image.*')) {
+        alert('File harus berupa gambar!');
+        return;
+    }
+    
+    logoFile = file;
+    
+    // Preview logo
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('storeLogoPreview').src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+// Leaflet Maps functionality - AUTO CONVERT KE ALAMAT
+let map, marker;
+
+function openMapsPicker() {
+    const mapContainer = document.getElementById('mapContainer');
+    mapContainer.classList.remove('hidden');
+    
+    if (!map) {
+        // Cek apakah ada koordinat tersimpan
+        const savedLat = parseFloat(document.getElementById('latitude').value);
+        const savedLng = parseFloat(document.getElementById('longitude').value);
+        
+        // Gunakan koordinat tersimpan atau default Jakarta
+        const defaultLat = (savedLat && !isNaN(savedLat)) ? savedLat : -6.2088;
+        const defaultLng = (savedLng && !isNaN(savedLng)) ? savedLng : 106.8456;
+        
+        console.log('Opening map at:', defaultLat, defaultLng);
+        
+        // Initialize map
+        map = L.map('mapContainer').setView([defaultLat, defaultLng], 15);
+        
+        // Add tile layer (peta)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+        
+        // Add marker di posisi yang benar
+        marker = L.marker([defaultLat, defaultLng], {
+            draggable: true
+        }).addTo(map);
+        
+        // Fungsi untuk update alamat dari koordinat
+        function updateAddressFromCoords(lat, lng) {
+            // Update hidden inputs
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+            
+            // Update placeholder mapsSearch
+            const mapsSearch = document.getElementById('mapsSearch');
+            if (mapsSearch) {
+                mapsSearch.placeholder = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+            }
+            
+            // Update alamat lengkap (reverse geocode)
+            const addressTextarea = document.getElementById('storeAddress');
+            if (addressTextarea) {
+                addressTextarea.value = 'Mengambil alamat...';
+                
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.display_name) {
+                            addressTextarea.value = data.display_name;
+                            console.log('Alamat lengkap:', data.display_name);
+                        } else {
+                            addressTextarea.value = `Koordinat: ${lat}, ${lng}`;
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Geocoding error:', err);
+                        addressTextarea.value = `Koordinat: ${lat}, ${lng}`;
+                    });
+            }
+        }
+        
+        // Update coordinates when marker is dragged
+        marker.on('dragend', function(event) {
+            const position = marker.getLatLng();
+            updateAddressFromCoords(position.lat, position.lng);
+        });
+        
+        // Click on map to move marker
+        map.on('click', function(e) {
+            marker.setLatLng(e.latlng);
+            updateAddressFromCoords(e.latlng.lat, e.latlng.lng);
+        });
+        
+        // Search functionality
+        const searchInput = document.getElementById('mapsSearch');
+        let searchTimeout;
+        
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const query = this.value.trim();
+            
+            if (query.length < 3) return;
+            
+            searchTimeout = setTimeout(() => {
+                // Search location
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            const result = data[0];
+                            const lat = parseFloat(result.lat);
+                            const lon = parseFloat(result.lon);
+                            
+                            map.setView([lat, lon], 15);
+                            marker.setLatLng([lat, lon]);
+                            
+                            updateAddressFromCoords(lat, lon);
+                        }
+                    })
+                    .catch(err => console.error('Search error:', err));
+            }, 1000);
+        });
+    } else {
+        // Map sudah ada, tapi cek apakah perlu update posisi
+        const savedLat = parseFloat(document.getElementById('latitude').value);
+        const savedLng = parseFloat(document.getElementById('longitude').value);
+        
+        if (savedLat && savedLng && !isNaN(savedLat) && !isNaN(savedLng)) {
+            map.setView([savedLat, savedLng], 15);
+            marker.setLatLng([savedLat, savedLng]);
+        }
+    }
+    
+    // Resize map setelah ditampilkan
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 100);
+}
+
+// Save store settings - VERSI FINAL dengan alamat dari maps
 async function saveStoreSettings() {
     const settingsInputs = document.querySelectorAll('#content-pengaturan input[type="text"]');
     const settingsTextarea = document.querySelector('#content-pengaturan textarea');
     
     const storeName = settingsInputs[0].value.trim();
     const description = settingsTextarea.value.trim();
+    const address = document.getElementById('storeAddress').value.trim(); // Ambil dari textarea otomatis
+    const phone = document.getElementById('storePhone').value.trim();
+    const latitude = document.getElementById('latitude').value;
+    const longitude = document.getElementById('longitude').value;
     
     if (!storeName) {
         alert('Nama toko tidak boleh kosong!');
         return;
     }
     
+    if (!latitude || !longitude) {
+        alert('Silakan pilih lokasi toko di peta terlebih dahulu!');
+        return;
+    }
+    
+    console.log('Saving store with data:', {
+        storeName,
+        description,
+        address,
+        phone,
+        latitude,
+        longitude,
+        hasLogo: logoFile !== null
+    });
+    
     try {
+        const formData = new FormData();
+        formData.append('store_name', storeName);
+        formData.append('description', description);
+        formData.append('address', address); // Alamat dari maps
+        formData.append('phone', phone);
+        formData.append('latitude', latitude || '');
+        formData.append('longitude', longitude || '');
+        
+        if (logoFile) {
+            formData.append('logo', logoFile);
+        }
+        
         const response = await fetch('backend/api/update_store.php', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
             credentials: 'include',
-            body: JSON.stringify({
-                store_name: storeName,
-                description: description
-            })
+            body: formData
         });
         
         const data = await response.json();
         
         if (data.success) {
             alert('Pengaturan toko berhasil disimpan!');
+            logoFile = null; // Reset logo file
             loadStoreProfile(); // Reload untuk update tampilan
         } else {
             alert('Gagal menyimpan: ' + (data.message || 'Unknown error'));

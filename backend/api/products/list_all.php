@@ -1,6 +1,6 @@
 <?php
 // backend/api/products/list_all.php
-// Untuk halaman explore - menampilkan SEMUA produk + store_name
+// Untuk halaman explore - menampilkan SEMUA produk + store_name + store info
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -16,9 +16,13 @@ if ($mysqli->connect_error) {
     exit;
 }
 
-// Query versi KODE 2, tapi untuk mysqli
+// Query dengan tambahan logo, latitude, longitude dari stores
 $query = "
-    SELECT p.*, s.store_name
+    SELECT p.*, 
+           s.store_name,
+           s.logo as store_logo,
+           s.latitude,
+           s.longitude
     FROM products p
     LEFT JOIN stores s ON p.seller_id = s.user_id
     ORDER BY p.created_at DESC
@@ -37,6 +41,6 @@ while ($row = $result->fetch_assoc()) {
 }
 
 echo json_encode($products);
-
+ 
 $mysqli->close();
 ?>

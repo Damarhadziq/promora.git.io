@@ -3,6 +3,7 @@
 const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get('id');
 
+
 // Redirect jika tidak ada ID
 if (!productId) {
     window.location.href = 'explore.html';
@@ -23,10 +24,26 @@ function changeImage(src) {
     event.target.classList.add('border-primary');
 }
 
+// Tambahkan fungsi untuk convert lat/long ke nama kota
+async function getCityFromCoordinates(lat, lon) {
+    try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`);
+        const data = await response.json();
+        
+        // Ambil city atau town atau village
+        const city = data.address.city || data.address.town || data.address.village || data.address.county;
+        const country = data.address.country;
+        
+        return `${city}, ${country}`;
+    } catch (error) {
+        console.error('Error getting location:', error);
+        return 'Location Unknown';
+    }
+}
+
 // Fetch product detail
 async function loadProductDetail() {
     try {
-        // UBAH PATH INI SESUAI DENGAN EXPLORE.JS
         const response = await fetch(`backend/api/products/list_all.php?id=${productId}`);
         
         if (!response.ok) {
@@ -49,46 +66,43 @@ async function loadProductDetail() {
             return;
         }
         
-
-        
         // Update main image dan thumbnail gallery
-const mainImage = document.getElementById('mainImage');
-const thumbnailGallery = document.querySelector('.grid.grid-cols-4.gap-3');
+        const mainImage = document.getElementById('mainImage');
+        const thumbnailGallery = document.querySelector('.grid.grid-cols-4.gap-3');
 
-// Kumpulkan semua gambar yang ada
-const images = [
-    product.image,
-    product.image2,
-    product.image3,
-    product.image4,
-    product.image5
-].filter(img => img && img !== null && img !== ''); // Filter yang ada isi aja
+        // Kumpulkan semua gambar yang ada
+        const images = [
+            product.image,
+            product.image2,
+            product.image3,
+            product.image4,
+            product.image5
+        ].filter(img => img && img !== null && img !== ''); // Filter yang ada isi aja
 
-// Set main image (pakai gambar pertama)
-if (images.length > 0) {
-    mainImage.src = images[0];
-} else {
-    mainImage.src = 'assets/img/placeholder.jpg';
-}
+        // Set main image (pakai gambar pertama)
+        if (images.length > 0) {
+            mainImage.src = images[0];
+        } else {
+            mainImage.src = 'assets/img/placeholder.jpg';
+        }
 
-// Update thumbnail gallery
-if (thumbnailGallery && images.length > 0) {
-    if (images.length === 1) {
-        // Kalau cuma 1 gambar, sembunyikan gallery
-        thumbnailGallery.style.display = 'none';
-    } else {
-        // Kalau lebih dari 1, tampilkan thumbnail
-        thumbnailGallery.style.display = 'grid';
-        thumbnailGallery.innerHTML = images.map((img, index) => `
-            <img onclick="changeImage('${img}')"
-                 src="${img}"
-                 alt="Thumbnail ${index + 1}"
-                 class="w-full h-24 object-cover rounded-lg cursor-pointer border-2 ${index === 0 ? 'border-primary' : 'border-transparent hover:border-primary'}"
-                 onerror="this.style.display='none'" />
-        `).join('');
-    }
-}
-
+        // Update thumbnail gallery
+        if (thumbnailGallery && images.length > 0) {
+            if (images.length === 1) {
+                // Kalau cuma 1 gambar, sembunyikan gallery
+                thumbnailGallery.style.display = 'none';
+            } else {
+                // Kalau lebih dari 1, tampilkan thumbnail
+                thumbnailGallery.style.display = 'grid';
+                thumbnailGallery.innerHTML = images.map((img, index) => `
+                    <img onclick="changeImage('${img}')"
+                         src="${img}"
+                         alt="Thumbnail ${index + 1}"
+                         class="w-full h-24 object-cover rounded-lg cursor-pointer border-2 ${index === 0 ? 'border-primary' : 'border-transparent hover:border-primary'}"
+                         onerror="this.style.display='none'" />
+                `).join('');
+            }
+        }
         
         // Update product title
         document.querySelector('h1.text-4xl').textContent = product.name;
@@ -152,22 +166,65 @@ if (thumbnailGallery && images.length > 0) {
             }
         }
         
-        // Update seller info
-        const sellerNameElement = document.querySelector('.text-lg.font-bold.text-gray-900');
-        if (sellerNameElement && product.store_name) {
-            sellerNameElement.textContent = product.store_name;
+// Update seller info (nama, foto, lokasi)
+const sellerNameElement = document.querySelector('.text-lg.font-bold.text-gray-900');
+if (sellerNameElement && product.store_name) {
+    sellerNameElement.textContent = product.store_name;
+}
+
+// Update seller profile image
+const sellerImage = document.querySelector('.flex.items-center.space-x-4 img');
+if (sellerImage) {
+    if (product.store_logo) {
+        // Coba kedua path (dengan/tanpa subfolder)
+        // Jika store_logo sudah include path lengkap, pakai langsung
+        if (product.store_logo.startsWith('backend/') || product.store_logo.startsWith('http')) {
+            sellerImage.src = product.store_logo;
+        } else {
+            // Kalau cuma nama file, tambahkan path
+            sellerImage.src = `backend/uploads/${product.store_logo}`;
         }
         
-        // Update location
-        if (product.location) {
-            const locationSpans = document.querySelectorAll('.text-sm.text-gray-500 span');
-            const locationSpan = Array.from(locationSpans).find(span => 
-                span.textContent.includes('Bangkok') || span.textContent.includes('Thailand')
-            );
-            if (locationSpan) {
-                locationSpan.textContent = product.location;
+        sellerImage.onerror = function() {
+            console.log('Image load failed:', this.src);
+            // Coba path alternatif
+            if (!this.src.includes('store_logos')) {
+                this.src = `backend/uploads/store_logos/${product.store_logo.split('/').pop()}`;
+            } else {
+                // Kalau tetap gagal, pakai avatar default
+                this.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(product.store_name || 'Seller') + '&background=9333ea&color=fff&size=100';
             }
+        };
+    } else {
+        sellerImage.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(product.store_name || 'Seller') + '&background=9333ea&color=fff&size=100';
+    }
+}
+
+// Update location dari latitude/longitude
+if (product.latitude && product.longitude) {
+    const locationContainer = document.querySelector('.flex.items-center.space-x-1.text-sm.text-gray-500.mt-1');
+    if (locationContainer) {
+        const locationSpan = locationContainer.querySelector('span');
+        if (locationSpan) {
+            locationSpan.textContent = 'Loading location...';
+            getCityFromCoordinates(product.latitude, product.longitude).then(cityName => {
+                locationSpan.textContent = cityName;
+            }).catch(error => {
+                console.error('Error loading city:', error);
+                locationSpan.textContent = 'Location unavailable';
+            });
         }
+    }
+} else {
+    // Kalau tidak ada lat/long, tampilkan location dari database (fallback)
+    const locationContainer = document.querySelector('.flex.items-center.space-x-1.text-sm.text-gray-500.mt-1');
+    if (locationContainer) {
+        const locationSpan = locationContainer.querySelector('span');
+        if (locationSpan && product.location) {
+            locationSpan.textContent = product.location;
+        }
+    }
+}
         
         // Load similar products
         loadSimilarProducts(product.category, product.id);
@@ -175,17 +232,46 @@ if (thumbnailGallery && images.length > 0) {
     } catch (error) {
         console.error('Error loading product:', error);
         alert('Gagal memuat produk! Error: ' + error.message);
-        // Jangan redirect, biarkan user lihat error
     }
 }
-      // Chat seller function
-      function chatSeller() {
-        window.location.href = "chat.html";
-      }
+
+// Chat seller function
+async function chatSeller() {
+    try {
+        // Cek login status dari server
+        const sessionResponse = await fetch('backend/api/check_session.php', {
+            credentials: 'include'
+        });
+        const sessionData = await sessionResponse.json();
+        
+        if (!sessionData.logged_in) {
+            alert('Silakan login terlebih dahulu untuk chat dengan seller!');
+            window.location.href = 'lamanLogin.html';
+            return;
+        }
+        
+        // Jika sudah login, redirect ke halaman chat
+        window.location.href = `chat.html?id=${productId}`;
+        
+    } catch (error) {
+        console.error('Error checking session:', error);
+        // Fallback: cek localStorage
+        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        
+        if (!isLoggedIn) {
+            alert('Silakan login terlebih dahulu untuk chat dengan seller!');
+            window.location.href = 'lamanLogin.html';
+            return;
+        }
+        
+        // Jika localStorage bilang sudah login, lanjutkan
+        window.location.href = `chat.html?id=${productId}`;
+    }
+}
+
 // Load similar products
 async function loadSimilarProducts(category, currentProductId) {
     try {
-        // UBAH PATH INI JUGA
         const response = await fetch(`backend/api/products/list_all.php`);
         
         if (!response.ok) {
@@ -197,7 +283,7 @@ async function loadSimilarProducts(category, currentProductId) {
         // Filter produk dengan kategori sama, exclude produk current
         const similarProducts = allProducts
             .filter(p => p.category === category && p.id != currentProductId)
-            .slice(0, 3); // Ambil 3 produk pertama
+            .slice(0, 3);
         
         const container = document.getElementById('productsContainer');
         if (!container) return;
@@ -255,51 +341,45 @@ async function loadSimilarProducts(category, currentProductId) {
         console.error('Error loading similar products:', error);
     }
 }
+
 // ========== AUTH FUNCTIONS ==========
 // Cek login dari server (bukan localStorage)
 async function checkLoginStatus() {
     try {
         const response = await fetch('backend/api/check_session.php', {
-            credentials: 'include' // Penting untuk kirim cookie session
+            credentials: 'include'
         });
         
         const data = await response.json();
         const cartLink = document.getElementById('cart-link');
         
         if (data.logged_in && data.user) {
-            // User sudah login
             document.getElementById('auth-buttons').classList.add('hidden');
             document.getElementById('user-info').classList.remove('hidden');
             document.getElementById('user-info').classList.add('flex');
             
-            // Tampilkan keranjang
             if (cartLink) {
                 cartLink.classList.remove('hidden');
             }
             
-            // Set nama user (username saja)
             const userNameEl = document.getElementById('user-name');
             if (userNameEl) {
                 userNameEl.textContent = data.user.username;
             }
                         
-            // Simpan ke localStorage sebagai backup
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('userName', data.user.first_name || data.user.username);
             localStorage.setItem('userRole', data.user.role);
             localStorage.setItem('userId', data.user.id);
             
         } else {
-            // User belum login
             document.getElementById('auth-buttons').classList.remove('hidden');
             document.getElementById('user-info').classList.add('hidden');
             
-            // Sembunyikan keranjang
             if (cartLink) {
                 cartLink.classList.add('hidden');
             }
             
-            // Bersihkan localStorage
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('userName');
             localStorage.removeItem('userRole');
@@ -308,7 +388,6 @@ async function checkLoginStatus() {
     } catch (error) {
         console.error('Error checking session:', error);
         
-        // Fallback ke localStorage jika server error
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
         const userName = localStorage.getItem('userName');
         const cartLink = document.getElementById('cart-link');
@@ -336,14 +415,12 @@ async function logout() {
         const data = await response.json();
         
         if (data.success) {
-            // Bersihkan localStorage
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('userName');
             localStorage.removeItem('userRole');
             localStorage.removeItem('userId');
             localStorage.removeItem('cart');
             
-            // Update UI
             const cartLink = document.getElementById('cart-link');
             document.getElementById('auth-buttons').classList.remove('hidden');
             document.getElementById('user-info').classList.add('hidden');
@@ -389,7 +466,6 @@ document.addEventListener('click', function(e) {
 // Update fungsi addToCart untuk cek login dari server DAN kirim ke database
 async function addToCart() {
     try {
-        // Cek session dari server dulu
         const sessionResponse = await fetch('backend/api/check_session.php', {
             credentials: 'include'
         });
@@ -401,7 +477,6 @@ async function addToCart() {
             return;
         }
         
-        // Jika sudah login, kirim ke database
         const response = await fetch('backend/api/add_to_cart.php', {
             method: 'POST',
             headers: {
@@ -431,7 +506,6 @@ async function addToCart() {
 // Fungsi add to cart dari similar products
 async function addToCartFromDetail(productId, productName, price) {
     try {
-        // Cek session dari server dulu
         const sessionResponse = await fetch('backend/api/check_session.php', {
             credentials: 'include'
         });
@@ -443,7 +517,6 @@ async function addToCartFromDetail(productId, productName, price) {
             return;
         }
         
-        // Jika sudah login, kirim ke database
         const response = await fetch('backend/api/add_to_cart.php', {
             method: 'POST',
             headers: {
@@ -470,7 +543,7 @@ async function addToCartFromDetail(productId, productName, price) {
     }
 }
 
-// Tambahkan fungsi showToast jika belum ada
+// Tambahkan fungsi showToast
 function showToast() {
     const toast = document.getElementById('toast');
     if (toast) {
@@ -483,58 +556,9 @@ function showToast() {
         }, 3000);
     }
 }
-// Chat seller - cek login dulu
-async function chatSeller() {
-    try {
-        const sessionResponse = await fetch('backend/api/check_session.php', {
-            credentials: 'include'
-        });
-        const sessionData = await sessionResponse.json();
-        
-        if (!sessionData.logged_in) {
-            alert('Silakan login terlebih dahulu untuk chat dengan seller!');
-            window.location.href = 'lamanLogin.html';
-            return;
-        }
-        
-        window.location.href = "chat.html";
-        
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Terjadi kesalahan. Silakan coba lagi.');
-    }
-}
 
 // Jalankan checkLoginStatus saat halaman load
 window.addEventListener('load', checkLoginStatus);
-
-// Fungsi add to cart (tambahkan ini jika belum ada)
-function addToCartFromDetail(productId, productName, price) {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    
-    if (!isLoggedIn) {
-        alert('Silakan login terlebih dahulu!');
-        window.location.href = 'lamanLogin.html';
-        return;
-    }
-    
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const existingItem = cart.find(item => item.id === productId);
-    
-    if (existingItem) {
-        existingItem.quantity += 1;
-    } else {
-        cart.push({
-            id: productId,
-            name: productName,
-            price: price,
-            quantity: 1
-        });
-    }
-    
-    localStorage.setItem('cart', JSON.stringify(cart));
-    showToast();
-}
 
 // Load product saat halaman dibuka
 window.addEventListener('DOMContentLoaded', loadProductDetail);

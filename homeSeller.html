@@ -89,12 +89,12 @@
             
           <div class="flex items-center space-x-4">
             <!-- PROFILE -->
-            <a href="profileSeller.html"><img  
-              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop" 
-              alt="Profile" 
-              class="h-10 w-10 rounded-full object-cover border hover:opacity-90 cursor-pointer"/>
+            <a href="profileSeller.html">
+                <img id="navbarLogo"
+                    src="https://via.placeholder.com/150?text=Store+Logo" 
+                    alt="Profile" 
+                    class="h-10 w-10 rounded-full object-cover border hover:opacity-90 cursor-pointer"/>
             </a>
-            
              </div>
           </div>
         </div>
@@ -107,9 +107,10 @@
             <div class="flex items-start justify-between">
                 <div class="flex items-center space-x-6">
                     <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop" 
-                             alt="Profile" 
-                             class="w-20 h-20 rounded-2xl object-cover">
+                        <img id="storeLogoMain" 
+                            src="https://via.placeholder.com/150?text=Store+Logo" 
+                            alt="Store Logo" 
+                            class="w-20 h-20 rounded-2xl object-cover">
                         <div class="absolute -bottom-1 -right-1 w-7 h-7 bg-[#7A5AF8] rounded-full flex items-center justify-center">
                             <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
@@ -247,9 +248,64 @@
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Nomor WhatsApp</label>
-                        <input type="text" value="+62 812-3456-7890" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7A5AF8] focus:border-transparent">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Logo Toko</label>
+                    <div class="flex items-center space-x-4">
+                        <img id="storeLogoPreview" 
+                            src="https://via.placeholder.com/100?text=Logo" 
+                            alt="Logo Preview" 
+                            class="w-20 h-20 rounded-lg object-cover border-2 border-gray-200">
+                        <div>
+                            <input type="file" 
+                                id="logoUpload" 
+                                accept="image/*" 
+                                class="hidden" 
+                                onchange="handleLogoUpload(event)">
+                            <label for="logoUpload" 
+                                class="cursor-pointer bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg font-medium text-gray-700 inline-block">
+                                Pilih Logo
+                            </label>
+                            <p class="text-xs text-gray-500 mt-1">Max 2MB, format: JPG, PNG</p>
+                        </div>
                     </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Lokasi Toko di Maps</label>
+                    <input type="text" 
+                        id="mapsSearch" 
+                        placeholder="Pilih lokasi di peta untuk mendapatkan alamat"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7A5AF8] focus:border-transparent mb-2 cursor-not-allowed" disabled>
+                    <button type="button" 
+                            onclick="openMapsPicker()" 
+                            class="text-[#7A5AF8] hover:text-[#6346E8] font-medium flex items-center space-x-2 mb-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span>Buka Peta & Pilih Lokasi</span>
+                    </button>
+                    <div id="mapContainer" class="hidden mt-3 w-full h-64 rounded-lg border-2 border-gray-300"></div>
+                    <input type="hidden" id="latitude">
+                    <input type="hidden" id="longitude">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Alamat Lengkap Toko <span class="text-xs text-gray-500">(Otomatis dari Maps)</span></label>
+                    <textarea id="storeAddress" 
+                            rows="3" 
+                            disabled
+                            placeholder="Alamat akan terisi otomatis setelah memilih lokasi di peta"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"></textarea>
+                    <p class="text-xs text-gray-500 mt-1">📍 Alamat ini diambil otomatis dari koordinat yang Anda pilih di peta</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Nomor WhatsApp</label>
+                    <input type="text" 
+                        id="storePhone"
+                        placeholder="+62 812-xxxx-xxxx"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7A5AF8] focus:border-transparent">
+                </div>
                     
                 <button onclick="saveStoreSettings()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold">
                     Simpan Perubahan
@@ -323,5 +379,7 @@
         </div>
     </footer>
     <script src="./assets/js/homeSeller.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </body>
 </html>

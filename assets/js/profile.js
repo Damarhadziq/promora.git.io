@@ -1,5 +1,7 @@
 // assets/js/profile.js
 const API_BASE_URL = 'backend/api';
+let profilePhotoFile = null;
+let map, marker;
 
 // Load user profile saat page load
 document.addEventListener('DOMContentLoaded', async () => {
@@ -11,7 +13,7 @@ async function loadUserProfile() {
     try {
         const response = await fetch(API_BASE_URL + '/get_profile.php', {
             method: 'GET',
-            credentials: 'include' // Penting untuk kirim session cookie
+            credentials: 'include'
         });
         
         const result = await response.json();
@@ -23,6 +25,14 @@ async function loadUserProfile() {
             document.getElementById('displayName').textContent = user.full_name;
             document.getElementById('displayEmail').textContent = user.email;
             
+            // Update foto profil
+            if (user.profile_photo) {
+                const profileImages = document.querySelectorAll('#profileImage');
+                profileImages.forEach(img => {
+                    img.src = 'backend/uploads/profile_photos/' + user.profile_photo;
+                });
+            }
+            
             // Update Personal Information di Overview Tab
             updateOverviewTab(user);
             
@@ -32,9 +42,8 @@ async function loadUserProfile() {
             // Simpan ke localStorage sebagai backup
             localStorage.setItem('userData', JSON.stringify(user));
         } else {
-            // User belum login, redirect ke login page
             alert('Anda belum login. Silakan login terlebih dahulu.');
-            window.location.href = 'login.html';
+            window.location.href = 'lamanLogin.html';
         }
     } catch (error) {
         console.error('Error loading profile:', error);
@@ -46,6 +55,17 @@ async function loadUserProfile() {
 function updateOverviewTab(user) {
     const overviewTab = document.getElementById('overviewTab');
     
+    // Update foto profil di sidebar juga
+    if (user.profile_photo) {
+        const profileImages = document.querySelectorAll('#profileImage');
+        profileImages.forEach(img => {
+            img.src = './backend/uploads/profile_photos/' + user.profile_photo;
+            img.onerror = function() {
+                this.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.full_name) + '&size=150&background=7A5AF8&color=fff';
+            };
+        });
+    }
+
     // Update Personal Information
     const personalInfo = overviewTab.querySelector('.bg-gray-50.rounded-xl');
     if (personalInfo) {
@@ -80,6 +100,32 @@ function updateOverviewTab(user) {
         `;
         personalInfo.innerHTML = infoHTML;
     }
+    
+    // Update Address Section
+    const addressSection = document.getElementById('userAddress');
+    if (addressSection) {
+        if (user.address) {
+            addressSection.textContent = user.address;
+        } else if (user.latitude && user.longitude) {
+            // Convert koordinat ke alamat
+            addressSection.textContent = 'Memuat alamat...';
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${user.latitude}&lon=${user.longitude}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.display_name) {
+                        addressSection.textContent = data.display_name;
+                    } else {
+                        addressSection.textContent = `Koordinat: ${user.latitude}, ${user.longitude}`;
+                    }
+                })
+                .catch(err => {
+                    console.error('Geocoding error:', err);
+                    addressSection.textContent = `Koordinat: ${user.latitude}, ${user.longitude}`;
+                });
+        } else {
+            addressSection.textContent = 'Belum ada alamat tersimpan';
+        }
+    }
 }
 
 // Update Edit Form
@@ -88,6 +134,495 @@ function updateEditForm(user) {
     document.getElementById('lastName').value = user.last_name || '';
     document.getElementById('email').value = user.email || '';
     document.getElementById('phone').value = user.phone || '';
+    
+    // Update koordinat
+    const mapsSearch = document.getElementById('mapsSearch');
+    const addressTextarea = document.getElementById('address');
+    const latInput = document.getElementById('latitude');
+    const lngInput = document.getElementById('longitude');
+    
+    if (user.latitude && user.longitude) {
+        // Simpan koordinat di hidden input
+        latInput.value = user.latitude;
+        lngInput.value = user.longitude;
+        
+        // Update placeholder mapsSearch dengan koordinat
+        if (mapsSearch) {
+            mapsSearch.placeholder = `Lat: ${user.latitude}, Lng: ${user.longitude}`;
+        }
+        
+        // Untuk textarea alamat, tampilkan alamat lengkap
+        if (addressTextarea) {
+            if (user.address && user.address.trim() !== '') {
+                // Jika sudah ada alamat tersimpan, tampilkan
+                addressTextarea.value = user.address;
+            } else {
+                // Jika belum ada, convert dari koordinat
+                addressTextarea.value = 'Memuat alamat...';
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${user.latitude}&lon=${user.longitude}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.display_name) {
+                            addressTextarea.value = data.display_name;
+                        } else {
+                            addressTextarea.value = 'Alamat tidak ditemukan';
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Geocoding error:', err);
+                        addressTextarea.value = 'Gagal memuat alamat';
+                    });
+            }
+        }
+    } else {
+        // Jika belum ada koordinat
+        if (latInput) latInput.value = '';
+        if (lngInput) lngInput.value = '';
+        if (mapsSearch) {
+            mapsSearch.placeholder = "Pilih lokasi di peta untuk mendapatkan alamat";
+        }
+        if (addressTextarea) {
+            addressTextarea.value = '';
+            addressTextarea.placeholder = "Alamat akan terisi otomatis setelah memilih lokasi di peta";
+        }
+    }
+}
+
+// Load activities saat tab activity dibuka
+async function loadActivities() {
+    try {
+        const response = await fetch(API_BASE_URL + '/get_user_activities.php', {
+            method: 'GET',
+            credentials: 'include'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success && result.activities) {
+            displayActivities(result.activities);
+        } else {
+            document.getElementById('activityList').innerHTML = `
+                <div class="text-center py-12 text-gray-500">
+                    <i class="fas fa-inbox text-5xl mb-4"></i>
+                    <p>Belum ada aktivitas</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error loading activities:', error);
+        showNotification('Gagal memuat aktivitas', 'error');
+    }
+}
+
+// Display activities
+function displayActivities(activities) {
+    const container = document.getElementById('activityList');
+    
+    if (!activities || activities.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-12 text-gray-500">
+                <i class="fas fa-inbox text-5xl mb-4"></i>
+                <p>Belum ada aktivitas</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const statusConfig = {
+        pending: {
+            icon: 'fa-clock',
+            iconBg: 'bg-orange-100',
+            iconColor: 'text-orange-600',
+            badge: 'bg-orange-100 text-orange-700',
+            label: 'Menunggu Pembayaran',
+            description: 'Klik untuk upload bukti pembayaran'
+        },
+        waiting: {
+            icon: 'fa-hourglass-half',
+            iconBg: 'bg-yellow-100',
+            iconColor: 'text-yellow-600',
+            badge: 'bg-yellow-100 text-yellow-700',
+            label: 'Menunggu Verifikasi',
+            description: 'Sedang diverifikasi oleh admin'
+        },
+        success: {
+            icon: 'fa-check-circle',
+            iconBg: 'bg-green-100',
+            iconColor: 'text-green-600',
+            badge: 'bg-green-100 text-green-700',
+            label: 'Pesanan Selesai',
+            description: 'Transaksi berhasil diselesaikan'
+        },
+        rejected: {
+            icon: 'fa-times-circle',
+            iconBg: 'bg-red-100',
+            iconColor: 'text-red-600',
+            badge: 'bg-red-100 text-red-700',
+            label: 'Ditolak',
+            description: 'Pembayaran ditolak oleh admin'
+        }
+    };
+    
+    const html = activities.map(activity => {
+        const status = statusConfig[activity.display_status] || statusConfig.pending;
+        const timeAgo = getTimeAgo(activity.created_at);
+        const clickAction = activity.display_status === 'pending' ? 
+            `onclick="goToPayment('${activity.id}')"` : 
+            `onclick="showActivityDetail(${JSON.stringify(activity).replace(/"/g, '&quot;')})"`;
+        
+        return `
+            <div ${clickAction} class="flex gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition cursor-pointer">
+                <div class="w-12 h-12 ${status.iconBg} rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="fas ${status.icon} ${status.iconColor}"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center justify-between mb-1">
+                        <p class="font-semibold text-gray-800">${status.label}</p>
+                        <span class="text-xs px-3 py-1 rounded-full ${status.badge}">${activity.invoice_number}</span>
+                    </div>
+                    <p class="text-sm text-gray-600">${status.description}</p>
+                    <div class="flex items-center justify-between mt-2">
+                        <p class="text-sm font-bold text-primary">Rp ${formatNumber(activity.grand_total)}</p>
+                        <p class="text-xs text-gray-400">${activity.total_items} item • ${timeAgo}</p>
+                    </div>
+                    ${activity.admin_note && activity.display_status === 'rejected' ? `
+                        <div class="mt-2 p-2 bg-red-50 rounded border border-red-200">
+                            <p class="text-xs text-red-700"><i class="fas fa-info-circle mr-1"></i> ${activity.admin_note}</p>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    container.innerHTML = html;
+}
+
+// Format number
+function formatNumber(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+// Get time ago
+function getTimeAgo(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+    
+    if (diffInSeconds < 60) return 'Baru saja';
+    if (diffInSeconds < 3600) return Math.floor(diffInSeconds / 60) + ' menit lalu';
+    if (diffInSeconds < 86400) return Math.floor(diffInSeconds / 3600) + ' jam lalu';
+    if (diffInSeconds < 604800) return Math.floor(diffInSeconds / 86400) + ' hari lalu';
+    if (diffInSeconds < 2592000) return Math.floor(diffInSeconds / 604800) + ' minggu lalu';
+    return Math.floor(diffInSeconds / 2592000) + ' bulan lalu';
+}
+
+// Go to payment page (untuk status pending)
+function goToPayment(invoiceId) {
+    localStorage.setItem('invoice_id', invoiceId);
+    window.location.href = 'pembayaran.html';
+}
+
+// Show activity detail modal
+function showActivityDetail(activity) {
+    const statusConfig = {
+        pending: { label: 'Menunggu Pembayaran', class: 'text-orange-600 bg-orange-50' },
+        waiting: { label: 'Menunggu Verifikasi', class: 'text-yellow-600 bg-yellow-50' },
+        success: { label: 'Selesai', class: 'text-green-600 bg-green-50' },
+        rejected: { label: 'Ditolak', class: 'text-red-600 bg-red-50' }
+    };
+    
+    const status = statusConfig[activity.display_status] || statusConfig.pending;
+    
+    const itemsHtml = activity.items.map(item => `
+        <div class="flex items-center gap-3 p-3 bg-white rounded-lg border">
+            <img src="${item.product_image}" alt="${item.product_name}" class="w-16 h-16 object-cover rounded">
+            <div class="flex-1">
+                <p class="font-semibold text-sm">${item.product_name}</p>
+                <p class="text-xs text-gray-500">${item.product_brand}</p>
+                <p class="text-xs text-gray-600 mt-1">Qty: ${item.quantity} × Rp ${formatNumber(item.price)}</p>
+            </div>
+            <div class="text-right">
+                <p class="font-bold text-primary">Rp ${formatNumber(item.subtotal)}</p>
+            </div>
+        </div>
+    `).join('');
+    
+    const modalHtml = `
+        <div id="activityModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 overflow-y-auto">
+            <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">Detail Pesanan</h3>
+                        <p class="text-sm text-gray-500">${activity.invoice_number}</p>
+                    </div>
+                    <button onclick="closeActivityModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6 space-y-6">
+                    <!-- Status -->
+                    <div class="flex items-center justify-between p-4 rounded-xl ${status.class}">
+                        <div>
+                            <p class="text-sm font-medium">Status Pesanan</p>
+                            <p class="text-lg font-bold">${status.label}</p>
+                        </div>
+                        <i class="fas fa-${activity.display_status === 'success' ? 'check-circle' : activity.display_status === 'rejected' ? 'times-circle' : 'clock'} text-3xl"></i>
+                    </div>
+                    
+                    ${activity.admin_note && activity.display_status === 'rejected' ? `
+                        <div class="p-4 bg-red-50 border border-red-200 rounded-xl">
+                            <p class="text-sm font-semibold text-red-700 mb-1">Catatan Admin:</p>
+                            <p class="text-sm text-red-600">${activity.admin_note}</p>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Items -->
+                    <div>
+                        <h4 class="font-bold text-gray-800 mb-3">Daftar Produk (${activity.total_items} item)</h4>
+                        <div class="space-y-2">
+                            ${itemsHtml}
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Info -->
+                    <div class="bg-gray-50 rounded-xl p-4 space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Subtotal Produk</span>
+                            <span class="font-semibold">Rp ${formatNumber(activity.total_price)}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Fee Jastip</span>
+                            <span class="font-semibold">Rp ${formatNumber(activity.total_fee)}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Ongkir (${activity.courier_method})</span>
+                            <span class="font-semibold">Rp ${formatNumber(activity.shipping_cost)}</span>
+                        </div>
+                        <hr class="my-2">
+                        <div class="flex justify-between text-lg font-bold text-primary">
+                            <span>Total Pembayaran</span>
+                            <span>Rp ${formatNumber(activity.grand_total)}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Metode Pembayaran -->
+                    <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                        <span class="text-sm text-gray-600">Metode Pembayaran</span>
+                        <span class="font-semibold text-primary capitalize">${activity.payment_method}</span>
+                    </div>
+                    
+                    <!-- Bukti Pembayaran -->
+                    ${activity.payment_proof ? `
+                        <div>
+                            <h4 class="font-bold text-gray-800 mb-3">Bukti Pembayaran</h4>
+                            <img src="uploads/payments/${activity.payment_proof}" 
+                                 alt="Bukti Pembayaran" 
+                                 class="w-full rounded-lg border shadow-sm cursor-pointer hover:shadow-md transition"
+                                 onclick="window.open(this.src, '_blank')">
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Action Button -->
+                    ${activity.display_status === 'pending' ? `
+                        <button onclick="goToPayment('${activity.id}')" class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
+                            <i class="fas fa-upload mr-2"></i> Upload Bukti Pembayaran
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+// Close activity modal
+function closeActivityModal() {
+    const modal = document.getElementById('activityModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// Update switchTab function untuk load activities
+const originalSwitchTab = switchTab;
+switchTab = function(tabName) {
+    originalSwitchTab(tabName);
+    
+    if (tabName === 'activity') {
+        loadActivities();
+    }
+};
+
+// Load activities on page load jika tab activity aktif
+document.addEventListener('DOMContentLoaded', () => {
+    const activeTab = document.querySelector('.tab-button.active');
+    if (activeTab && activeTab.dataset.tab === 'activity') {
+        loadActivities();
+    }
+});
+
+
+// Handle foto profil upload
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Validasi file
+    if (file.size > 2 * 1024 * 1024) {
+        showNotification('Ukuran file terlalu besar! Maksimal 2MB', 'error');
+        return;
+    }
+    
+    if (!file.type.match('image.*')) {
+        showNotification('File harus berupa gambar!', 'error');
+        return;
+    }
+    
+    profilePhotoFile = file;
+    
+    // Preview foto
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.querySelectorAll('#profileImage').forEach(img => {
+            img.src = e.target.result;
+        });
+    };
+    reader.readAsDataURL(file);
+}
+
+// Leaflet Maps functionality
+function openMapsPicker() {
+    const mapContainer = document.getElementById('mapContainer');
+    mapContainer.classList.remove('hidden');
+    
+    if (!map) {
+        const savedLat = parseFloat(document.getElementById('latitude').value);
+        const savedLng = parseFloat(document.getElementById('longitude').value);
+        
+        const defaultLat = (savedLat && !isNaN(savedLat)) ? savedLat : -6.9932; // Semarang
+        const defaultLng = (savedLng && !isNaN(savedLng)) ? savedLng : 110.4203; // Semarang
+        
+        map = L.map('mapContainer').setView([defaultLat, defaultLng], 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+        
+        marker = L.marker([defaultLat, defaultLng], {
+            draggable: true
+        }).addTo(map);
+        
+        // Fungsi untuk convert koordinat ke alamat lengkap
+        function updateAddressFromCoords(lat, lng) {
+            // Simpan koordinat
+            document.getElementById('latitude').value = lat.toFixed(6);
+            document.getElementById('longitude').value = lng.toFixed(6);
+            
+            // Update placeholder dengan koordinat
+            const mapsSearch = document.getElementById('mapsSearch');
+            if (mapsSearch) {
+                mapsSearch.placeholder = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+            }
+            
+            // Update alamat lengkap di textarea
+            const addressTextarea = document.getElementById('address');
+            if (addressTextarea) {
+                addressTextarea.value = 'Mengambil alamat...';
+                
+                // Geocoding API untuk convert koordinat ke alamat
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.display_name) {
+                            // Tampilkan alamat lengkap
+                            addressTextarea.value = data.display_name;
+                        } else if (data.address) {
+                            // Atau format manual dari address details
+                            const addr = data.address;
+                            let fullAddress = '';
+                            
+                            if (addr.road) fullAddress += addr.road;
+                            if (addr.suburb) fullAddress += (fullAddress ? ', ' : '') + addr.suburb;
+                            if (addr.city) fullAddress += (fullAddress ? ', ' : '') + addr.city;
+                            if (addr.state) fullAddress += (fullAddress ? ', ' : '') + addr.state;
+                            if (addr.postcode) fullAddress += ' ' + addr.postcode;
+                            if (addr.country) fullAddress += (fullAddress ? ', ' : '') + addr.country;
+                            
+                            addressTextarea.value = fullAddress || data.display_name;
+                        } else {
+                            addressTextarea.value = 'Alamat tidak ditemukan';
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Geocoding error:', err);
+                        addressTextarea.value = `Koordinat: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                    });
+            }
+        }
+        
+        // Event saat marker di-drag
+        marker.on('dragend', function(event) {
+            const position = marker.getLatLng();
+            updateAddressFromCoords(position.lat, position.lng);
+        });
+        
+        // Event saat klik di map
+        map.on('click', function(e) {
+            marker.setLatLng(e.latlng);
+            updateAddressFromCoords(e.latlng.lat, e.latlng.lng);
+        });
+        
+        // Search location
+        const searchInput = document.getElementById('mapsSearch');
+        let searchTimeout;
+        
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const query = this.value.trim();
+            
+            if (query.length < 3) return;
+            
+            searchTimeout = setTimeout(() => {
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            const result = data[0];
+                            const lat = parseFloat(result.lat);
+                            const lon = parseFloat(result.lon);
+                            
+                            map.setView([lat, lon], 15);
+                            marker.setLatLng([lat, lon]);
+                            
+                            updateAddressFromCoords(lat, lon);
+                        }
+                    })
+                    .catch(err => console.error('Search error:', err));
+            }, 1000);
+        });
+        
+        // Auto-load alamat saat pertama buka map
+        if (savedLat && savedLng && !isNaN(savedLat) && !isNaN(savedLng)) {
+            updateAddressFromCoords(savedLat, savedLng);
+        }
+        
+    } else {
+        const savedLat = parseFloat(document.getElementById('latitude').value);
+        const savedLng = parseFloat(document.getElementById('longitude').value);
+        
+        if (savedLat && savedLng && !isNaN(savedLat) && !isNaN(savedLng)) {
+            map.setView([savedLat, savedLng], 15);
+            marker.setLatLng([savedLat, savedLng]);
+        }
+    }
+    
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 100);
 }
 
 // Save Profile Changes
@@ -98,6 +633,9 @@ async function saveProfile(event) {
     const lastName = document.getElementById('lastName').value.trim();
     const email = document.getElementById('email').value.trim();
     const phone = document.getElementById('phone').value.trim();
+    const address = document.getElementById('address').value.trim();
+    const latitude = document.getElementById('latitude').value;
+    const longitude = document.getElementById('longitude').value;
     
     if (!firstName || !email) {
         showNotification('First name and email are required', 'error');
@@ -105,27 +643,31 @@ async function saveProfile(event) {
     }
     
     try {
+        const formData = new FormData();
+        formData.append('first_name', firstName);
+        formData.append('last_name', lastName);
+        formData.append('email', email);
+        formData.append('phone', phone);
+        formData.append('address', address);
+        formData.append('latitude', latitude || '');
+        formData.append('longitude', longitude || '');
+        
+        if (profilePhotoFile) {
+            formData.append('profile_photo', profilePhotoFile);
+        }
+        
         const response = await fetch(API_BASE_URL + '/update_profile.php', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
             credentials: 'include',
-            body: JSON.stringify({
-                first_name: firstName,
-                last_name: lastName,
-                email: email,
-                phone: phone
-            })
+            body: formData
         });
         
         const result = await response.json();
         
         if (response.ok) {
             showNotification('Profile updated successfully!', 'success');
-            // Reload profile data
+            profilePhotoFile = null;
             await loadUserProfile();
-            // Switch ke overview tab
             switchTab('overview');
         } else {
             showNotification(result.message || 'Failed to update profile', 'error');
@@ -176,7 +718,6 @@ async function changePassword(event) {
         
         if (response.ok) {
             showNotification('Password changed successfully!', 'success');
-            // Reset form
             document.getElementById('currentPassword').value = '';
             document.getElementById('newPassword').value = '';
             document.getElementById('confirmPassword').value = '';
@@ -191,18 +732,15 @@ async function changePassword(event) {
 
 // Switch Tab Function
 function switchTab(tabName) {
-    // Hide all tabs
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.add('hidden');
     });
     
-    // Remove active class from all buttons
     document.querySelectorAll('.tab-button').forEach(btn => {
         btn.classList.remove('active', 'text-primary', 'border-b-2', 'border-primary');
         btn.classList.add('text-gray-500');
     });
     
-    // Show selected tab
     const tabMap = {
         'overview': 'overviewTab',
         'edit': 'editTab',
@@ -215,7 +753,6 @@ function switchTab(tabName) {
         selectedTab.classList.remove('hidden');
     }
     
-    // Add active class to clicked button
     const activeBtn = document.querySelector(`[data-tab="${tabName}"]`);
     if (activeBtn) {
         activeBtn.classList.add('active', 'text-primary', 'border-b-2', 'border-primary');
@@ -230,7 +767,6 @@ function showNotification(message, type = 'success') {
     
     notificationText.textContent = message;
     
-    // Change icon based on type
     const icon = notification.querySelector('i');
     if (type === 'error') {
         icon.className = 'fas fa-exclamation-circle text-red-500 text-xl';
@@ -247,7 +783,7 @@ function showNotification(message, type = 'success') {
 
 // Cancel Edit
 function cancelEdit() {
-    loadUserProfile(); // Reload original data
+    loadUserProfile();
     switchTab('overview');
 }
 
@@ -261,25 +797,12 @@ async function logout() {
         
         if (response.ok) {
             localStorage.clear();
-            window.location.href = 'login.html';
+            window.location.href = 'lamanLogin.html';
         }
     } catch (error) {
         console.error('Error:', error);
         localStorage.clear();
-        window.location.href = 'login.html';
-    }
-}
-
-// Upload Image (placeholder)
-function handleImageUpload(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('profileImage').src = e.target.result;
-            showNotification('Profile picture updated!', 'success');
-        };
-        reader.readAsDataURL(file);
+        window.location.href = 'lamanLogin.html';
     }
 }
 

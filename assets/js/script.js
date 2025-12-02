@@ -176,7 +176,13 @@ async function checkLoginStatus() {
         const cartLink = document.getElementById('cart-link');
         
         if (data.logged_in && data.user) {
-            // User sudah login
+            // ✅ CEK ROLE: Jika seller, redirect ke homeSeller.html
+            if (data.user.role === 'seller') {
+                window.location.href = 'homeSeller.html';
+                return; // Stop eksekusi selanjutnya
+            }
+            
+            // User sudah login (dan bukan seller)
             document.getElementById('auth-buttons').classList.add('hidden');
             document.getElementById('user-info').classList.remove('hidden');
             document.getElementById('user-info').classList.add('flex');
@@ -220,7 +226,14 @@ async function checkLoginStatus() {
         // Fallback ke localStorage jika server error
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
         const userName = localStorage.getItem('userName');
+        const userRole = localStorage.getItem('userRole');
         const cartLink = document.getElementById('cart-link');
+        
+        // ✅ CEK ROLE dari localStorage
+        if (isLoggedIn && userRole === 'seller') {
+            window.location.href = 'homeSeller.html';
+            return;
+        }
         
         if (isLoggedIn && userName) {
             document.getElementById('auth-buttons').classList.add('hidden');

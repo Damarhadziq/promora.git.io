@@ -102,12 +102,18 @@
                         <!-- Profile Image -->
                         <div class="px-6 pb-6 -mt-16">
                             <div class="profile-image-wrapper">
-                                <img id="profileImage" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop" 
-                                     alt="Profile" class="profile-image">
+                                <img id="profileImage" 
+                                    src="https://via.placeholder.com/150?text=User" 
+                                    alt="Profile" 
+                                    class="profile-image">
                                 <label for="imageUpload" class="upload-overlay">
                                     <i class="fas fa-camera text-white"></i>
                                 </label>
-                                <input type="file" id="imageUpload" class="hidden" accept="image/*" onchange="handleImageUpload(event)">
+                                <input type="file" 
+                                    id="imageUpload" 
+                                    class="hidden" 
+                                    accept="image/*" 
+                                    onchange="handleImageUpload(event)">
                             </div>
                             
                             <!-- User Info -->
@@ -282,11 +288,9 @@
                                 </div>
 
                                 <!-- Address -->
-                                <div class="bg-gray-50 rounded-xl p-6">
-                                    <h4 class="font-bold text-gray-800 mb-4">Default Address</h4>
-                                    <p class="text-gray-700">Jl. Sudirman No. 123, RT 05/RW 02</p>
-                                    <p class="text-gray-700">Kecamatan Menteng, Jakarta Pusat</p>
-                                    <p class="text-gray-700">DKI Jakarta, 10310</p>
+                                <div class="bg-gray-50 rounded-xl p-6" id="addressSection">
+                                    <h4 class="font-bold text-gray-800 mb-4">📍 Alamat</h4>
+                                    <p class="text-gray-700" id="userAddress">Belum ada alamat tersimpan</p>
                                 </div>
                             </div>
 
@@ -343,17 +347,42 @@
                                         </div>
                                     </div>
 
-                                    <div class="input-group">
-                                        <textarea id="address" placeholder=" " rows="3"
-                                                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none">Jl. Sudirman No. 123, RT 05/RW 02, Kecamatan Menteng, Jakarta Pusat, DKI Jakarta, 10310</textarea>
-                                        <label>Address</label>
-                                    </div>
+<div class="input-group">
+    <textarea id="bio" placeholder=" " rows="4"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none">Saya seorang profesional yang gemar berbelanja dan berburu promo. Bergabung dengan Promora untuk mendapatkan pengalaman jastip yang menyenangkan!</textarea>
+    <label>Bio</label>
+</div>
 
-                                    <div class="input-group">
-                                        <textarea id="bio" placeholder=" " rows="4"
-                                                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none">Saya seorang profesional yang gemar berbelanja dan berburu promo. Bergabung dengan Promora untuk mendapatkan pengalaman jastip yang menyenangkan!</textarea>
-                                        <label>Bio</label>
-                                    </div>
+<!-- TAMBAHKAN INI - ALAMAT DENGAN MAPS -->
+<div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Lokasi Alamat di Maps</label>
+    <input type="text" 
+        id="mapsSearch" 
+        placeholder="Pilih lokasi di peta untuk mendapatkan alamat"
+        class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none mb-2">
+    <button type="button" 
+            onclick="openMapsPicker()" 
+            class="text-primary hover:text-purple-600 font-medium flex items-center space-x-2 mb-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+        <span>Buka Peta & Pilih Lokasi</span>
+    </button>
+    <div id="mapContainer" class="hidden mt-3 w-full h-64 rounded-lg border-2 border-gray-300"></div>
+    <input type="hidden" id="latitude">
+    <input type="hidden" id="longitude">
+</div>
+
+<div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Alamat Lengkap <span class="text-xs text-gray-500">(Otomatis dari Maps)</span></label>
+    <textarea id="address" 
+              rows="3" 
+              disabled
+              placeholder="Alamat akan terisi otomatis setelah memilih lokasi di peta"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"></textarea>
+    <p class="text-xs text-gray-500 mt-1">📍 Alamat ini diambil otomatis dari koordinat yang Anda pilih di peta</p>
+</div>
 
                                     <div class="flex gap-4">
                                         <button type="submit" class="flex-1 bg-primary text-white py-3 rounded-lg hover:bg-purple-600 transition font-semibold">
@@ -449,83 +478,16 @@
 
                             <!-- Activity Tab -->
                             <div id="activityTab" class="tab-content hidden">
-                                <h3 class="text-2xl font-bold text-gray-800 mb-6">Recent Activity</h3>
-                                
-                                <div class="space-y-4">
-                                    <div class="flex gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
-                                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                            <i class="fas fa-shopping-cart text-primary"></i>
-                                        </div>
-                                        <div class="flex-1">
-                                            <p class="font-semibold text-gray-800">New Order Placed</p>
-                                            <p class="text-sm text-gray-500">Order #PRO-2024-001 - Rp 450.000</p>
-                                            <p class="text-xs text-gray-400 mt-1">2 hours ago</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
-                                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                            <i class="fas fa-check-circle text-green-600"></i>
-                                        </div>
-                                        <div class="flex-1">
-                                            <p class="font-semibold text-gray-800">Order Completed</p>
-                                            <p class="text-sm text-gray-500">Order #PRO-2024-000 has been delivered</p>
-                                            <p class="text-xs text-gray-400 mt-1">1 day ago</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
-                                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                            <i class="fas fa-star text-blue-600"></i>
-                                        </div>
-                                        <div class="flex-1">
-                                            <p class="font-semibold text-gray-800">Review Posted</p>
-                                            <p class="text-sm text-gray-500">You gave 5 stars to Sarah's Shop</p>
-                                            <p class="text-xs text-gray-400 mt-1">3 days ago</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
-                                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                            <i class="fas fa-heart text-yellow-600"></i>
-                                        </div>
-                                        <div class="flex-1">
-                                            <p class="font-semibold text-gray-800">Added to Wishlist</p>
-                                            <p class="text-sm text-gray-500">Nike Air Max 2024</p>
-                                            <p class="text-xs text-gray-400 mt-1">5 days ago</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
-                                        <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                            <i class="fas fa-wallet text-orange-600"></i>
-                                        </div>
-                                        <div class="flex-1">
-                                            <p class="font-semibold text-gray-800">Payment Method Added</p>
-                                            <p class="text-sm text-gray-500">BCA Virtual Account</p>
-                                            <p class="text-xs text-gray-400 mt-1">1 week ago</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
-                                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                            <i class="fas fa-crown text-primary"></i>
-                                        </div>
-                                        <div class="flex-1">
-                                            <p class="font-semibold text-gray-800">Membership Upgraded</p>
-                                            <p class="text-sm text-gray-500">Congratulations! You're now a Gold Member</p>
-                                            <p class="text-xs text-gray-400 mt-1">2 weeks ago</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Load More -->
-                                <div class="text-center mt-6">
-                                    <button onclick="loadMoreActivity()" class="text-primary hover:text-purple-700 font-semibold">
-                                        <i class="fas fa-sync-alt mr-2"></i> Load More Activity
-                                    </button>
-                                </div>
-                            </div>
+    <h3 class="text-2xl font-bold text-gray-800 mb-6">Riwayat Aktivitas</h3>
+    
+    <div id="activityList" class="space-y-4">
+        <!-- Activities akan dimuat secara dinamis -->
+        <div class="text-center py-12">
+            <i class="fas fa-spinner fa-spin text-4xl text-primary mb-4"></i>
+            <p class="text-gray-500">Memuat aktivitas...</p>
+        </div>
+    </div>
+</div>
                         </div>
                     </div>
                 </div>
@@ -608,5 +570,7 @@
       </div>
     </footer>
 <script src="./assets/js/profile.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </body>
 </html>

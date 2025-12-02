@@ -133,7 +133,7 @@ session_start(); // PINDAHKAN KE PALING ATAS, SEBELUM <!DOCTYPE html>
             <div class="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 border-b font-semibold text-gray-700">
               <div class="col-span-1">Pilih</div>
               <div class="col-span-3">Produk</div>
-              <div class="col-span-2 text-center">Harga Promo</div>
+              <div class="col-span-2 text-center">Harga</div>
               <div class="col-span-2 text-left pl-2">Fee Jastip</div>
               <div class="col-span-2 text-left pl-2">Jumlah</div>
               <div class="col-span-1 -ml-4">Subtotal</div>
@@ -157,7 +157,7 @@ session_start(); // PINDAHKAN KE PALING ATAS, SEBELUM <!DOCTYPE html>
                 
                 // Query untuk mengambil cart items dengan detail produk
                 $query = "SELECT c.id as cart_id, c.quantity, c.product_id,
-                                 p.name, p.brand, p.price, p.fee, p.image
+                                p.name, p.brand, p.price, p.fee, p.image, p.stock
                           FROM cart c
                           JOIN products p ON c.product_id = p.id
                           WHERE c.user_id = :user_id
@@ -176,13 +176,17 @@ session_start(); // PINDAHKAN KE PALING ATAS, SEBELUM <!DOCTYPE html>
                     foreach($cart_items as $item):
                         $subtotal = ($item['price'] * $item['quantity']) + $item['fee'];
             ?>
-                <div class="cart-item border-b" data-id="<?php echo $item['cart_id']; ?>" 
-                     data-price="<?php echo $item['price']; ?>" 
-                     data-fee="<?php echo $item['fee']; ?>">
+                    <div class="cart-item border-b" 
+                        data-id="<?php echo $item['cart_id']; ?>" 
+                        data-product-id="<?php echo $item['product_id']; ?>"
+                        data-price="<?php echo $item['price']; ?>" 
+                        data-fee="<?php echo $item['fee']; ?>"
+                        data-stock="<?php echo $item['stock']; ?>">
                     <div class="grid grid-cols-12 gap-4 px-6 py-6 items-center">
                         
                         <div class="col-span-4 flex items-center space-x-4">
-                            <input type="checkbox" class="item-check w-5 h-5 accent-primary" />
+                            <input type="checkbox" class="item-check w-5 h-5 accent-primary" 
+                              <?php echo $item['stock'] <= 0 ? 'disabled' : ''; ?> />
                             <img src="<?php echo htmlspecialchars($item['image']); ?>" 
                                  alt="<?php echo htmlspecialchars($item['name']); ?>" 
                                  class="w-20 h-20 object-cover rounded-lg" />
@@ -201,10 +205,14 @@ session_start(); // PINDAHKAN KE PALING ATAS, SEBELUM <!DOCTYPE html>
                         </div>
                         
                         <div class="col-span-2 flex justify-start items-center space-x-2 -ml-6">
-                            <button class="qty-btn qty-minus w-8 h-8 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center">−</button>
-                            <input type="number" class="qty-input w-10 text-center border border-gray-300 rounded-lg py-1" 
-                                   value="<?php echo $item['quantity']; ?>" min="1" />
-                            <button class="qty-btn qty-plus w-8 h-8 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center">+</button>
+                            <?php if($item['stock'] > 0): ?>
+                                <button class="qty-btn qty-minus w-8 h-8 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center">−</button>
+                                <input type="number" class="qty-input w-10 text-center border border-gray-300 rounded-lg py-1" 
+                                      value="<?php echo $item['quantity']; ?>" min="1" max="<?php echo $item['stock']; ?>" />
+                                <button class="qty-btn qty-plus w-8 h-8 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center">+</button>
+                            <?php else: ?>
+                                <span class="text-red-500 font-semibold">Kuota Habis</span>
+                            <?php endif; ?>
                         </div>
                         
                         <div class="col-span-1 text-center pr-2 -ml-4 whitespace-nowrap">
@@ -232,40 +240,64 @@ session_start(); // PINDAHKAN KE PALING ATAS, SEBELUM <!DOCTYPE html>
 
 
         <!-- Order Summary -->
-        <div class="col-span-1">
-          <div class="bg-white rounded-2xl shadow-sm p-6 sticky top-24">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">
-              Ringkasan Pesanan
-            </h2>
+<div class="col-span-1">
+  <div class="bg-white rounded-2xl shadow-sm p-6 sticky top-24">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">
+      Ringkasan Pesanan
+    </h2>
 
-            <div class="space-y-4 mb-6">
-              <div class="flex justify-between text-gray-700">
-                <span>Total Harga Promo</span>
-                <span id="totalPromo" class="font-semibold">Rp 0</span>
-              </div>
-              <div class="flex justify-between text-gray-700">
-                <span>Total Fee Jastip</span>
-                <span id="totalFee" class="font-semibold">Rp 0</span>
-              </div>
-              <div class="flex justify-between text-gray-700">
-                <span>Ongkir Dummy</span>
-                <span class="font-semibold">Rp 50.000</span>
-              </div>
-            </div>
+    <!-- Metode Pembayaran -->
+    <div class="mb-6">
+      <label class="block text-gray-700 font-semibold mb-2">Metode Pembayaran</label>
+      <!-- Ganti dropdown Metode Pembayaran di cart.php -->
+      <select id="payment-method" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+        <option value="">Pilih Metode Pembayaran</option>
+        <option value="transfer">Transfer Bank (BRI & BNI)</option>
+        <option value="ewallet">E-Wallet (OVO, GoPay, DANA)</option>
+        <option value="qris">QRIS</option>
+      </select>
+    </div>
 
-            <div class="border-t pt-4 mb-6">
-              <div class="flex justify-between items-center">
-                <span class="text-xl font-bold text-gray-800">Grand Total</span>
-                <span id="grandTotal" class="text-3xl font-bold text-primary">Rp 50.000</span>
-              </div>
-            </div>
+    <!-- Jasa Pengiriman -->
+    <div class="mb-6">
+      <label class="block text-gray-700 font-semibold mb-2">Jasa Pengiriman</label>
+      <select id="courier-method" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+        <option value="">Pilih Jasa Pengiriman</option>
+      </select>
+      <div id="courier-info" class="mt-2 text-sm text-gray-600 hidden"></div>
+    </div>
 
-            <a href="pembayaran.html"
-                class="w-full block text-center primary-color text-white py-4 rounded-xl font-semibold text-lg hover:primary-dark transition mb-3">
-                Lanjut Bayar
-            </a>
-          </div>
+    <div class="space-y-4 mb-6">
+      <div class="flex justify-between text-gray-700">
+        <span>Total Harga</span>
+        <span id="totalPromo" class="font-semibold">Rp 0</span>
+      </div>
+      <div class="flex justify-between text-gray-700">
+        <span>Total Fee Jastip</span>
+        <span id="totalFee" class="font-semibold">Rp 0</span>
+      </div>
+      <div class="flex justify-between text-gray-700">
+        <div class="flex items-center space-x-1">
+          <span>Ongkir</span>
+          <span id="distance-info" class="text-xs text-gray-500"></span>
         </div>
+        <span id="totalOngkir" class="font-semibold">Rp 0</span>
+      </div>
+    </div>
+
+    <div class="border-t pt-4 mb-6">
+      <div class="flex justify-between items-center">
+        <span class="text-xl font-bold text-gray-800">Grand Total</span>
+        <span id="grandTotal" class="text-3xl font-bold text-primary">Rp 0</span>
+      </div>
+    </div>
+
+    <button id="checkout-btn" disabled
+        class="w-full block text-center bg-gray-300 text-gray-500 py-4 rounded-xl font-semibold text-lg cursor-not-allowed mb-3">
+        Pilih Metode Pembayaran & Pengiriman
+    </button>
+  </div>
+</div>
       </div>
     </div>
 

@@ -190,7 +190,7 @@
               ></path>
             </svg>
             <span class="text-sm font-medium"
-              >Stok Tersedia: <span id="stock"></span> item</span
+              >Kuota Tersedia: <span id="stock"></span> item</span
             >
           </div>
 
@@ -247,11 +247,12 @@
         <h3 class="text-2xl font-bold text-gray-900 mb-6">Informasi Penjual</h3>
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
-            <img
-              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop"
-              alt="Seller"
-              class="w-16 h-16 rounded-full object-cover"
-            />
+          <img
+            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop"
+            alt="Seller"
+            class="w-16 h-16 rounded-full object-cover"
+            onerror="this.src='https://ui-avatars.com/api/?name=Seller&background=9333ea&color=fff&size=100'"
+          />
             <div>
               <div class="flex items-center space-x-2">
                 <h4 class="text-lg font-bold text-gray-900">
@@ -314,7 +315,7 @@
                     d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                   ></path>
                 </svg>
-                <span>Bangkok, Thailand</span>
+                <span></span>
               </div>
             </div>
           </div>

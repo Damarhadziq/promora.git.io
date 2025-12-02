@@ -1,5 +1,4 @@
 <?php
-// backend/api/get_profile.php
 session_start();
 
 header("Access-Control-Allow-Origin: *");
@@ -7,7 +6,6 @@ header("Content-Type: application/json; charset=UTF-8");
 
 include_once '../config/db.php';
 
-// Cek apakah user sudah login
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     http_response_code(401);
     echo json_encode(array(
@@ -21,8 +19,8 @@ try {
     $database = new Database();
     $db = $database->getConnection();
     
-    // Ambil data lengkap user dari database
-    $query = "SELECT id, first_name, last_name, email, username, phone, role, created_at 
+    $query = "SELECT id, first_name, last_name, email, username, phone, role, 
+              profile_photo, address, latitude, longitude, created_at 
               FROM users 
               WHERE id = :user_id 
               LIMIT 1";
@@ -46,6 +44,10 @@ try {
                 "username" => $user['username'],
                 "phone" => $user['phone'],
                 "role" => $user['role'],
+                "profile_photo" => $user['profile_photo'],
+                "address" => $user['address'],
+                "latitude" => $user['latitude'],
+                "longitude" => $user['longitude'],
                 "created_at" => $user['created_at'],
                 "member_since" => date('F Y', strtotime($user['created_at']))
             )

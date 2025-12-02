@@ -15,7 +15,7 @@ try {
         LEFT JOIN stores s ON p.seller_id = s.user_id
         WHERE p.discount > 0 AND p.stock > 0
         ORDER BY RAND()
-        LIMIT 6
+        LIMIT 3
     ");
     
     $query->execute();

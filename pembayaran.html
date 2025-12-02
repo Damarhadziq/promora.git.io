@@ -116,63 +116,24 @@
 
       <div class="p-8 space-y-8">
 
-        <!-- Pilih Metode -->
-        <div class="space-y-5">
-          <!-- BCA -->
-          <div onclick="pilihMetode('bca')" class="border-2 border-transparent hover:border-primary rounded-2xl p-5 cursor-pointer transition-all bg-gray-50 hover:bg-purple-50">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-5">
-                <div class="bg-white p-3 rounded-xl border">
-                    <img src="./assets/img/bca.png" 
-                        alt="BCA" class="w-12 h-12 object-contain">
-                  </div>
-                <div>
-                  <p class="font-bold text-lg">Bank BCA - Virtual Account</p>
-                  <p class="text-sm text-gray-600">a.n. PROMORA JASTIP INDONESIA</p>
-                </div>
-              </div>
-              <i id="check-bca" class="fas fa-check-circle text-primary text-2xl hidden"></i>
-            </div>
-            <div id="detail-bca" class="mt-5 hidden bg-white border border-purple-200 rounded-xl p-5">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-xs text-gray-500 uppercase">Nomor Virtual Account</p>
-                  <p class="text-2xl font-mono font-bold tracking-wider">177088899921234</p>
-                </div>
-                <button onclick="copy('177088899921234'); event.stopPropagation();" class="px-5 py-3 bg-primary text-white rounded-full text-sm font-medium hover:bg-purple-700 transition shadow-md">
-                  <i class="fas fa-copy mr-2"></i>Salin
-                </button>
-              </div>
-            </div>
-          </div>
+<!-- Ganti bagian "Pilih Metode" dengan ini: -->
+<div class="space-y-5" id="payment-methods-container">
+  <!-- Metode pembayaran akan dimuat secara dinamis -->
+</div>
 
-          <!-- QRIS -->
-          <div onclick="pilihMetode('qris')" class="border-2 border-transparent hover:border-primary rounded-2xl p-5 cursor-pointer transition-all bg-gray-50 hover:bg-purple-50">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-5">
-                <div class="bg-white p-3 rounded-xl border">
-                  <img src="./assets/img/qris.png" 
-                      alt="QRIS" class="w-12 h-12 object-contain">
-                </div>
-                <div>
-                  <p class="font-bold text-lg">QRIS Semua Payment</p>
-                  <p class="text-sm text-gray-600">ShopeePay • OVO • GoPay • DANA</p>
-                </div>
-              </div>
-              <i id="check-qris" class="fas fa-check-circle text-primary text-2xl hidden"></i>
-            </div>
-            <div id="detail-qris" class="mt-5 hidden text-center">
-              <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=00020126580014BR.COM.BANCOBRADESCO5204000053039865802BR5925PROMORA+JASTIP+INDONESIA6009JAKARTA61051234062240306PAY2134002630440C5" alt="QRIS" class="mx-auto rounded-2xl shadow-lg border-4 border-white">
-              <p class="mt-4 font-semibold text-primary text-xl total-bayar">Rp 0</p>
-            </div>
-          </div>
-        </div>
+<!-- Tambahkan section untuk daftar produk SEBELUM "Ringkasan" -->
+<div class="border-t pt-6 mb-6">
+  <h3 class="font-bold text-lg mb-4">Detail Produk</h3>
+  <div id="product-list" class="space-y-3">
+    <!-- Produk akan dimuat secara dinamis -->
+  </div>
+</div>
 
-        <!-- Ringkasan -->
-        <div class="flex justify-between font-medium">
-          <span class="jumlah-barang">0 barang</span>
-          <span class="total-promo">Rp 0</span>
-        </div>
+<!-- Ringkasan (tetap seperti sebelumnya) -->
+<div class="flex justify-between font-medium">
+  <span class="jumlah-barang">0 barang</span>
+  <span class="total-promo">Rp 0</span>
+</div>
 
         <div class="flex justify-between text-gray-600">
           <span>Fee Jastip + Ongkir</span>
@@ -198,8 +159,7 @@
         </div>
 
         <p class="text-center text-xs text-gray-500 mt-4">
-          Setelah pembayaran terdeteksi, pesanan akan otomatis diproses.<br>
-          <span class="font-medium text-red-500">Ini hanya simulasi (demo)</span>
+          Setelah pembayaran terdeteksi,upload bukti dan tunggu verifikasi dari admin.<br>
         </p>
       </div>
     </div>
@@ -239,14 +199,22 @@
     </div>
   </div>
 
-  <!-- Notifikasi Sedang Diverifikasi -->
-  <div id="notif" class="fixed inset-0 bg-black bg-opacity-80 hidden flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-3xl p-12 text-center max-w-sm">
-      <i class="fas fa-spinner fa-spin text-6xl text-primary mb-6"></i>
-      <h3 class="text-2xl font-bold">Sedang Diverifikasi...</h3>
-      <p class="text-gray-600 mt-4">Tim kami sedang memeriksa bukti transfer</p>
+<!-- Notifikasi Bukti Tersimpan -->
+<div id="notif" class="fixed inset-0 bg-black bg-opacity-80 hidden flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-3xl p-12 text-center max-w-md">
+    <i class="fas fa-check-circle text-6xl text-green-500 mb-6"></i>
+    <h3 class="text-2xl font-bold text-gray-800 mb-4">Bukti Sudah Tersimpan!</h3>
+    <p class="text-gray-600 leading-relaxed">
+      Bukti pembayaran Anda sudah tersimpan. Tinggal menunggu verifikasi dari admin, mohon ditunggu.
+    </p>
+    <div class="mt-6 p-4 bg-purple-50 rounded-lg border border-purple-200">
+      <p class="text-sm text-purple-700">
+        <i class="fas fa-info-circle mr-2"></i>
+        Anda akan diarahkan ke halaman pesanan dalam beberapa detik...
+      </p>
     </div>
   </div>
+</div>
 
   <!-- Footer -->
     <footer class="bg-purple-900 text-white py-12">

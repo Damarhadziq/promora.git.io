@@ -114,7 +114,7 @@
                         <div class="px-6 pb-6 -mt-16">
                             <div class="profile-image-wrapper">
                                 <img id="profileImage" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop" 
-                                     alt="Profile" class="profile-image">
+                                     alt="Store Logo" class="profile-image">
                                 <label for="imageUpload" class="upload-overlay">
                                     <i class="fas fa-camera text-white"></i>
                                 </label>
@@ -378,7 +378,7 @@
                                     </div>
                                     <div class="flex gap-4 p-4 bg-gray-50 rounded-xl">
                                         <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center"><i class="fas fa-box text-blue-600"></i></div>
-                                        <div><p class="font-semibold">Produk baru ditambahkan</p><p class="text-sm text-gray-500">Zara Mini Bag - Rp 480.000 • 15 stok</p></div>
+                                        <div><p class="font-semibold">Produk baru ditambahkan</p><p class="text-sm text-gray-500">Zara Mini Bag - Rp 480.000 • 15 Kuota</p></div>
                                     </div>
                                 </div>
                             </div>
@@ -448,6 +448,14 @@ function updateStoreDisplay(store) {
         displayName.textContent = store.store_name;
     }
     
+    // Update logo
+    if (store.logo) {
+        const profileImg = document.getElementById('profileImage');
+        if (profileImg) {
+            profileImg.src = 'backend/uploads/store_logos/' + store.logo;
+        }
+    }
+
     // Update di dashboard tab
     const dashboardStoreName = document.querySelector('#overviewTab .font-semibold.text-gray-800');
     if (dashboardStoreName) {
