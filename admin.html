@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Admin Dashboard - Verifikasi Seller | Promora</title>
   <link
       rel="stylesheet"
@@ -48,30 +48,49 @@
         </h1>
         <p class="text-sm text-purple-200 mt-1">Panel Verifikasi</p>
       </div>
-      <ul class="space-y-2">
-        <li><a href="#" class="flex items-center space-x-3 bg-white bg-opacity-20 px-4 py-3 rounded-xl"><i class="ri-user-search-line text-xl"></i><span>Verifikasi Seller</span></a></li>
-        <li class="pt-4 mt-4 border-t border-white border-opacity-20">
-          <a href="#" onclick="logoutAdmin(event)" class="flex items-center space-x-3 opacity-70 hover:opacity-100 hover:bg-red-500 hover:bg-opacity-20 px-4 py-3 rounded-xl transition-all">
-            <i class="ri-logout-box-line text-xl"></i><span>Logout</span>
-          </a>
-        </li>
-      </ul>
-      <div class="mt-8 bg-white bg-opacity-10 rounded-xl p-4">
-        <h3 class="text-sm font-semibold mb-3 opacity-80">Ringkasan Hari Ini</h3>
-        <div class="space-y-2 text-sm">
-          <div class="flex justify-between"><span class="opacity-80">Pending:</span><span class="font-bold" id="sidebar-pending">0</span></div>
-          <div class="flex justify-between"><span class="opacity-80">Diverifikasi:</span><span class="font-bold" id="sidebar-verified">0</span></div>
-          <div class="flex justify-between"><span class="opacity-80">Ditolak:</span><span class="font-bold" id="sidebar-rejected">0</span></div>
-        </div>
-      </div>
+<ul class="space-y-2">
+  <li>
+    <a href="#" onclick="switchMenu('seller'); return false;" id="menu-seller" class="flex items-center space-x-3 bg-white bg-opacity-20 px-4 py-3 rounded-xl">
+      <i class="ri-user-search-line text-xl"></i><span>Verifikasi Seller</span>
+    </a>
+  </li>
+  <li>
+    <a href="#" onclick="switchMenu('payment'); return false;" id="menu-payment" class="flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white hover:bg-opacity-20 transition-all">
+      <i class="ri-secure-payment-line text-xl"></i><span>Verifikasi Pembayaran</span>
+    </a>
+  </li>
+    <li>
+    <a href="#" onclick="logoutAdmin(event)" class="flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white hover:bg-opacity-20 transition-all text-red-200 hover:text-white">
+      <i class="ri-logout-box-line text-xl"></i><span>Logout</span>
+    </a>
+  </li>
+  <li class="pt-4 mt-4 border-t border-white border-opacity-20">
+<div class="mt-8 bg-white bg-opacity-10 rounded-xl p-4">
+  <h3 class="text-sm font-semibold mb-3 opacity-80">Ringkasan Hari Ini</h3>
+  
+  <!-- Seller Stats -->
+  <div id="sidebar-seller-stats" class="space-y-2 text-sm">
+    <div class="flex justify-between"><span class="opacity-80">Pending:</span><span class="font-bold" id="sidebar-pending">0</span></div>
+    <div class="flex justify-between"><span class="opacity-80">Diverifikasi:</span><span class="font-bold" id="sidebar-verified">0</span></div>
+    <div class="flex justify-between"><span class="opacity-80">Ditolak:</span><span class="font-bold" id="sidebar-rejected">0</span></div>
+  </div>
+  
+  <!-- Payment Stats -->
+<div id="sidebar-payment-stats" class="space-y-2 text-sm hidden">
+  <div class="flex justify-between"><span class="opacity-80">Belum Bayar:</span><span class="font-bold" id="sidebar-payment-pending">0</span></div>
+  <div class="flex justify-between"><span class="opacity-80">Menunggu:</span><span class="font-bold" id="sidebar-payment-waiting">0</span></div>
+  <div class="flex justify-between"><span class="opacity-80">Terverifikasi:</span><span class="font-bold" id="sidebar-payment-verified">0</span></div>
+  <div class="flex justify-between"><span class="opacity-80">Ditolak:</span><span class="font-bold" id="sidebar-payment-rejected">0</span></div>
+</div>
+</div>
     </div>
 
     <!-- Main Content -->
     <div class="flex-1 p-8">
       <div class="flex justify-between items-center mb-8">
         <div>
-          <h2 class="text-3xl font-bold text-gray-800">Verifikasi Seller Baru</h2>
-          <p class="text-gray-500 mt-1">Kelola dan verifikasi pendaftaran seller</p>
+          <h2 id="page-title" class="text-3xl font-bold text-gray-800">Verifikasi Seller Baru</h2>
+          <p id="page-subtitle" class="text-gray-500 mt-1">Kelola dan verifikasi pendaftaran seller</p>
         </div>
         <div class="flex items-center gap-4">
           <button onclick="refreshData()" class="px-4 py-2 bg-white border rounded-xl hover:bg-gray-50 flex items-center gap-2">
@@ -85,7 +104,7 @@
       </div>
 
       <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div id="seller-stats" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div class="bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-2xl p-6 text-white shadow-lg">
           <p class="text-yellow-100 text-sm">Menunggu</p>
           <h3 class="text-4xl font-bold mt-2" id="stat-pending">0</h3>
@@ -104,12 +123,54 @@
         </div>
       </div>
 
-      <!-- Tabs -->
-      <div class="flex space-x-8 border-b mb-8">
-        <button onclick="loadSellers('pending')"   id="tab-pending"   class="pb-4 px-2 tab-active">Menunggu Verifikasi <span class="ml-2 bg-yellow-100 text-yellow-800 text-xs px-2.5 py-1 rounded-full font-semibold" id="count-pending">0</span></button>
-        <button onclick="loadSellers('verified')"  id="tab-verified"  class="pb-4 px-2 tab-inactive">Terverifikasi <span class="ml-2 bg-green-100 text-green-800 text-xs px-2.5 py-1 rounded-full font-semibold" id="count-verified">0</span></button>
-        <button onclick="loadSellers('rejected')"  id="tab-rejected"  class="pb-4 px-2 tab-inactive">Ditolak <span class="ml-2 bg-red-100 text-red-800 text-xs px-2.5 py-1 rounded-full font-semibold" id="count-rejected">0</span></button>
-      </div>
+
+<!-- Stats Cards - Payment (PERBAIKAN: hapus class hidden, gunakan style display) -->
+<div id="payment-stats" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8" style="display: none;">
+  <div class="bg-gradient-to-br from-orange-400 to-orange-500 rounded-2xl p-6 text-white shadow-lg">
+    <p class="text-orange-100 text-sm">Menunggu Pembayaran</p>
+    <h3 class="text-4xl font-bold mt-2" id="stat-payment-pending">0</h3>
+  </div>
+  <div class="bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-2xl p-6 text-white shadow-lg">
+    <p class="text-yellow-100 text-sm">Menunggu Verifikasi</p>
+    <h3 class="text-4xl font-bold mt-2" id="stat-payment-waiting">0</h3>
+  </div>
+  <div class="bg-gradient-to-br from-green-400 to-green-500 rounded-2xl p-6 text-white shadow-lg">
+    <p class="text-green-100 text-sm">Terverifikasi</p>
+    <h3 class="text-4xl font-bold mt-2" id="stat-payment-verified">0</h3>
+  </div>
+  <div class="bg-gradient-to-br from-red-400 to-red-500 rounded-2xl p-6 text-white shadow-lg">
+    <p class="text-red-100 text-sm">Ditolak</p>
+    <h3 class="text-4xl font-bold mt-2" id="stat-payment-rejected">0</h3>
+  </div>
+</div>
+
+<!-- Tabs - Seller -->
+<div id="seller-tabs" class="flex space-x-8 border-b mb-8">
+  <button onclick="loadSellers('pending')" id="tab-pending" class="pb-4 px-2 tab-active">Menunggu Verifikasi <span class="ml-2 bg-yellow-100 text-yellow-800 text-xs px-2.5 py-1 rounded-full font-semibold" id="count-pending">0</span></button>
+  <button onclick="loadSellers('verified')" id="tab-verified" class="pb-4 px-2 tab-inactive">Terverifikasi <span class="ml-2 bg-green-100 text-green-800 text-xs px-2.5 py-1 rounded-full font-semibold" id="count-verified">0</span></button>
+  <button onclick="loadSellers('rejected')" id="tab-rejected" class="pb-4 px-2 tab-inactive">Ditolak <span class="ml-2 bg-red-100 text-red-800 text-xs px-2.5 py-1 rounded-full font-semibold" id="count-rejected">0</span></button>
+</div>
+
+<!-- Tabs - Payment (PERBAIKAN: hapus class hidden, gunakan style display) -->
+<div id="payment-tabs" class="flex space-x-8 border-b mb-8" style="display: none;">
+  <button onclick="loadPayments('pending')" id="tab-payment-pending" class="pb-4 px-2 tab-active">
+    Menunggu Pembayaran 
+    <span class="ml-2 bg-orange-100 text-orange-800 text-xs px-2.5 py-1 rounded-full font-semibold" id="count-payment-pending">0</span>
+  </button>
+  <button onclick="loadPayments('waiting')" id="tab-payment-waiting" class="pb-4 px-2 tab-inactive">
+    Menunggu Verifikasi 
+    <span class="ml-2 bg-yellow-100 text-yellow-800 text-xs px-2.5 py-1 rounded-full font-semibold" id="count-payment-waiting">0</span>
+  </button>
+  <button onclick="loadPayments('verified')" id="tab-payment-verified" class="pb-4 px-2 tab-inactive">
+    Terverifikasi 
+    <span class="ml-2 bg-green-100 text-green-800 text-xs px-2.5 py-1 rounded-full font-semibold" id="count-payment-verified">0</span>
+  </button>
+  <button onclick="loadPayments('rejected')" id="tab-payment-rejected" class="pb-4 px-2 tab-inactive">
+    Ditolak 
+    <span class="ml-2 bg-red-100 text-red-800 text-xs px-2.5 py-1 rounded-full font-semibold" id="count-payment-rejected">0</span>
+  </button>
+</div>
+
 
       <!-- Search & Filter -->
       <div class="mb-6 flex gap-4">
@@ -147,6 +208,32 @@
           <h3 class="text-xl font-semibold text-gray-600">Tidak ada data</h3>
         </div>
       </div>
+
+      <!-- Table Payment -->
+       <div id="payment-table-container" style="display: none;">
+  <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+          <tr>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Invoice</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Customer</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Total</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Tanggal Upload</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Bukti</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
+            <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="payment-list"></tbody>
+      </table>
+    </div>
+    <div id="payment-empty-state" class="hidden py-16 text-center">
+      <i class="ri-inbox-line text-6xl text-gray-300 mb-4"></i>
+      <h3 class="text-xl font-semibold text-gray-600">Tidak ada data</h3>
+    </div>
+  </div>
+</div>
 
       <!-- Pagination -->
       <div class="mt-6 flex justify-between items-center">
@@ -271,6 +358,129 @@
   </div>
 </div>
 
+<!-- Modal Detail Payment -->
+<div id="modal-payment" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop hidden items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto animate-slide-in">
+    <div class="sticky top-0 bg-white border-b px-8 py-6 flex justify-between items-center z-10">
+      <div>
+        <h3 class="text-2xl font-bold">Detail Pembayaran</h3>
+        <p class="text-sm text-gray-500 mt-1" id="modal-payment-invoice">-</p>
+      </div>
+      <button onclick="closePaymentModal()" class="text-gray-400 hover:text-gray-600">
+        <i class="ri-close-line text-3xl"></i>
+      </button>
+    </div>
+    
+    <div class="p-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Info Transaksi -->
+        <div class="space-y-5">
+          <h4 class="font-bold text-lg border-b pb-3 flex items-center gap-2">
+            <i class="ri-shopping-cart-line text-[#7A5AF8]"></i> Info Transaksi
+          </h4>
+          <div>
+            <p class="text-sm text-gray-500">Customer</p>
+            <p class="font-semibold text-lg" id="modal-payment-customer">-</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Total Pembayaran</p>
+            <p class="font-bold text-2xl text-[#7A5AF8]" id="modal-payment-total">-</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Metode Pembayaran</p>
+            <p class="font-semibold capitalize" id="modal-payment-method">-</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Tanggal Upload Bukti</p>
+            <p class="font-semibold" id="modal-payment-date">-</p>
+          </div>
+          
+          <!-- Items List -->
+          <div class="mt-6">
+            <h5 class="font-semibold mb-3">Detail Produk:</h5>
+            <div id="modal-payment-items" class="space-y-2 max-h-60 overflow-y-auto">
+              <!-- Items akan dimuat dinamis -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Bukti Pembayaran -->
+        <div>
+          <h4 class="font-bold text-lg border-b pb-3 mb-4 flex items-center gap-2">
+            <i class="ri-image-line text-[#7A5AF8]"></i> Bukti Pembayaran
+          </h4>
+          <div class="border-2 border-dashed border-gray-200 rounded-xl overflow-hidden bg-gray-50 relative group">
+            <img id="modal-payment-proof" src="" alt="Bukti" class="w-full cursor-pointer hover:opacity-90 transition-opacity" onclick="openZoomPaymentModal()">
+            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all flex items-center justify-center">
+              <i class="ri-zoom-in-line text-4xl text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-3 text-center flex items-center justify-center gap-2">
+            <i class="ri-information-line"></i> Klik gambar untuk memperbesar
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div id="payment-action-buttons" class="flex gap-4">
+        <button onclick="verifyPayment(currentPaymentId, 'verified')" 
+                class="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-all">
+          <i class="ri-checkbox-circle-line text-2xl"></i> Verifikasi Pembayaran
+        </button>
+        <button onclick="showPaymentRejectReason()" 
+                class="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-all">
+          <i class="ri-close-circle-line text-2xl"></i> Tolak Pembayaran
+        </button>
+      </div>
+
+      <!-- Reject Reason Form -->
+      <div id="payment-reject-reason" class="mt-6 hidden">
+        <div class="bg-red-50 border-2 border-red-200 rounded-xl p-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-3">
+            Alasan Penolakan <span class="text-red-500">*</span>
+          </label>
+          <textarea id="payment-reject-textarea" 
+                    class="w-full px-4 py-3 border-2 border-red-200 rounded-xl focus:border-red-400 focus:ring-2 focus:ring-red-200 outline-none" 
+                    rows="4" 
+                    placeholder="Contoh: Bukti tidak jelas / Nominal tidak sesuai / Bank berbeda..."></textarea>
+          <div class="mt-4 flex gap-3">
+            <button onclick="verifyPayment(currentPaymentId, 'rejected')" 
+                    class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all">
+              <i class="ri-send-plane-fill"></i> Konfirmasi Tolak
+            </button>
+            <button onclick="hidePaymentRejectReason()" 
+                    class="px-6 py-3 bg-gray-200 hover:bg-gray-300 rounded-xl font-semibold transition-all">
+              Batal
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Info -->
+      <div id="payment-verified-info" class="hidden mt-6 bg-green-50 border-2 border-green-200 rounded-xl p-6">
+        <div class="flex items-center gap-3">
+          <i class="ri-checkbox-circle-fill text-3xl text-green-600"></i>
+          <h4 class="font-bold text-green-800">Pembayaran Sudah Diverifikasi</h4>
+        </div>
+      </div>
+
+      <div id="payment-rejected-info" class="hidden mt-6 bg-red-50 border-2 border-red-200 rounded-xl p-6">
+        <div class="flex items-center gap-3 mb-2">
+          <i class="ri-close-circle-fill text-3xl text-red-600"></i>
+          <h4 class="font-bold text-red-800">Pembayaran Ditolak</h4>
+        </div>
+        <p class="text-sm text-gray-600 mb-2"><strong>Alasan:</strong></p>
+        <p class="text-sm text-gray-700 bg-white p-3 rounded-lg" id="payment-rejected-reason">-</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Zoom Modal Payment -->
+<div id="zoom-modal-payment" class="fixed inset-0 bg-black bg-opacity-90 hidden items-center justify-center z-[60] p-8" onclick="closeZoomPaymentModal()">
+  <img id="zoomed-payment-proof" class="max-w-full max-h-full rounded-xl" src="" alt="">
+</div>
+
   <!-- Zoom Modal -->
   <div id="zoom-modal" class="fixed inset-0 bg-black bg-opacity-90 hidden items-center justify-center z-[60] p-8" onclick="closeZoomModal()">
     <img id="zoomed-ktp" class="max-w-full max-h-full rounded-xl" src="" alt="">
@@ -288,63 +498,67 @@
   </div>
 
 <script>
-    let allSellers = [];
-    let filteredSellers = [];
-    let currentStatus = 'pending';
-    let currentPage = 1;
-    const itemsPerPage = 10;
-    let currentSellerId = null;
+let allSellers = [];
+let filteredSellers = [];
+let currentStatus = 'pending';
+let currentPage = 1;
+const itemsPerPage = 10;
+let currentSellerId = null;
+let currentMenu = 'seller';
+let currentPaymentId = null;
+let allPayments = [];
+let filteredPayments = [];
 
-    // Cek login admin
-    if (!localStorage.getItem('adminLoggedIn')) {
-      window.location.href = 'loginAdmin.html';
-    }
+// Cek login admin
+if (!localStorage.getItem('adminLoggedIn')) {
+  window.location.href = 'loginAdmin.html';
+}
 
-    document.addEventListener('DOMContentLoaded', () => {
-      updateCurrentDate();
-      loadSellers('pending');
-      setInterval(updateCurrentDate, 60000);
-    });
+document.addEventListener('DOMContentLoaded', () => {
+  updateCurrentDate();
+  loadSellers('pending');
+  setInterval(updateCurrentDate, 60000);
+});
 
-    function updateCurrentDate() {
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-      document.getElementById('current-date').textContent = new Date().toLocaleDateString('id-ID', options);
-    }
+function updateCurrentDate() {
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+  document.getElementById('current-date').textContent = new Date().toLocaleDateString('id-ID', options);
+}
 
-    async function loadSellers(status) {
-      currentStatus = status;
+async function loadSellers(status) {
+  currentStatus = status;
+  
+  try {
+    const searchQuery = document.getElementById('search').value;
+    const dateFilter = document.getElementById('filter-date').value;
+    
+    const response = await fetch(`backend/api/get_sellers.php?status=${status}&search=${searchQuery}&date_filter=${dateFilter}`);
+    const result = await response.json();
+
+    if (result.success) {
+      allSellers = result.data;
+      document.querySelectorAll('[id^="tab-"]').forEach(t => {
+        t.classList.remove('tab-active');
+        t.classList.add('tab-inactive');
+      });
+      document.getElementById(`tab-${status}`).classList.remove('tab-inactive');
+      document.getElementById(`tab-${status}`).classList.add('tab-active');
       
-      try {
-        const searchQuery = document.getElementById('search').value;
-        const dateFilter = document.getElementById('filter-date').value;
-        
-        const response = await fetch(`backend/api/get_sellers.php?status=${status}&search=${searchQuery}&date_filter=${dateFilter}`);
-        const result = await response.json();
-
-        if (result.success) {
-          allSellers = result.data;
-          document.querySelectorAll('[id^="tab-"]').forEach(t => {
-            t.classList.remove('tab-active');
-            t.classList.add('tab-inactive');
-          });
-          document.getElementById(`tab-${status}`).classList.remove('tab-inactive');
-          document.getElementById(`tab-${status}`).classList.add('tab-active');
-          
-          filterSellers();
-          updateStats();
-        }
-      } catch (error) {
-        console.error('Error loading sellers:', error);
-        showToast('error', 'Error', 'Gagal memuat data seller');
-      }
+      filterSellers();
+      updateStats();
     }
+  } catch (error) {
+    console.error('Error loading sellers:', error);
+    showToast('error', 'Error', 'Gagal memuat data seller');
+  }
+}
 
-    function filterSellers() {
-      filteredSellers = allSellers;
-      currentPage = 1;
-      renderTable();
-      renderPagination();
-    }
+function filterSellers() {
+  filteredSellers = allSellers;
+  currentPage = 1;
+  renderTable();
+  renderPagination();
+}
 
 function renderTable() {
   const tbody = document.getElementById('seller-list');
@@ -369,21 +583,18 @@ function renderTable() {
     
     const hasKtp = s.ktp_photo && s.ktp_photo !== '';
     
-    // Escape JSON untuk onclick
-    const sellerJson = JSON.stringify(s).replace(/"/g, '&quot;');
-    
     const ktpButton = hasKtp 
       ? `<button onclick='openModal(${JSON.stringify(s).replace(/'/g, "\\'")})'  class="text-[#7A5AF8] hover:underline font-medium">
            <i class="ri-image-line"></i> Lihat KTP
          </button>`
       : `<span class="text-gray-400 text-sm">Tidak ada foto</span>`;
     
-    const actionButton = s.status === 'pending'
-      ? `<button onclick='openModal(${JSON.stringify(s).replace(/'/g, "\\'")})'  
-                 class="text-white bg-[#7A5AF8] hover:bg-[#6346E8] px-4 py-2 rounded-lg font-medium transition-all">
-           <i class="ri-check-line"></i> Verifikasi
-         </button>`
-      : `<span class="text-gray-400">-</span>`;
+const actionButton = (s.status === 'pending' && hasKtp)
+    ? `<button onclick='openModal(${JSON.stringify(s).replace(/'/g, "\\'")})'
+             class="text-white bg-[#7A5AF8] hover:bg-[#6346E8] px-4 py-2 rounded-lg font-medium transition-all">
+       <i class="ri-check-line"></i> Verifikasi
+     </button>`
+    : `<span class="text-gray-400">-</span>`;
     
     const row = `
       <tr class="border-b hover:bg-gray-50 transition-colors">
@@ -426,54 +637,50 @@ function renderTable() {
   document.getElementById('showing-count').textContent = pageData.length;
   document.getElementById('total-count').textContent = filteredSellers.length;
 }
-    function renderPagination() {
-      const total = Math.ceil(filteredSellers.length / itemsPerPage);
-      const cont = document.getElementById('pagination-numbers');
-      cont.innerHTML = '';
-      for(let i=1;i<=total;i++){
-        cont.innerHTML += `<button onclick="currentPage=${i};renderTable();renderPagination()" class="px-4 py-2 rounded-lg ${i===currentPage?'bg-[#7A5AF8] text-white':'bg-gray-100 hover:bg-gray-200'}">${i}</button>`;
-      }
+
+function renderPagination() {
+  const total = Math.ceil(filteredSellers.length / itemsPerPage);
+  const cont = document.getElementById('pagination-numbers');
+  cont.innerHTML = '';
+  for(let i=1;i<=total;i++){
+    cont.innerHTML += `<button onclick="currentPage=${i};renderTable();renderPagination()" class="px-4 py-2 rounded-lg ${i===currentPage?'bg-[#7A5AF8] text-white':'bg-gray-100 hover:bg-gray-200'}">${i}</button>`;
+  }
+}
+
+async function updateStats() {
+  try {
+    const statuses = ['pending', 'verified', 'rejected'];
+    for (const st of statuses) {
+      const resp = await fetch(`backend/api/get_sellers.php?status=${st}`);
+      const data = await resp.json();
+      const count = data.success ? data.data.length : 0;
+      
+      document.getElementById(`stat-${st}`).textContent = count;
+      document.getElementById(`count-${st}`).textContent = count;
+      document.getElementById(`sidebar-${st}`).textContent = count;
     }
 
-    async function updateStats() {
-      try {
-        const statuses = ['pending', 'verified', 'rejected'];
-        for (const st of statuses) {
-          const resp = await fetch(`backend/api/get_sellers.php?status=${st}`);
-          const data = await resp.json();
-          const count = data.success ? data.data.length : 0;
-          
-          document.getElementById(`stat-${st}`).textContent = count;
-          document.getElementById(`count-${st}`).textContent = count;
-          document.getElementById(`sidebar-${st}`).textContent = count;
-        }
+    const totalResp = await fetch(`backend/api/get_sellers.php?status=all`);
+    const totalData = await totalResp.json();
+    document.getElementById('stat-total').textContent = totalData.success ? totalData.data.length : 0;
+  } catch (error) {
+    console.error('Error updating stats:', error);
+  }
+}
 
-        const totalResp = await fetch(`backend/api/get_sellers.php?status=all`);
-        const totalData = await totalResp.json();
-        document.getElementById('stat-total').textContent = totalData.success ? totalData.data.length : 0;
-      } catch (error) {
-        console.error('Error updating stats:', error);
-      }
-    }
-
-    function openModal(seller) {
+function openModal(seller) {
   currentSellerId = seller.id;
   
-  // PERBAIKAN: ktp_photo sudah berisi full path dari database
   let ktpPath;
   
   if (seller.ktp_photo && seller.ktp_photo !== '') {
-    // Path dari database sudah lengkap: uploads/ktp/filename.jpg
-    // Tinggal tambahkan ../ karena admin.html di root, uploads di backend
     ktpPath = `backend/${seller.ktp_photo}`;
-    
     console.log('KTP Photo from DB:', seller.ktp_photo);
     console.log('Final KTP Path:', ktpPath);
   } else {
     ktpPath = 'https://via.placeholder.com/800x500/cccccc/666666?text=Foto+KTP+Tidak+Tersedia';
   }
   
-  // Populate data
   document.getElementById('modal-name').textContent = `${seller.first_name} ${seller.last_name}`;
   document.getElementById('modal-email').textContent = seller.email;
   document.getElementById('modal-username').textContent = '@' + seller.username;
@@ -487,26 +694,21 @@ function renderTable() {
     minute: '2-digit'
   });
   
-  // Set KTP image dengan error handler
   const ktpImg = document.getElementById('modal-ktp');
   ktpImg.src = ktpPath;
   
-  // Handler jika gambar gagal load
   ktpImg.onerror = function() {
     console.error('Failed to load image:', ktpPath);
     this.src = 'https://via.placeholder.com/800x500/ff6b6b/ffffff?text=Foto+KTP+Gagal+Dimuat';
   };
   
-  // Reset form
   document.getElementById('reject-reason').classList.add('hidden');
   document.getElementById('reject-textarea').value = '';
   
-  // Show/hide elements based on status
   const actionButtons = document.getElementById('action-buttons');
   const verifiedInfo = document.getElementById('verified-info');
   const rejectedInfo = document.getElementById('rejected-info');
   
-  // Hide all first
   actionButtons.classList.add('hidden');
   verifiedInfo.classList.add('hidden');
   rejectedInfo.classList.add('hidden');
@@ -531,89 +733,437 @@ function renderTable() {
     document.getElementById('rejected-reason').textContent = seller.rejection_reason || '-';
   }
   
-  // Show modal
   document.getElementById('modal').classList.remove('hidden');
   document.getElementById('modal').classList.add('flex');
 }
-    function closeModal(){ 
-      document.getElementById('modal').classList.add('hidden');
-      document.getElementById('modal').classList.remove('flex');
-    }
-    
-    function showRejectReason(){ document.getElementById('reject-reason').classList.remove('hidden'); }
-    function hideRejectReason(){ document.getElementById('reject-reason').classList.add('hidden'); }
 
-    async function verifySeller(id, action) {
-      const rejectionReason = document.getElementById('reject-textarea').value.trim();
+function closeModal(){ 
+  document.getElementById('modal').classList.add('hidden');
+  document.getElementById('modal').classList.remove('flex');
+}
+
+function showRejectReason(){ 
+  document.getElementById('reject-reason').classList.remove('hidden'); 
+}
+
+function hideRejectReason(){ 
+  document.getElementById('reject-reason').classList.add('hidden'); 
+}
+
+async function verifySeller(id, action) {
+  const rejectionReason = document.getElementById('reject-textarea').value.trim();
+  
+  if(action==='rejected' && !rejectionReason) {
+    showToast('error','Gagal','Alasan penolakan wajib diisi!');
+    return;
+  }
+
+  try {
+    const response = await fetch('backend/api/verify_seller.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        seller_id: id,
+        action: action,
+        rejection_reason: rejectionReason
+      })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      closeModal();
+      loadSellers(currentStatus);
+      showToast('success', 'Sukses', result.message);
+    } else {
+      showToast('error', 'Gagal', result.message);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showToast('error', 'Error', 'Terjadi kesalahan sistem');
+  }
+}
+
+function openZoomModal(){ 
+  document.getElementById('zoomed-ktp').src = document.getElementById('modal-ktp').src;
+  document.getElementById('zoom-modal').classList.remove('hidden');
+  document.getElementById('zoom-modal').classList.add('flex');
+}
+
+function closeZoomModal(){ 
+  document.getElementById('zoom-modal').classList.add('hidden');
+  document.getElementById('zoom-modal').classList.remove('flex');
+}
+
+function showToast(type, title, msg){
+  document.getElementById('toast-title').textContent = title;
+  document.getElementById('toast-message').textContent = msg;
+  const icon = type==='success' ? '<i class="ri-checkbox-circle-line text-2xl"></i>' : '<i class="ri-close-circle-line text-2xl"></i>';
+  document.getElementById('toast-icon').innerHTML = icon;
+  document.getElementById('toast-icon').className = `w-10 h-10 rounded-lg flex items-center justify-center text-white ${type==='success'?'bg-green-500':'bg-red-500'}`;
+  document.getElementById('toast').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('toast').classList.add('hidden'), 4000);
+}
+
+function refreshData(){ 
+  if (currentMenu === 'seller') {
+    loadSellers(currentStatus);
+  } else {
+    loadPayments(currentStatus);
+  }
+  showToast('success','Refresh','Data berhasil diperbarui'); 
+}
+
+function logoutAdmin(e) {
+  e.preventDefault();
+  if (confirm('Yakin ingin logout?')) {
+    fetch('backend/api/logout_admin.php')
+      .then(() => {
+        localStorage.removeItem('adminLoggedIn');
+        localStorage.removeItem('adminRemember');
+        window.location.href = 'loginAdmin.html';
+      });
+  }
+}
+
+// ==================== PAYMENT VERIFICATION FUNCTIONS ====================
+
+function switchMenu(menu) {
+  currentMenu = menu;
+  
+  document.getElementById('menu-seller').classList.remove('bg-white', 'bg-opacity-20');
+  document.getElementById('menu-payment').classList.remove('bg-white', 'bg-opacity-20');
+  
+  if (menu === 'seller') {
+    document.getElementById('menu-seller').classList.add('bg-white', 'bg-opacity-20');
+    document.getElementById('page-title').textContent = 'Verifikasi Seller Baru';
+    document.getElementById('page-subtitle').textContent = 'Kelola dan verifikasi pendaftaran seller';
+    
+    document.getElementById('seller-stats').style.display = 'grid';
+    document.getElementById('seller-tabs').style.display = 'flex';
+    document.querySelector('.bg-white.rounded-2xl.shadow-lg').style.display = 'block';
+    document.getElementById('sidebar-seller-stats').classList.remove('hidden');
+    
+    document.getElementById('payment-stats').style.display = 'none';
+    document.getElementById('payment-tabs').style.display = 'none';
+    document.getElementById('payment-table-container').style.display = 'none';
+    document.getElementById('sidebar-payment-stats').classList.add('hidden');
+    
+    loadSellers('pending');
+  } else {
+    document.getElementById('menu-payment').classList.add('bg-white', 'bg-opacity-20');
+    document.getElementById('page-title').textContent = 'Verifikasi Pembayaran';
+    document.getElementById('page-subtitle').textContent = 'Kelola dan verifikasi bukti pembayaran invoice';
+    
+    document.getElementById('payment-stats').style.display = 'grid';
+    document.getElementById('payment-tabs').style.display = 'flex';
+    document.getElementById('payment-table-container').style.display = 'block';
+    document.getElementById('sidebar-payment-stats').classList.remove('hidden');
+    
+    document.getElementById('seller-stats').style.display = 'none';
+    document.getElementById('seller-tabs').style.display = 'none';
+    document.querySelector('.bg-white.rounded-2xl.shadow-lg').style.display = 'none';
+    document.getElementById('sidebar-seller-stats').classList.add('hidden');
+    
+    loadPayments('pending');
+  }
+}
+
+async function loadPayments(status) {
+  currentStatus = status;
+  
+  try {
+    const searchQuery = document.getElementById('search').value;
+    const dateFilter = document.getElementById('filter-date').value;
+    
+    const url = `backend/api/get_payments.php?status=${status}&search=${searchQuery}&date_filter=${dateFilter}`;
+    console.log('Loading payments from:', url);
+    
+    const response = await fetch(url);
+    const result = await response.json();
+    
+    console.log('Payment response:', result);
+
+    if (result.success) {
+      allPayments = result.data;
+      console.log('Total payments loaded:', allPayments.length);
       
-      if(action==='rejected' && !rejectionReason) {
-        showToast('error','Gagal','Alasan penolakan wajib diisi!');
-        return;
-      }
+      document.querySelectorAll('[id^="tab-payment-"]').forEach(t => {
+        t.classList.remove('tab-active');
+        t.classList.add('tab-inactive');
+      });
+      document.getElementById(`tab-payment-${status}`).classList.remove('tab-inactive');
+      document.getElementById(`tab-payment-${status}`).classList.add('tab-active');
+      
+      filterPayments();
+      updatePaymentStats();
+    } else {
+      console.error('Error from server:', result.message);
+      showToast('error', 'Error', result.message || 'Gagal memuat data pembayaran');
+    }
+  } catch (error) {
+    console.error('Error loading payments:', error);
+    showToast('error', 'Error', 'Gagal memuat data pembayaran: ' + error.message);
+  }
+}
 
-      try {
-        const response = await fetch('backend/api/verify_seller.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            seller_id: id,
-            action: action,
-            rejection_reason: rejectionReason
-          })
-        });
+function filterPayments() {
+  filteredPayments = allPayments;
+  currentPage = 1;
+  renderPaymentTable();
+  renderPagination();
+}
 
-        const result = await response.json();
+function renderPaymentTable() {
+  const tbody = document.getElementById('payment-list');
+  const emptyState = document.getElementById('payment-empty-state');
+  
+  if (!tbody) {
+    console.error('payment-list element not found!');
+    return;
+  }
+  
+  tbody.innerHTML = '';
+  
+  const start = (currentPage - 1) * itemsPerPage;
+  const pageData = filteredPayments.slice(start, start + itemsPerPage);
+  
+  console.log('Rendering payments:', pageData.length, 'items');
 
-        if (result.success) {
-          closeModal();
-          loadSellers(currentStatus);
-          showToast('success', 'Sukses', result.message);
-        } else {
-          showToast('error', 'Gagal', result.message);
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        showToast('error', 'Error', 'Terjadi kesalahan sistem');
-      }
+  if (pageData.length === 0) {
+    if (emptyState) emptyState.classList.remove('hidden');
+    return;
+  } else {
+    if (emptyState) emptyState.classList.add('hidden');
+  }
+
+  pageData.forEach(p => {
+    console.log('Payment item:', p);
+    
+const statusLabel = p.status === 'pending' ? 'Menunggu Pembayaran' : 
+                    p.status === 'waiting' ? 'Menunggu Verifikasi' :
+                    p.status === 'verified' ? 'Terverifikasi' : 'Ditolak';
+
+const statusClass = p.status === 'pending' ? 'status-pending' : 
+                    p.status === 'waiting' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
+                    p.status === 'verified' ? 'status-verified' : 'status-rejected';
+    
+const actionButton = (p.status === 'waiting' && p.payment_proof)
+    ? `<button onclick='openPaymentModal(${JSON.stringify(p).replace(/'/g, "\\'")})'
+                 class="text-white bg-[#7A5AF8] hover:bg-[#6346E8] px-4 py-2 rounded-lg font-medium transition-all">
+           <i class="ri-check-line"></i> Verifikasi
+         </button>`
+      : `<span class="text-gray-400">-</span>`;
+    
+    const row = `
+      <tr class="border-b hover:bg-gray-50 transition-colors">
+        <td class="px-6 py-4">
+          <div class="font-semibold text-[#7A5AF8]">${p.invoice_number}</div>
+          <div class="text-xs text-gray-500">${p.total_items || 0} item</div>
+        </td>
+        <td class="px-6 py-4">
+          <div class="font-medium">${p.customer_name}</div>
+          <div class="text-sm text-gray-500">${p.customer_email}</div>
+        </td>
+        <td class="px-6 py-4 font-bold text-gray-900">
+          Rp ${Number(p.grand_total).toLocaleString('id-ID')}
+        </td>
+        <td class="px-6 py-4 text-sm text-gray-600">
+          ${p.updated_at ? new Date(p.updated_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
+        </td>
+        <td class="px-6 py-4">
+          ${p.payment_proof ? `<button onclick='openPaymentModal(${JSON.stringify(p).replace(/'/g, "\\'")})' class="text-[#7A5AF8] hover:underline font-medium">
+            <i class="ri-image-line"></i> Lihat Bukti
+          </button>` : '<span class="text-gray-400 text-sm">Belum upload</span>'}
+        </td>
+        <td class="px-6 py-4">
+          <span class="px-3 py-1 rounded-full text-xs font-medium ${statusClass}">
+            ${statusLabel}
+          </span>
+        </td>
+        <td class="px-6 py-4 text-center">${actionButton}</td>
+      </tr>`;
+    
+    tbody.innerHTML += row;
+  });
+}
+
+async function updatePaymentStats() {
+  try {
+    const statuses = ['pending', 'waiting', 'verified', 'rejected']; // HAPUS 'completed'
+    for (const st of statuses) {
+      const resp = await fetch(`backend/api/get_payments.php?status=${st}`);
+      const data = await resp.json();
+      const count = data.success ? data.data.length : 0;
+      
+      const statEl = document.getElementById(`stat-payment-${st}`);
+      const countEl = document.getElementById(`count-payment-${st}`);
+      
+      if (statEl) statEl.textContent = count;
+      if (countEl) countEl.textContent = count;
+      
+      const sidebarEl = document.getElementById(`sidebar-payment-${st}`);
+      if (sidebarEl) sidebarEl.textContent = count;
     }
 
-    function openZoomModal(){ 
-      document.getElementById('zoomed-ktp').src = document.getElementById('modal-ktp').src;
-      document.getElementById('zoom-modal').classList.remove('hidden');
-      document.getElementById('zoom-modal').classList.add('flex');
+    const totalResp = await fetch(`backend/api/get_payments.php?status=all`);
+    const totalData = await totalResp.json();
+    const totalEl = document.getElementById('stat-payment-total');
+    if (totalEl) {
+      totalEl.textContent = totalData.success ? totalData.data.length : 0;
+    }
+  } catch (error) {
+    console.error('Error updating payment stats:', error);
+  }
+}
+
+// Ganti fungsi openPaymentModal dengan ini:
+function openPaymentModal(payment) {
+  currentPaymentId = payment.id;
+  
+  document.getElementById('modal-payment-invoice').textContent = payment.invoice_number;
+  document.getElementById('modal-payment-customer').textContent = payment.customer_name;
+  document.getElementById('modal-payment-total').textContent = 'Rp ' + Number(payment.grand_total).toLocaleString('id-ID');
+  document.getElementById('modal-payment-method').textContent = payment.payment_method;
+  document.getElementById('modal-payment-date').textContent = payment.updated_at ? 
+    new Date(payment.updated_at).toLocaleDateString('id-ID', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }) : '-';
+  
+  // Render items
+  const itemsHtml = JSON.parse(payment.items || '[]').map(item => {
+    // Foto produk ada di assets/img (TIDAK pakai prefix backend/)
+    let imagePath = item.product_image || '';
+    
+    // Jika path kosong, gunakan placeholder
+    if (!imagePath) {
+      imagePath = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2248%22 height=%2248%22%3E%3Crect fill=%22%23ddd%22 width=%2248%22 height=%2248%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 fill=%22%23999%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2212%22%3ENo Image%3C/text%3E%3C/svg%3E';
     }
     
-    function closeZoomModal(){ 
-      document.getElementById('zoom-modal').classList.add('hidden');
-      document.getElementById('zoom-modal').classList.remove('flex');
-    }
+    return `
+      <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
+        <img src="${imagePath}" 
+             alt="Product" 
+             class="w-12 h-12 object-cover rounded" 
+             onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2248%22 height=%2248%22%3E%3Crect fill=%22%23ddd%22 width=%2248%22 height=%2248%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 fill=%22%23999%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2212%22%3ENo Image%3C/text%3E%3C/svg%3E';">
+        <div class="flex-1">
+          <p class="font-medium text-sm">${item.product_name || item.name}</p>
+          <p class="text-xs text-gray-500">${item.quantity}x @ Rp ${Number(item.price).toLocaleString('id-ID')}</p>
+        </div>
+        <p class="font-semibold text-sm">Rp ${Number(item.subtotal).toLocaleString('id-ID')}</p>
+      </div>
+    `;
+  }).join('');
+  
+  document.getElementById('modal-payment-items').innerHTML = itemsHtml;
+  
+  // Set bukti pembayaran - uploads/payments TIDAK di dalam folder backend
+  let proofPath = '';
+  if (payment.payment_proof && payment.payment_proof !== '') {
+    // Path dari PHP sudah: uploads/payments/payment_X.jpg
+    // Dari admin.html, cukup gunakan langsung (karena uploads sejajar dengan admin.html)
+    proofPath = payment.payment_proof;
+  } else {
+    proofPath = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22500%22%3E%3Crect fill=%22%23cccccc%22 width=%22800%22 height=%22500%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 fill=%22%23666666%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2224%22%3EBukti Belum Upload%3C/text%3E%3C/svg%3E';
+  }
+  
+  const proofImg = document.getElementById('modal-payment-proof');
+  proofImg.src = proofPath;
+  
+  proofImg.onerror = function() {
+    console.error('Failed to load payment proof:', proofPath);
+    this.onerror = null;
+    this.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22500%22%3E%3Crect fill=%22%23ff6b6b%22 width=%22800%22 height=%22500%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 fill=%22%23ffffff%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2224%22%3EGagal Memuat Bukti%3C/text%3E%3C/svg%3E';
+  };
+  
+  document.getElementById('payment-reject-reason').classList.add('hidden');
+  document.getElementById('payment-reject-textarea').value = '';
+  
+  const actionButtons = document.getElementById('payment-action-buttons');
+  const verifiedInfo = document.getElementById('payment-verified-info');
+  const rejectedInfo = document.getElementById('payment-rejected-info');
+  
+  actionButtons.classList.add('hidden');
+  verifiedInfo.classList.add('hidden');
+  rejectedInfo.classList.add('hidden');
+  
+if (payment.status === 'waiting' && payment.payment_proof) {
+    // Kalau status waiting (sudah upload bukti, menunggu verifikasi), tampilkan tombol aksi
+    actionButtons.classList.remove('hidden');
+} else if (payment.status === 'verified') {
+    verifiedInfo.classList.remove('hidden');
+} else if (payment.status === 'rejected') {
+    rejectedInfo.classList.remove('hidden');
+    document.getElementById('payment-rejected-reason').textContent = payment.admin_note || '-';
+}
+  
+  document.getElementById('modal-payment').classList.remove('hidden');
+  document.getElementById('modal-payment').classList.add('flex');
+}
 
-    function showToast(type, title, msg){
-      document.getElementById('toast-title').textContent = title;
-      document.getElementById('toast-message').textContent = msg;
-      const icon = type==='success' ? '<i class="ri-checkbox-circle-line text-2xl"></i>' : '<i class="ri-close-circle-line text-2xl"></i>';
-      document.getElementById('toast-icon').innerHTML = icon;
-      document.getElementById('toast-icon').className = `w-10 h-10 rounded-lg flex items-center justify-center text-white ${type==='success'?'bg-green-500':'bg-red-500'}`;
-      document.getElementById('toast').classList.remove('hidden');
-      setTimeout(()=>document.getElementById('toast').classList.add('hidden'), 4000);
-    }
 
-    function refreshData(){ 
-      loadSellers(currentStatus); 
-      showToast('success','Refresh','Data berhasil diperbarui'); 
-    }
+function closePaymentModal() {
+  document.getElementById('modal-payment').classList.add('hidden');
+  document.getElementById('modal-payment').classList.remove('flex');
+}
 
-    function logoutAdmin(e) {
-    e.preventDefault();
-      if (confirm('Yakin ingin logout?')) {
-        fetch('backend/api/logout_admin.php')
-          .then(() => {
-            localStorage.removeItem('adminLoggedIn');
-            localStorage.removeItem('adminRemember');
-            window.location.href = 'loginAdmin.html';
-          });
-      }
+function showPaymentRejectReason() {
+  document.getElementById('payment-reject-reason').classList.remove('hidden');
+}
+
+function hidePaymentRejectReason() {
+  document.getElementById('payment-reject-reason').classList.add('hidden');
+}
+
+async function verifyPayment(id, action) {
+  const rejectionReason = document.getElementById('payment-reject-textarea').value.trim();
+  
+  if (action === 'rejected' && !rejectionReason) {
+    showToast('error', 'Gagal', 'Alasan penolakan wajib diisi!');
+    return;
+  }
+
+  try {
+    const response = await fetch('backend/api/verify_payment.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        invoice_id: id,
+        action: action,
+        rejection_reason: rejectionReason
+      })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      closePaymentModal();
+      loadPayments(currentStatus);
+      showToast('success', 'Sukses', result.message);
+    } else {
+      showToast('error', 'Gagal', result.message);
     }
+  } catch (error) {
+    console.error('Error:', error);
+    showToast('error', 'Error', 'Terjadi kesalahan sistem');
+  }
+}
+
+function openZoomPaymentModal() {
+  document.getElementById('zoomed-payment-proof').src = document.getElementById('modal-payment-proof').src;
+  document.getElementById('zoom-modal-payment').classList.remove('hidden');
+  document.getElementById('zoom-modal-payment').classList.add('flex');
+}
+
+function closeZoomPaymentModal() {
+  document.getElementById('zoom-modal-payment').classList.add('hidden');
+  document.getElementById('zoom-modal-payment').classList.remove('flex');
+}
 </script>
 </body>
 </html>

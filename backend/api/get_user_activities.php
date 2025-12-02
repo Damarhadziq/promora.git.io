@@ -68,20 +68,20 @@ try {
             $items = json_decode('[' . $row['items'] . ']', true);
         }
         
-        // Map status database ke status display
-        $statusMap = [
-            'pending' => 'pending',      // Belum upload bukti
-            'verified' => 'waiting',     // Sudah upload, menunggu verifikasi
-            'rejected' => 'rejected',    // Ditolak admin
-            'completed' => 'success'     // Sudah diverifikasi & selesai
-        ];
-        
-        $displayStatus = $statusMap[$row['status']] ?? 'pending';
-        
-        // Jika sudah upload bukti tapi masih pending, ubah jadi waiting
-        if ($row['status'] === 'pending' && $row['payment_proof']) {
-            $displayStatus = 'waiting';
-        }
+            // Map status database ke status display
+            $statusMap = [
+                'pending' => 'pending',      // Belum upload bukti
+                'waiting' => 'waiting',      // Sudah upload, menunggu verifikasi admin
+                'verified' => 'verified',    // ✅ PERBAIKAN: verified tetap verified
+                'rejected' => 'rejected'
+            ];
+
+            $displayStatus = $statusMap[$row['status']] ?? 'pending';
+
+            // Jika sudah upload bukti tapi masih pending, ubah jadi waiting
+            if ($row['status'] === 'pending' && $row['payment_proof']) {
+                $displayStatus = 'waiting';
+            }
         
         $activities[] = [
             'id' => $row['id'],

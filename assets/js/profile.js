@@ -103,29 +103,44 @@ function updateOverviewTab(user) {
     
     // Update Address Section
     const addressSection = document.getElementById('userAddress');
-    if (addressSection) {
-        if (user.address) {
-            addressSection.textContent = user.address;
-        } else if (user.latitude && user.longitude) {
-            // Convert koordinat ke alamat
-            addressSection.textContent = 'Memuat alamat...';
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${user.latitude}&lon=${user.longitude}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.display_name) {
-                        addressSection.textContent = data.display_name;
-                    } else {
-                        addressSection.textContent = `Koordinat: ${user.latitude}, ${user.longitude}`;
-                    }
-                })
-                .catch(err => {
-                    console.error('Geocoding error:', err);
-                    addressSection.textContent = `Koordinat: ${user.latitude}, ${user.longitude}`;
-                });
-        } else {
-            addressSection.textContent = 'Belum ada alamat tersimpan';
-        }
+if (addressSection) {
+    if (user.address && user.address.trim() !== '') {
+        // Jika sudah ada alamat tersimpan, tampilkan langsung
+        addressSection.textContent = user.address;
+    } else if (user.latitude && user.longitude) {
+        // Jika belum ada alamat tapi ada koordinat, convert ke alamat
+        addressSection.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memuat alamat...';
+        
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${user.latitude}&lon=${user.longitude}&addressdetails=1`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.display_name) {
+                    addressSection.textContent = data.display_name;
+                } else if (data.address) {
+                    // Format alamat dari komponen address
+                    const addr = data.address;
+                    let fullAddress = '';
+                    
+                    if (addr.road) fullAddress += addr.road;
+                    if (addr.suburb) fullAddress += (fullAddress ? ', ' : '') + addr.suburb;
+                    if (addr.city || addr.city_district) fullAddress += (fullAddress ? ', ' : '') + (addr.city || addr.city_district);
+                    if (addr.state) fullAddress += (fullAddress ? ', ' : '') + addr.state;
+                    if (addr.postcode) fullAddress += ' ' + addr.postcode;
+                    if (addr.country) fullAddress += (fullAddress ? ', ' : '') + addr.country;
+                    
+                    addressSection.textContent = fullAddress || 'Alamat tidak dapat diformat';
+                } else {
+                    addressSection.textContent = 'Alamat tidak ditemukan';
+                }
+            })
+            .catch(err => {
+                console.error('Geocoding error:', err);
+                addressSection.textContent = 'Gagal memuat alamat';
+            });
+    } else {
+        addressSection.textContent = 'Belum ada alamat tersimpan';
     }
+}
 }
 
 // Update Edit Form
@@ -135,23 +150,25 @@ function updateEditForm(user) {
     document.getElementById('email').value = user.email || '';
     document.getElementById('phone').value = user.phone || '';
     
-    // Update koordinat
+    // Update koordinat dan alamat
     const mapsSearch = document.getElementById('mapsSearch');
     const addressTextarea = document.getElementById('address');
     const latInput = document.getElementById('latitude');
     const lngInput = document.getElementById('longitude');
-    
+
     if (user.latitude && user.longitude) {
         // Simpan koordinat di hidden input
         latInput.value = user.latitude;
         lngInput.value = user.longitude;
         
-        // Update placeholder mapsSearch dengan koordinat
+        // ✅ TAMPILKAN KOORDINAT di input mapsSearch (READ-ONLY)
         if (mapsSearch) {
-            mapsSearch.placeholder = `Lat: ${user.latitude}, Lng: ${user.longitude}`;
+            mapsSearch.value = `${user.latitude}, ${user.longitude}`;
+            mapsSearch.disabled = true; // Disable input agar tidak bisa diedit
+            mapsSearch.classList.add('bg-gray-100', 'cursor-not-allowed'); // Tambah styling disabled
         }
         
-        // Untuk textarea alamat, tampilkan alamat lengkap
+        // Untuk textarea alamat
         if (addressTextarea) {
             if (user.address && user.address.trim() !== '') {
                 // Jika sudah ada alamat tersimpan, tampilkan
@@ -159,11 +176,25 @@ function updateEditForm(user) {
             } else {
                 // Jika belum ada, convert dari koordinat
                 addressTextarea.value = 'Memuat alamat...';
-                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${user.latitude}&lon=${user.longitude}`)
+                
+                fetch(`backend/api/geocode.php?lat=${user.latitude}&lon=${user.longitude}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.display_name) {
                             addressTextarea.value = data.display_name;
+                        } else if (data.address) {
+                            // Format alamat dari komponen address
+                            const addr = data.address;
+                            let fullAddress = '';
+                            
+                            if (addr.road) fullAddress += addr.road;
+                            if (addr.suburb) fullAddress += (fullAddress ? ', ' : '') + addr.suburb;
+                            if (addr.city || addr.city_district) fullAddress += (fullAddress ? ', ' : '') + (addr.city || addr.city_district);
+                            if (addr.state) fullAddress += (fullAddress ? ', ' : '') + addr.state;
+                            if (addr.postcode) fullAddress += ' ' + addr.postcode;
+                            if (addr.country) fullAddress += (fullAddress ? ', ' : '') + addr.country;
+                            
+                            addressTextarea.value = fullAddress || 'Alamat tidak dapat diformat';
                         } else {
                             addressTextarea.value = 'Alamat tidak ditemukan';
                         }
@@ -179,7 +210,10 @@ function updateEditForm(user) {
         if (latInput) latInput.value = '';
         if (lngInput) lngInput.value = '';
         if (mapsSearch) {
-            mapsSearch.placeholder = "Pilih lokasi di peta untuk mendapatkan alamat";
+            mapsSearch.value = '';
+            mapsSearch.placeholder = "Pilih lokasi di peta untuk mendapatkan koordinat";
+            mapsSearch.disabled = false; // Enable kembali
+            mapsSearch.classList.remove('bg-gray-100', 'cursor-not-allowed');
         }
         if (addressTextarea) {
             addressTextarea.value = '';
@@ -229,38 +263,38 @@ function displayActivities(activities) {
     }
     
     const statusConfig = {
-        pending: {
-            icon: 'fa-clock',
-            iconBg: 'bg-orange-100',
-            iconColor: 'text-orange-600',
-            badge: 'bg-orange-100 text-orange-700',
-            label: 'Menunggu Pembayaran',
-            description: 'Klik untuk upload bukti pembayaran'
-        },
-        waiting: {
-            icon: 'fa-hourglass-half',
-            iconBg: 'bg-yellow-100',
-            iconColor: 'text-yellow-600',
-            badge: 'bg-yellow-100 text-yellow-700',
-            label: 'Menunggu Verifikasi',
-            description: 'Sedang diverifikasi oleh admin'
-        },
-        success: {
-            icon: 'fa-check-circle',
-            iconBg: 'bg-green-100',
-            iconColor: 'text-green-600',
-            badge: 'bg-green-100 text-green-700',
-            label: 'Pesanan Selesai',
-            description: 'Transaksi berhasil diselesaikan'
-        },
-        rejected: {
-            icon: 'fa-times-circle',
-            iconBg: 'bg-red-100',
-            iconColor: 'text-red-600',
-            badge: 'bg-red-100 text-red-700',
-            label: 'Ditolak',
-            description: 'Pembayaran ditolak oleh admin'
-        }
+    pending: {
+        icon: 'fa-clock',
+        iconBg: 'bg-orange-100',
+        iconColor: 'text-orange-600',
+        badge: 'bg-orange-100 text-orange-700',
+        label: 'Menunggu Pembayaran',
+        description: 'Klik untuk upload bukti pembayaran'
+    },
+    waiting: {
+        icon: 'fa-hourglass-half',
+        iconBg: 'bg-yellow-100',
+        iconColor: 'text-yellow-600',
+        badge: 'bg-yellow-100 text-yellow-700',
+        label: 'Menunggu Verifikasi',
+        description: 'Sedang diverifikasi oleh admin'
+    },
+    verified: {
+        icon: 'fa-check-circle',
+        iconBg: 'bg-green-100',
+        iconColor: 'text-green-600',
+        badge: 'bg-green-100 text-green-700',
+        label: 'Pembayaran Terverifikasi',
+        description: 'Pembayaran sudah diverifikasi admin'
+    },
+    rejected: {
+        icon: 'fa-times-circle',
+        iconBg: 'bg-red-100',
+        iconColor: 'text-red-600',
+        badge: 'bg-red-100 text-red-700',
+        label: 'Pembayaran Ditolak',
+        description: 'Pembayaran ditolak oleh admin'
+    }
     };
     
     const html = activities.map(activity => {
@@ -328,7 +362,7 @@ function showActivityDetail(activity) {
     const statusConfig = {
         pending: { label: 'Menunggu Pembayaran', class: 'text-orange-600 bg-orange-50' },
         waiting: { label: 'Menunggu Verifikasi', class: 'text-yellow-600 bg-yellow-50' },
-        success: { label: 'Selesai', class: 'text-green-600 bg-green-50' },
+        verified: { label: 'Pembayaran Terverifikasi', class: 'text-green-600 bg-green-50' },  // ✅ GANTI 'success' jadi 'verified'
         rejected: { label: 'Ditolak', class: 'text-red-600 bg-red-50' }
     };
     
@@ -368,7 +402,7 @@ function showActivityDetail(activity) {
                             <p class="text-sm font-medium">Status Pesanan</p>
                             <p class="text-lg font-bold">${status.label}</p>
                         </div>
-                        <i class="fas fa-${activity.display_status === 'success' ? 'check-circle' : activity.display_status === 'rejected' ? 'times-circle' : 'clock'} text-3xl"></i>
+                        <i class="fas fa-${activity.display_status === 'verified' ? 'check-circle' : activity.display_status === 'rejected' ? 'times-circle' : 'clock'} text-3xl"></i>
                     </div>
                     
                     ${activity.admin_note && activity.display_status === 'rejected' ? `
@@ -493,6 +527,71 @@ function handleImageUpload(event) {
     reader.readAsDataURL(file);
 }
 
+// Fungsi untuk update address dari koordinat
+async function updateAddressFromCoords(lat, lng) {
+    try {
+        // Update hidden inputs
+        document.getElementById('latitude').value = lat;
+        document.getElementById('longitude').value = lng;
+        
+        // ✅ UPDATE INPUT KOORDINAT (READ-ONLY)
+        const mapsSearch = document.getElementById('mapsSearch');
+        if (mapsSearch) {
+            mapsSearch.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`; // Format 6 desimal
+            mapsSearch.disabled = true;
+            mapsSearch.classList.add('bg-gray-100', 'cursor-not-allowed');
+        }
+        
+        // Update textarea dengan loading
+        const addressTextarea = document.getElementById('address');
+        if (addressTextarea) {
+            addressTextarea.value = 'Memuat alamat...';
+        }
+        
+        // Fetch alamat dari koordinat (menggunakan backend proxy untuk menghindari CORS)
+        const response = await fetch(`backend/api/geocode.php?lat=${lat}&lon=${lng}`);
+        const data = await response.json();
+        
+        let fullAddress = '';
+        
+        if (data.display_name) {
+            fullAddress = data.display_name;
+        } else if (data.address) {
+            // Format alamat dari komponen
+            const addr = data.address;
+            if (addr.road) fullAddress += addr.road;
+            if (addr.suburb) fullAddress += (fullAddress ? ', ' : '') + addr.suburb;
+            if (addr.city || addr.city_district) fullAddress += (fullAddress ? ', ' : '') + (addr.city || addr.city_district);
+            if (addr.state) fullAddress += (fullAddress ? ', ' : '') + addr.state;
+            if (addr.postcode) fullAddress += ' ' + addr.postcode;
+            if (addr.country) fullAddress += (fullAddress ? ', ' : '') + addr.country;
+        }
+        
+        // Update textarea
+        if (addressTextarea) {
+            addressTextarea.value = fullAddress || 'Alamat tidak dapat ditemukan';
+        }
+        
+        showNotification('Lokasi berhasil dipilih!', 'success');
+        
+    } catch (error) {
+        console.error('Geocoding error:', error);
+        const addressTextarea = document.getElementById('address');
+        if (addressTextarea) {
+            addressTextarea.value = 'Gagal memuat alamat. Coba lagi.';
+        }
+        showNotification('Gagal memuat alamat dari koordinat', 'error');
+    }
+}
+
+// PERBAIKI fungsi closeMapsPicker (tambahkan jika belum ada)
+function closeMapsPicker() {
+    const mapContainer = document.getElementById('mapContainer');
+    if (mapContainer) {
+        mapContainer.classList.add('hidden');
+    }
+}
+
 // Leaflet Maps functionality
 function openMapsPicker() {
     const mapContainer = document.getElementById('mapContainer');
@@ -516,53 +615,6 @@ function openMapsPicker() {
             draggable: true
         }).addTo(map);
         
-        // Fungsi untuk convert koordinat ke alamat lengkap
-        function updateAddressFromCoords(lat, lng) {
-            // Simpan koordinat
-            document.getElementById('latitude').value = lat.toFixed(6);
-            document.getElementById('longitude').value = lng.toFixed(6);
-            
-            // Update placeholder dengan koordinat
-            const mapsSearch = document.getElementById('mapsSearch');
-            if (mapsSearch) {
-                mapsSearch.placeholder = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
-            }
-            
-            // Update alamat lengkap di textarea
-            const addressTextarea = document.getElementById('address');
-            if (addressTextarea) {
-                addressTextarea.value = 'Mengambil alamat...';
-                
-                // Geocoding API untuk convert koordinat ke alamat
-                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.display_name) {
-                            // Tampilkan alamat lengkap
-                            addressTextarea.value = data.display_name;
-                        } else if (data.address) {
-                            // Atau format manual dari address details
-                            const addr = data.address;
-                            let fullAddress = '';
-                            
-                            if (addr.road) fullAddress += addr.road;
-                            if (addr.suburb) fullAddress += (fullAddress ? ', ' : '') + addr.suburb;
-                            if (addr.city) fullAddress += (fullAddress ? ', ' : '') + addr.city;
-                            if (addr.state) fullAddress += (fullAddress ? ', ' : '') + addr.state;
-                            if (addr.postcode) fullAddress += ' ' + addr.postcode;
-                            if (addr.country) fullAddress += (fullAddress ? ', ' : '') + addr.country;
-                            
-                            addressTextarea.value = fullAddress || data.display_name;
-                        } else {
-                            addressTextarea.value = 'Alamat tidak ditemukan';
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Geocoding error:', err);
-                        addressTextarea.value = `Koordinat: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-                    });
-            }
-        }
         
         // Event saat marker di-drag
         marker.on('dragend', function(event) {
@@ -587,8 +639,8 @@ function openMapsPicker() {
             if (query.length < 3) return;
             
             searchTimeout = setTimeout(() => {
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`)
-                    .then(response => response.json())
+                fetch(`backend/api/geocode.php?q=${encodeURIComponent(query)}`)
+                  .then(response => response.json())
                     .then(data => {
                         if (data.length > 0) {
                             const result = data[0];

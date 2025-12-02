@@ -56,39 +56,39 @@ function displayActivities(activities) {
     const container = document.getElementById('activityList');
     
     const statusConfig = {
-        pending: {
-            icon: 'fa-clock',
-            iconBg: 'bg-orange-100',
-            iconColor: 'text-orange-600',
-            badge: 'bg-orange-100 text-orange-700',
-            label: 'Menunggu Pembayaran',
-            description: 'Klik untuk upload bukti pembayaran'
-        },
-        waiting: {
-            icon: 'fa-hourglass-half',
-            iconBg: 'bg-yellow-100',
-            iconColor: 'text-yellow-600',
-            badge: 'bg-yellow-100 text-yellow-700',
-            label: 'Menunggu Verifikasi',
-            description: 'Sedang diverifikasi oleh admin'
-        },
-        success: {
-            icon: 'fa-check-circle',
-            iconBg: 'bg-green-100',
-            iconColor: 'text-green-600',
-            badge: 'bg-green-100 text-green-700',
-            label: 'Pesanan Selesai',
-            description: 'Transaksi berhasil diselesaikan'
-        },
-        rejected: {
-            icon: 'fa-times-circle',
-            iconBg: 'bg-red-100',
-            iconColor: 'text-red-600',
-            badge: 'bg-red-100 text-red-700',
-            label: 'Ditolak',
-            description: 'Pembayaran ditolak oleh admin'
-        }
-    };
+    pending: {
+        icon: 'fa-clock',
+        iconBg: 'bg-orange-100',
+        iconColor: 'text-orange-600',
+        badge: 'bg-orange-100 text-orange-700',
+        label: 'Menunggu Pembayaran',
+        description: 'Klik untuk upload bukti pembayaran'
+    },
+    waiting: {
+        icon: 'fa-hourglass-half',
+        iconBg: 'bg-yellow-100',
+        iconColor: 'text-yellow-600',
+        badge: 'bg-yellow-100 text-yellow-700',
+        label: 'Menunggu Verifikasi',
+        description: 'Sedang diverifikasi oleh admin'
+    },
+    verified: {
+        icon: 'fa-check-circle',
+        iconBg: 'bg-green-100',
+        iconColor: 'text-green-600',
+        badge: 'bg-green-100 text-green-700',
+        label: 'Pembayaran Terverifikasi',
+        description: 'Pembayaran sudah diverifikasi admin'
+    },
+    rejected: {
+        icon: 'fa-times-circle',
+        iconBg: 'bg-red-100',
+        iconColor: 'text-red-600',
+        badge: 'bg-red-100 text-red-700',
+        label: 'Pembayaran Ditolak',
+        description: 'Pembayaran ditolak oleh admin'
+    }
+};
     
     const html = activities.map(activity => {
         const status = statusConfig[activity.display_status] || statusConfig.pending;
@@ -155,28 +155,28 @@ function goToPayment(invoiceId) {
 
 // Show activity detail modal
 function showActivityDetail(activity) {
-    const statusConfig = {
-        pending: { 
-            label: 'Menunggu Pembayaran', 
-            class: 'text-orange-600 bg-orange-50 border-orange-200',
-            icon: 'fa-clock'
-        },
-        waiting: { 
-            label: 'Menunggu Verifikasi', 
-            class: 'text-yellow-600 bg-yellow-50 border-yellow-200',
-            icon: 'fa-hourglass-half'
-        },
-        success: { 
-            label: 'Selesai', 
-            class: 'text-green-600 bg-green-50 border-green-200',
-            icon: 'fa-check-circle'
-        },
-        rejected: { 
-            label: 'Ditolak', 
-            class: 'text-red-600 bg-red-50 border-red-200',
-            icon: 'fa-times-circle'
-        }
-    };
+const statusConfig = {
+    pending: { 
+        label: 'Menunggu Pembayaran', 
+        class: 'text-orange-600 bg-orange-50 border-orange-200',
+        icon: 'fa-clock'
+    },
+    waiting: { 
+        label: 'Menunggu Verifikasi', 
+        class: 'text-yellow-600 bg-yellow-50 border-yellow-200',
+        icon: 'fa-hourglass-half'
+    },
+    verified: {  // ✅ TAMBAHKAN INI
+        label: 'Pembayaran Terverifikasi', 
+        class: 'text-green-600 bg-green-50 border-green-200',
+        icon: 'fa-check-circle'
+    },
+    rejected: { 
+        label: 'Pembayaran Ditolak', 
+        class: 'text-red-600 bg-red-50 border-red-200',
+        icon: 'fa-times-circle'
+    }
+};
     
     const status = statusConfig[activity.display_status] || statusConfig.pending;
     

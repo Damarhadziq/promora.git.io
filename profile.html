@@ -355,11 +355,15 @@
 
 <!-- TAMBAHKAN INI - ALAMAT DENGAN MAPS -->
 <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Lokasi Alamat di Maps</label>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">
+        📍 Koordinat Lokasi 
+        <span class="text-xs text-gray-500">(Latitude, Longitude)</span>
+    </label>
     <input type="text" 
         id="mapsSearch" 
-        placeholder="Pilih lokasi di peta untuk mendapatkan alamat"
-        class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none mb-2">
+        placeholder="Pilih lokasi di peta untuk mendapatkan koordinat"
+        class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none mb-2"
+        readonly>
     <button type="button" 
             onclick="openMapsPicker()" 
             class="text-primary hover:text-purple-600 font-medium flex items-center space-x-2 mb-2">
@@ -369,19 +373,33 @@
         </svg>
         <span>Buka Peta & Pilih Lokasi</span>
     </button>
-    <div id="mapContainer" class="hidden mt-3 w-full h-64 rounded-lg border-2 border-gray-300"></div>
+    <div id="mapContainer" class="hidden mt-3 w-full h-64 rounded-lg border-2 border-gray-300 relative">
+        <button type="button" 
+                onclick="closeMapsPicker()" 
+                class="absolute top-2 right-2 z-[1000] bg-white hover:bg-gray-100 text-gray-700 px-3 py-2 rounded-lg shadow-md font-semibold">
+            <i class="fas fa-times mr-1"></i> Tutup Peta
+        </button>
+    </div>
     <input type="hidden" id="latitude">
     <input type="hidden" id="longitude">
+    <p class="text-xs text-gray-500 mt-1">
+        ℹ️ Koordinat akan otomatis terisi setelah memilih lokasi di peta
+    </p>
 </div>
 
 <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">Alamat Lengkap <span class="text-xs text-gray-500">(Otomatis dari Maps)</span></label>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">
+        Alamat Lengkap 
+        <span class="text-xs text-gray-500">(Otomatis dari Koordinat)</span>
+    </label>
     <textarea id="address" 
               rows="3" 
               disabled
               placeholder="Alamat akan terisi otomatis setelah memilih lokasi di peta"
               class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"></textarea>
-    <p class="text-xs text-gray-500 mt-1">📍 Alamat ini diambil otomatis dari koordinat yang Anda pilih di peta</p>
+    <p class="text-xs text-gray-500 mt-1">
+        🗺️ Alamat ini diambil otomatis dari koordinat yang Anda pilih di peta
+    </p>
 </div>
 
                                     <div class="flex gap-4">
@@ -487,7 +505,7 @@
             <p class="text-gray-500">Memuat aktivitas...</p>
         </div>
     </div>
-</div>
+</div> 
                         </div>
                     </div>
                 </div>
