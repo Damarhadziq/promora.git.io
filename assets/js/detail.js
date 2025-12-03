@@ -352,54 +352,81 @@ async function checkLoginStatus() {
         
         const data = await response.json();
         const cartLink = document.getElementById('cart-link');
+        const authButtons = document.getElementById('auth-buttons');
+        const userInfo = document.getElementById('user-info');
+        const userNameEl = document.getElementById('user-name');
         
         if (data.logged_in && data.user) {
-            document.getElementById('auth-buttons').classList.add('hidden');
-            document.getElementById('user-info').classList.remove('hidden');
-            document.getElementById('user-info').classList.add('flex');
+            if (authButtons) authButtons.classList.add('hidden');
+            if (userInfo) {
+                userInfo.classList.remove('hidden');
+                userInfo.classList.add('flex');
+            }
+            if (cartLink) cartLink.classList.remove('hidden');
+            if (userNameEl) userNameEl.textContent = data.user.username;
             
-            if (cartLink) {
-                cartLink.classList.remove('hidden');
+            // ✅ UPDATE FOTO PROFIL
+            const userAvatar = document.getElementById('user-avatar');
+            if (userAvatar) {
+                if (data.user.profile_photo && data.user.profile_photo !== '') {
+                    userAvatar.src = './backend/uploads/profile_photos/' + data.user.profile_photo;
+                    userAvatar.onerror = function() {
+                        this.src = './assets/img/user.png';
+                    };
+                } else {
+                    userAvatar.src = './assets/img/user.png';
+                }
             }
             
-            const userNameEl = document.getElementById('user-name');
-            if (userNameEl) {
-                userNameEl.textContent = data.user.username;
-            }
-                        
             localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userName', data.user.first_name || data.user.username);
+            localStorage.setItem('userName', data.user.username);
             localStorage.setItem('userRole', data.user.role);
             localStorage.setItem('userId', data.user.id);
+            localStorage.setItem('userPhoto', data.user.profile_photo || '');
             
         } else {
-            document.getElementById('auth-buttons').classList.remove('hidden');
-            document.getElementById('user-info').classList.add('hidden');
-            
-            if (cartLink) {
-                cartLink.classList.add('hidden');
-            }
+            if (authButtons) authButtons.classList.remove('hidden');
+            if (userInfo) userInfo.classList.add('hidden');
+            if (cartLink) cartLink.classList.add('hidden');
             
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('userName');
             localStorage.removeItem('userRole');
             localStorage.removeItem('userId');
+            localStorage.removeItem('userPhoto');
         }
     } catch (error) {
         console.error('Error checking session:', error);
         
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
         const userName = localStorage.getItem('userName');
+        const userPhoto = localStorage.getItem('userPhoto');
         const cartLink = document.getElementById('cart-link');
+        const authButtons = document.getElementById('auth-buttons');
+        const userInfo = document.getElementById('user-info');
+        const userNameEl = document.getElementById('user-name');
         
         if (isLoggedIn && userName) {
-            document.getElementById('auth-buttons').classList.add('hidden');
-            document.getElementById('user-info').classList.remove('hidden');
-            document.getElementById('user-info').classList.add('flex');
+            if (authButtons) authButtons.classList.add('hidden');
+            if (userInfo) {
+                userInfo.classList.remove('hidden');
+                userInfo.classList.add('flex');
+            }
             if (cartLink) cartLink.classList.remove('hidden');
-            
-            const userNameEl = document.getElementById('user-name');
             if (userNameEl) userNameEl.textContent = userName;
+            
+            // ✅ SET FOTO DARI LOCALSTORAGE
+            const userAvatar = document.getElementById('user-avatar');
+            if (userAvatar && userPhoto && userPhoto !== '') {
+                userAvatar.src = './backend/uploads/profile_photos/' + userPhoto;
+                userAvatar.onerror = function() {
+                    this.src = './assets/img/user.png';
+                };
+            }
+        } else {
+            if (authButtons) authButtons.classList.remove('hidden');
+            if (userInfo) userInfo.classList.add('hidden');
+            if (cartLink) cartLink.classList.add('hidden');
         }
     }
 }
@@ -420,6 +447,7 @@ async function logout() {
             localStorage.removeItem('userRole');
             localStorage.removeItem('userId');
             localStorage.removeItem('cart');
+            localStorage.removeItem('userPhoto'); // ✅ TAMBAHKAN INI
             
             const cartLink = document.getElementById('cart-link');
             document.getElementById('auth-buttons').classList.remove('hidden');

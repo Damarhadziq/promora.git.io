@@ -208,6 +208,9 @@
                                 <button onclick="switchTab('activity')" class="tab-button py-4 font-semibold text-gray-500" data-tab="activity">
                                     Activity
                                 </button>
+                                                                <button onclick="switchTab('order')" class="tab-button py-4 font-semibold text-gray-500" data-tab="order">
+                                    My Orders
+                                </button>
                             </div>
                         </div>
 
@@ -506,6 +509,41 @@
         </div>
     </div>
 </div> 
+
+<!-- Orders Tab -->
+<div id="orderTab" class="tab-content hidden">
+    <h3 class="text-2xl font-bold text-gray-800 mb-6">Pesanan Saya</h3>
+    
+    <!-- Filter Tabs -->
+    <div class="flex gap-2 mb-6 overflow-x-auto">
+        <button onclick="filterOrders('all')" class="order-filter-btn active px-4 py-2 rounded-lg font-medium transition" data-filter="all">
+            Semua
+        </button>
+        <button onclick="filterOrders('pending')" class="order-filter-btn px-4 py-2 rounded-lg font-medium transition" data-filter="pending">
+            Belum Bayar
+        </button>
+        <button onclick="filterOrders('waiting')" class="order-filter-btn px-4 py-2 rounded-lg font-medium transition" data-filter="waiting">
+            Diproses
+        </button>
+        <button onclick="filterOrders('shipped')" class="order-filter-btn px-4 py-2 rounded-lg font-medium transition" data-filter="shipped">
+            Dikirim
+        </button>
+        <button onclick="filterOrders('delivered')" class="order-filter-btn px-4 py-2 rounded-lg font-medium transition" data-filter="delivered">
+            Sampai
+        </button>
+        <button onclick="filterOrders('completed')" class="order-filter-btn px-4 py-2 rounded-lg font-medium transition" data-filter="completed">
+            Selesai
+        </button>
+    </div>
+    
+    <!-- Orders List -->
+    <div id="ordersList" class="space-y-4">
+        <div class="text-center py-12">
+            <i class="fas fa-spinner fa-spin text-4xl text-primary mb-4"></i>
+            <p class="text-gray-500">Memuat pesanan...</p>
+        </div>
+    </div>
+</div>
                         </div>
                     </div>
                 </div>

@@ -181,7 +181,7 @@ function displayPaymentMethod(method) {
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-5">
                         <div class="bg-white p-3 rounded-xl border">
-                            <img src="https://upload.wikimedia.org/wikipedia/id/thumb/5/55/BNI_logo.svg/240px-BNI_logo.svg.png" alt="BNI" class="w-12 h-12 object-contain">
+                            <img src="./assets/img/bni.png" alt="BNI" class="w-12 h-12 object-contain">
                         </div>
                         <div>
                             <p class="font-bold text-lg">Bank BNI</p>
@@ -450,31 +450,98 @@ function kirimBukti() {
 }
 
     // Script ini WAJIB ada di SETIAP halaman biar status login konsisten
-function checkLoginStatus() {
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  const userName = localStorage.getItem('userName');
-
-  if (isLoggedIn && userName) {
-    // Sudah login → sembunyiin Login/Sign Up, tampilkan user info
-    const auth = document.getElementById('auth-buttons');
-    const user = document.getElementById('user-info');
-    if (auth) auth.classList.add('hidden');
-    if (user) {
-      user.classList.remove('hidden');
+async function checkLoginStatus() {
+    try {
+        const response = await fetch('backend/api/check_session.php', {
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        const cartLink = document.getElementById('cart-link');
+        const authButtons = document.getElementById('auth-buttons');
+        const userInfo = document.getElementById('user-info');
+        const userNameEl = document.getElementById('user-name');
+        
+        if (data.logged_in && data.user) {
+            if (authButtons) authButtons.classList.add('hidden');
+            if (userInfo) {
+                userInfo.classList.remove('hidden');
+                userInfo.classList.add('flex');
+            }
+            if (cartLink) cartLink.classList.remove('hidden');
+            if (userNameEl) userNameEl.textContent = data.user.username;
+            
+            // ✅ UPDATE FOTO PROFIL
+            const userAvatar = document.getElementById('user-avatar');
+            if (userAvatar) {
+                if (data.user.profile_photo && data.user.profile_photo !== '') {
+                    userAvatar.src = './backend/uploads/profile_photos/' + data.user.profile_photo;
+                    userAvatar.onerror = function() {
+                        this.src = './assets/img/user.png';
+                    };
+                } else {
+                    userAvatar.src = './assets/img/user.png';
+                }
+            }
+            
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userName', data.user.username);
+            localStorage.setItem('userRole', data.user.role);
+            localStorage.setItem('userId', data.user.id);
+            localStorage.setItem('userPhoto', data.user.profile_photo || '');
+            
+        } else {
+            if (authButtons) authButtons.classList.remove('hidden');
+            if (userInfo) userInfo.classList.add('hidden');
+            if (cartLink) cartLink.classList.add('hidden');
+            
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userPhoto');
+        }
+    } catch (error) {
+        console.error('Error checking session:', error);
+        
+        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        const userName = localStorage.getItem('userName');
+        const userPhoto = localStorage.getItem('userPhoto');
+        const cartLink = document.getElementById('cart-link');
+        const authButtons = document.getElementById('auth-buttons');
+        const userInfo = document.getElementById('user-info');
+        const userNameEl = document.getElementById('user-name');
+        
+        if (isLoggedIn && userName) {
+            if (authButtons) authButtons.classList.add('hidden');
+            if (userInfo) {
+                userInfo.classList.remove('hidden');
+                userInfo.classList.add('flex');
+            }
+            if (cartLink) cartLink.classList.remove('hidden');
+            if (userNameEl) userNameEl.textContent = userName;
+            
+            // ✅ SET FOTO DARI LOCALSTORAGE
+            const userAvatar = document.getElementById('user-avatar');
+            if (userAvatar && userPhoto && userPhoto !== '') {
+                userAvatar.src = './backend/uploads/profile_photos/' + userPhoto;
+                userAvatar.onerror = function() {
+                    this.src = './assets/img/user.png';
+                };
+            }
+        } else {
+            if (authButtons) authButtons.classList.remove('hidden');
+            if (userInfo) userInfo.classList.add('hidden');
+            if (cartLink) cartLink.classList.add('hidden');
+        }
     }
-  } else {
-    // Belum login
-    const auth = document.getElementById('auth-buttons');
-    const user = document.getElementById('user-info');
-    if (auth) auth.classList.remove('hidden');
-    if (user) user.classList.add('hidden');
-  }
 }
 
 function logout() {
   localStorage.removeItem('isLoggedIn');
   localStorage.removeItem('userName');
   localStorage.removeItem('userRole');
+  localStorage.removeItem('userPhoto'); // ✅ TAMBAHKAN INI
   
   // Update UI langsung + tutup dropdown kalau ada
   const auth = document.getElementById('auth-buttons');

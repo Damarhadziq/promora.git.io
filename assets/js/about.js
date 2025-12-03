@@ -51,51 +51,56 @@ async function checkLoginStatus() {
         const userNameEl = document.getElementById('user-name');
         
         if (data.logged_in && data.user) {
-            // User sudah login
             if (authButtons) authButtons.classList.add('hidden');
             if (userInfo) {
                 userInfo.classList.remove('hidden');
                 userInfo.classList.add('flex');
             }
             
-            // Tampilkan keranjang
             if (cartLink) {
                 cartLink.classList.remove('hidden');
             }
             
-            // Set nama user (username saja)
             if (userNameEl) {
                 userNameEl.textContent = data.user.username;
             }
             
-            // Simpan ke localStorage sebagai backup
+            // ✅ UPDATE FOTO PROFIL
+            const userAvatar = document.getElementById('user-avatar');
+            if (userAvatar) {
+                if (data.user.profile_photo && data.user.profile_photo !== '') {
+                    userAvatar.src = './backend/uploads/profile_photos/' + data.user.profile_photo;
+                    userAvatar.onerror = function() {
+                        this.src = './assets/img/user.png';
+                    };
+                } else {
+                    userAvatar.src = './assets/img/user.png';
+                }
+            }
+            
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('userName', data.user.username);
             localStorage.setItem('userRole', data.user.role);
             localStorage.setItem('userId', data.user.id);
+            localStorage.setItem('userPhoto', data.user.profile_photo || '');
             
         } else {
-            // User belum login
             if (authButtons) authButtons.classList.remove('hidden');
             if (userInfo) userInfo.classList.add('hidden');
+            if (cartLink) cartLink.classList.add('hidden');
             
-            // Sembunyikan keranjang
-            if (cartLink) {
-                cartLink.classList.add('hidden');
-            }
-            
-            // Bersihkan localStorage
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('userName');
             localStorage.removeItem('userRole');
             localStorage.removeItem('userId');
+            localStorage.removeItem('userPhoto');
         }
     } catch (error) {
         console.error('Error checking session:', error);
         
-        // Fallback ke localStorage jika server error
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
         const userName = localStorage.getItem('userName');
+        const userPhoto = localStorage.getItem('userPhoto');
         const cartLink = document.getElementById('cart-link');
         const authButtons = document.getElementById('auth-buttons');
         const userInfo = document.getElementById('user-info');
@@ -109,6 +114,15 @@ async function checkLoginStatus() {
             }
             if (cartLink) cartLink.classList.remove('hidden');
             if (userNameEl) userNameEl.textContent = userName;
+            
+            // ✅ SET FOTO DARI LOCALSTORAGE
+            const userAvatar = document.getElementById('user-avatar');
+            if (userAvatar && userPhoto && userPhoto !== '') {
+                userAvatar.src = './backend/uploads/profile_photos/' + userPhoto;
+                userAvatar.onerror = function() {
+                    this.src = './assets/img/user.png';
+                };
+            }
         } else {
             if (authButtons) authButtons.classList.remove('hidden');
             if (userInfo) userInfo.classList.add('hidden');
@@ -116,7 +130,6 @@ async function checkLoginStatus() {
         }
     }
 }
-
 // Logout dengan request ke server
 async function logout() {
     try {
@@ -134,6 +147,7 @@ async function logout() {
             localStorage.removeItem('userRole');
             localStorage.removeItem('userId');
             localStorage.removeItem('cart');
+            localStorage.removeItem('userPhoto'); // ✅ TAMBAHKAN INI
             
             // Update UI
             const cartLink = document.getElementById('cart-link');

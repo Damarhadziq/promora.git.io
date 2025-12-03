@@ -301,6 +301,13 @@
 function switchToRegister() {
     document.getElementById('login-container').classList.add('hidden');
     document.getElementById('register-container').classList.remove('hidden');
+    
+    // Reset login form
+    const loginForm = document.querySelector('#login-container form');
+    if (loginForm) {
+        loginForm.reset();
+    }
+    
     // Reset ke customer saat buka register
     selectRoleReg('customer');
 }
@@ -308,6 +315,20 @@ function switchToRegister() {
 function switchToLogin() {
     document.getElementById('register-container').classList.add('hidden');
     document.getElementById('login-container').classList.remove('hidden');
+    
+    // Reset register form
+    const registerForm = document.querySelector('#register-container form');
+    if (registerForm) {
+        registerForm.reset();
+    }
+    
+    // Reset KTP upload
+    document.getElementById('ktp-input').value = '';
+    document.getElementById('ktp-preview').classList.add('hidden');
+    document.getElementById('ktp-placeholder').classList.remove('hidden');
+    
+    // Reset ke customer role
+    selectRole('customer');
 }
 
 // ============ ROLE SELECTION - LOGIN ============
@@ -441,43 +462,40 @@ async function handleLogin(e) {
         console.log('Login status:', response.status); // Debug
         console.log('Login result:', result); // Debug
 
-        if (response.ok && response.status === 200) {
-            // ✅ Login berhasil
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userId', result.user.id);
-            localStorage.setItem('userName', result.user.first_name);
-            localStorage.setItem('userEmail', result.user.email);
-            localStorage.setItem('userRole', result.user.role);
+    if (response.ok && response.status === 200) {
+    // ✅ Login berhasil
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('userId', result.user.id);
+    localStorage.setItem('userName', result.user.first_name);
+    localStorage.setItem('userEmail', result.user.email);
+    localStorage.setItem('userRole', result.user.role);
 
-            showCustomAlert('✅ Login berhasil! Selamat datang di Promora', 'success');
-            
-            setTimeout(() => {
-                window.location.href = result.user.role === 'seller' ? 'homeSeller.html' : 'index.html';
-            }, 1000);
+    showCustomAlert('Login berhasil! Mengalihkan ke dashboard...', 'success');
+    
+    setTimeout(() => {
+        window.location.href = result.user.role === 'seller' ? 'homeSeller.html' : 'index.html';
+    }, 1000);
 
-        } else if (response.status === 403) {
-            // ✅ Seller belum diverifikasi
-            showCustomAlert(
-                '⏳ Akun Anda Belum Diverifikasi\n\n' +
-                'Akun seller Anda masih menunggu verifikasi dari admin.\n\n' +
-                '📧 Anda akan menerima notifikasi setelah akun diverifikasi.\n\n' +
-                '💡 Proses verifikasi biasanya memakan waktu 1-2 hari kerja.',
-                'warning'
-            );
-        } else if (response.status === 401) {
-            // ✅ Bedakan pesan error antara Role salah vs Password salah
-            if (result.message && result.message.toLowerCase().includes('role')) {
-                showCustomAlert('⚠️ Role yang dipilih tidak sesuai dengan akun Anda!', 'error');
-            } else {
-                showCustomAlert('❌ Password yang Anda masukkan salah!', 'error');
-            }
-        } else if (response.status === 404) {
-            showCustomAlert('❌ Email atau username tidak ditemukan!', 'error');
-        } else if (response.status === 400) {
-            showCustomAlert('⚠️ ' + (result.message || 'Data tidak lengkap'), 'error');
-        } else {
-            showCustomAlert('❌ ' + (result.message || 'Login gagal. Silakan coba lagi.'), 'error');
-        }
+} else if (response.status === 403) {
+    // ⏳ Seller belum diverifikasi
+    showCustomAlert(
+        'Akun seller Anda sedang dalam proses verifikasi.\n\nSilakan tunggu konfirmasi dari admin (1-2 hari kerja).',
+        'warning'
+    );
+} else if (response.status === 401) {
+    // ⚠️ Bedakan pesan error
+    if (result.message && result.message.toLowerCase().includes('role')) {
+        showCustomAlert('Role yang dipilih tidak sesuai dengan akun Anda.', 'error');
+    } else {
+        showCustomAlert('Password yang Anda masukkan salah!', 'error');
+    }
+} else if (response.status === 404) {
+    showCustomAlert('Email atau username tidak ditemukan.', 'error');
+} else if (response.status === 400) {
+    showCustomAlert(result.message || 'Data login tidak lengkap.', 'error');
+} else {
+    showCustomAlert(result.message || 'Login gagal. Silakan coba lagi.', 'error');
+}
     } catch (error) {
         console.error('Error:', error);
         showCustomAlert('❌ Terjadi kesalahan koneksi. Silakan coba lagi.', 'error');
@@ -486,6 +504,13 @@ async function handleLogin(e) {
 // ============ HANDLE REGISTER (Dengan upload KTP untuk seller) ============
 async function handleRegister(e) {
     e.preventDefault();
+    e.stopPropagation();
+
+    // Disable tombol submit
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<svg class="animate-spin h-5 w-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
 
     const formData = new FormData();
 
@@ -498,10 +523,14 @@ async function handleRegister(e) {
     const confirmPassword = e.target.querySelector('input[placeholder="Konfirmasi Password"]').value;
 
     if (password !== confirmPassword) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
         showCustomAlert('Password dan konfirmasi password tidak cocok!', 'error');
         return;
     }
     if (password.length < 8) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
         showCustomAlert('Password minimal 8 karakter!', 'error');
         return;
     }
@@ -517,6 +546,8 @@ async function handleRegister(e) {
     if (currentRegisterRole === 'seller') {
         const ktpFile = document.getElementById('ktp-input').files[0];
         if (!ktpFile) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
             showCustomAlert('KTP wajib diupload untuk seller!', 'error');
             return;
         }
@@ -531,107 +562,221 @@ async function handleRegister(e) {
 
         const result = await response.json();
         
-        console.log('Register status:', response.status); // Debug
-        console.log('Register result:', result); // Debug
+        // DEBUG: Log semua info
+        console.log('=== DEBUG REGISTER ===');
+        console.log('Status:', response.status);
+        console.log('Response OK:', response.ok);
+        console.log('Result:', result);
+        console.log('Success:', result.success);
+        console.log('User Role:', result.user?.role);
+        console.log('Is Verified:', result.user?.is_verified);
+        console.log('=====================');
 
-        // ✅ FIX: Cek response.ok ATAU status 201
-        if ((response.ok || response.status === 201) && result.success) {
+        // ✅ CEK KONDISI LEBIH SEDERHANA
+        if (result.success) {
             
-            if (result.user.role === 'seller' && result.user.is_verified === 0) {
-                // ✅ Seller belum verified - TAMPILKAN ALERT DAN KEMBALI KE LOGIN
+            // RESET FORM IMMEDIATELY
+            e.target.reset();
+            document.getElementById('ktp-input').value = '';
+            document.getElementById('ktp-preview').classList.add('hidden');
+            document.getElementById('ktp-placeholder').classList.remove('hidden');
+            
+            // Restore button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+            
+            // CEK ROLE
+            if (result.user.role === 'seller') {
+                // SELLER FLOW
+                console.log('🔄 Seller registration flow');
+                
                 showCustomAlert(
-                    '✅ Pendaftaran Berhasil!\n\n' +
-                    '⏳ Akun seller Anda sedang menunggu verifikasi dari admin.\n\n' +
-                    '📧 Anda akan menerima notifikasi setelah akun diverifikasi.\n\n' +
-                    '💡 Silakan login setelah akun Anda diverifikasi.',
-                    'warning'
+                    `Pendaftaran berhasil!\n\nUsername: ${result.user.username}\nEmail: ${result.user.email}\n\nAkun seller Anda telah terdaftar.`,
+                    'success'
                 );
                 
-                // Reset form
-                e.target.reset();
-                document.getElementById('ktp-preview').classList.add('hidden');
-                document.getElementById('ktp-placeholder').classList.remove('hidden');
-                
-                // Kembali ke login setelah 3 detik
                 setTimeout(() => {
-                    switchToLogin();
-                }, 3000);
+                    showCustomAlert(
+                        `Menunggu Verifikasi Admin\n\nAkun seller Anda sedang dalam proses verifikasi.\n\nProses verifikasi: 1-2 hari kerja.\n\nSilakan login setelah mendapat konfirmasi.`,
+                        'warning'
+                    );
+                }, 2500);
                 
-        } else if (result.user.role === 'customer') {
-            // ✅ Customer langsung verified - REDIRECT KE HOME
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userId', result.user.id);
-            localStorage.setItem('userName', result.user.first_name);
-            localStorage.setItem('userEmail', result.user.email);
-            localStorage.setItem('userRole', result.user.role);
+                setTimeout(() => {
+                    console.log('🔄 Switching to login...');
+                    switchToLogin();
+                    selectRole('customer');
+                }, 7000);
+                
+            } else {
+                // CUSTOMER FLOW
+                console.log('✅ Customer registration flow');
+                
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userId', result.user.id);
+                localStorage.setItem('userName', result.user.first_name);
+                localStorage.setItem('userEmail', result.user.email);
+                localStorage.setItem('userRole', result.user.role);
 
-            showCustomAlert(
-                '✅ Pendaftaran Berhasil!\n\n' +
-                '👤 Username: ' + result.user.username + '\n\n' +
-                '🎉 Selamat datang di Promora!\n\n' +
-                '💡 Gunakan username ini untuk login.',
-                'success'
-            );
+                showCustomAlert(
+                    `Pendaftaran berhasil!\n\nUsername: ${result.user.username}\nEmail: ${result.user.email}\n\nSelamat datang di Promora!`,
+                    'success'
+                );
+                
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2500);
+            }
             
-            setTimeout(() => {
-                window.location.href = 'lamanLogin.html';
-            }, 3000);
-        }
         } else {
-            // ✅ Tampilkan error message dari server
-            showCustomAlert(result.message || 'Registrasi gagal. Silakan coba lagi.', 'error');
+            // ❌ ERROR HANDLING
+            console.log('❌ Registration failed');
+            
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+            
+            if (response.status === 409) {
+                showCustomAlert(
+                    result.message || 'Email atau username sudah terdaftar!',
+                    'error'
+                );
+            } else {
+                showCustomAlert(
+                    result.message || 'Registrasi gagal. Silakan coba lagi.',
+                    'error'
+                );
+            }
         }
+        
     } catch (error) {
-        console.error('Error:', error);
-        showCustomAlert('Terjadi kesalahan saat registrasi. Silakan coba lagi.', 'error');
+        console.error('❌ Catch Error:', error);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+        showCustomAlert('Terjadi kesalahan koneksi. Silakan coba lagi.', 'error');
     }
 }
-// ============ CUSTOM ALERT CANTIK ============
+
+// ============ CUSTOM ALERT PROFESIONAL DENGAN ANIMASI ============
 function showCustomAlert(message, type = 'info') {
+    // Remove existing alert if any
+    const existingAlert = document.getElementById('custom-alert');
+    if (existingAlert) {
+        existingAlert.remove();
+    }
+
     const alertDiv = document.createElement('div');
-    alertDiv.className = `fixed top-4 right-4 z-50 p-6 rounded-2xl shadow-2xl max-w-md`;
+    alertDiv.id = 'custom-alert';
+    alertDiv.className = 'fixed top-4 right-4 z-50 max-w-md transform transition-all duration-500 ease-out';
+    alertDiv.style.transform = 'translateX(400px)';
+    alertDiv.style.opacity = '0';
     
     let bgColor = '';
+    let borderColor = '';
+    let iconBg = '';
+    let iconColor = '';
     let icon = '';
+    let title = '';
     
     if (type === 'success') {
-        bgColor = 'bg-gradient-to-r from-green-500 to-green-600';
-        icon = '✅';
+        bgColor = 'bg-white';
+        borderColor = 'border-l-4 border-green-500';
+        iconBg = 'bg-green-100';
+        iconColor = 'text-green-600';
+        title = 'Berhasil!';
+        icon = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>`;
     } else if (type === 'warning') {
-        bgColor = 'bg-gradient-to-r from-yellow-500 to-orange-500';
-        icon = '⏳';
+        bgColor = 'bg-white';
+        borderColor = 'border-l-4 border-yellow-500';
+        iconBg = 'bg-yellow-100';
+        iconColor = 'text-yellow-600';
+        title = 'Perhatian!';
+        icon = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>`;
     } else if (type === 'error') {
-        bgColor = 'bg-gradient-to-r from-red-500 to-red-600';
-        icon = '❌';
+        bgColor = 'bg-white';
+        borderColor = 'border-l-4 border-red-500';
+        iconBg = 'bg-red-100';
+        iconColor = 'text-red-600';
+        title = 'Gagal!';
+        icon = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>`;
     } else {
-        bgColor = 'bg-gradient-to-r from-blue-500 to-blue-600';
-        icon = 'ℹ️';
+        bgColor = 'bg-white';
+        borderColor = 'border-l-4 border-blue-500';
+        iconBg = 'bg-blue-100';
+        iconColor = 'text-blue-600';
+        title = 'Informasi';
+        icon = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>`;
     }
     
-    alertDiv.className += ` ${bgColor} text-white`;
-    
     alertDiv.innerHTML = `
-        <div class="flex items-start space-x-4">
-            <div class="text-3xl">${icon}</div>
-            <div class="flex-1">
-                <p class="text-sm leading-relaxed whitespace-pre-line">${message}</p>
+        <div class="${bgColor} ${borderColor} rounded-xl shadow-2xl overflow-hidden">
+            <div class="p-5">
+                <div class="flex items-start space-x-4">
+                    <!-- Icon -->
+                    <div class="${iconBg} ${iconColor} rounded-full p-3 flex-shrink-0">
+                        ${icon}
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0">
+                        <h4 class="text-lg font-bold text-gray-900 mb-1">${title}</h4>
+                        <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line">${message}</p>
+                    </div>
+                    
+                    <!-- Close Button -->
+                    <button onclick="closeAlert()" 
+                            class="text-gray-400 hover:text-gray-600 transition flex-shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
-            <button onclick="this.closest('div').parentElement.remove()" 
-                    class="text-white hover:text-gray-200 text-2xl font-bold leading-none">
-                ×
-            </button>
+            
+            <!-- Progress Bar -->
+            <div class="h-1 bg-gray-100">
+                <div id="progress-bar" class="h-full ${type === 'success' ? 'bg-green-500' : type === 'warning' ? 'bg-yellow-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'} transition-all duration-[5000ms] ease-linear" style="width: 100%"></div>
+            </div>
         </div>
     `;
     
     document.body.appendChild(alertDiv);
     
-    // Auto remove after 6 seconds
+    // Slide in animation
     setTimeout(() => {
-        alertDiv.style.transition = 'all 0.5s ease-out';
+        alertDiv.style.transform = 'translateX(0)';
+        alertDiv.style.opacity = '1';
+    }, 10);
+    
+    // Start progress bar animation
+    setTimeout(() => {
+        const progressBar = document.getElementById('progress-bar');
+        if (progressBar) {
+            progressBar.style.width = '0%';
+        }
+    }, 100);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        closeAlert();
+    }, 5000);
+}
+
+// Function to close alert with animation
+function closeAlert() {
+    const alertDiv = document.getElementById('custom-alert');
+    if (alertDiv) {
+        alertDiv.style.transform = 'translateX(400px)';
         alertDiv.style.opacity = '0';
-        alertDiv.style.transform = 'translateX(100%)';
         setTimeout(() => alertDiv.remove(), 500);
-    }, 6000);
+    }
 }
 
 // ============ INIT: Pastikan KTP hidden saat pertama load ============

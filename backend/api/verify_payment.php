@@ -63,6 +63,7 @@ if ($invoice['status'] !== 'waiting') {
         $updateStmt = $db->prepare("
             UPDATE invoices 
             SET status = 'verified', 
+                shipping_status = 'pending',
                 updated_at = NOW()
             WHERE id = :id
         ");

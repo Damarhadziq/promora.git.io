@@ -480,16 +480,6 @@ function closeActivityModal() {
     }
 }
 
-// Update switchTab function untuk load activities
-const originalSwitchTab = switchTab;
-switchTab = function(tabName) {
-    originalSwitchTab(tabName);
-    
-    if (tabName === 'activity') {
-        loadActivities();
-    }
-};
-
 // Load activities on page load jika tab activity aktif
 document.addEventListener('DOMContentLoaded', () => {
     const activeTab = document.querySelector('.tab-button.active');
@@ -783,6 +773,7 @@ async function changePassword(event) {
 }
 
 // Switch Tab Function
+// Switch Tab Function
 function switchTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.add('hidden');
@@ -797,7 +788,8 @@ function switchTab(tabName) {
         'overview': 'overviewTab',
         'edit': 'editTab',
         'security': 'securityTab',
-        'activity': 'activityTab'
+        'activity': 'activityTab',
+        'order': 'orderTab'  // ✅ TAMBAHKAN INI
     };
     
     const selectedTab = document.getElementById(tabMap[tabName]);
@@ -809,6 +801,13 @@ function switchTab(tabName) {
     if (activeBtn) {
         activeBtn.classList.add('active', 'text-primary', 'border-b-2', 'border-primary');
         activeBtn.classList.remove('text-gray-500');
+    }
+    
+    // ✅ TRIGGER LOAD DATA UNTUK TAB TERTENTU
+    if (tabName === 'activity') {
+        loadActivities();
+    } else if (tabName === 'order') {
+        loadUserOrders();
     }
 }
 
@@ -837,6 +836,209 @@ function showNotification(message, type = 'success') {
 function cancelEdit() {
     loadUserProfile();
     switchTab('overview');
+}
+
+// Load user orders
+async function loadUserOrders(filterStatus = 'all') {
+    const container = document.getElementById('ordersList');
+    
+    container.innerHTML = `
+        <div class="text-center py-12">
+            <i class="fas fa-spinner fa-spin text-4xl text-primary mb-4"></i>
+            <p class="text-gray-500">Memuat pesanan...</p>
+        </div>
+    `;
+    
+    try {
+        const response = await fetch(API_BASE_URL + '/user/get_orders.php', {
+            credentials: 'include'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success && result.orders) {
+            let orders = result.orders;
+            
+            // Filter orders
+            if (filterStatus !== 'all') {
+                if (filterStatus === 'pending') {
+                    orders = orders.filter(o => o.status === 'pending');
+                } else if (filterStatus === 'waiting') {
+                    orders = orders.filter(o => o.status === 'waiting' || (o.status === 'verified' && o.shipping_status !== 'delivered' && o.shipping_status !== 'completed'));
+                } else if (filterStatus === 'shipped') {
+                    orders = orders.filter(o => o.shipping_status === 'shipped');
+                } else if (filterStatus === 'delivered') {
+                    orders = orders.filter(o => o.shipping_status === 'delivered');
+                } else if (filterStatus === 'completed') {
+                    orders = orders.filter(o => o.shipping_status === 'completed');
+                }
+            }
+            
+            displayUserOrders(orders);
+        } else {
+            container.innerHTML = `
+                <div class="text-center py-12">
+                    <i class="fas fa-inbox text-5xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500">Belum ada pesanan</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error loading orders:', error);
+        container.innerHTML = `
+            <div class="text-center py-12 text-red-500">
+                <i class="fas fa-exclamation-circle text-5xl mb-4"></i>
+                <p>Gagal memuat pesanan</p>
+            </div>
+        `;
+    }
+}
+
+// Display user orders
+function displayUserOrders(orders) {
+    const container = document.getElementById('ordersList');
+    
+    if (orders.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-12">
+                <i class="fas fa-inbox text-5xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">Tidak ada pesanan dengan filter ini</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const statusConfig = {
+        pending: { icon: 'clock', color: 'orange', label: 'Belum Bayar' },
+        waiting: { icon: 'hourglass-half', color: 'yellow', label: 'Menunggu Verifikasi' },
+        processing: { icon: 'box', color: 'purple', label: 'Sedang Diproses' },
+        shipped: { icon: 'truck', color: 'blue', label: 'Sedang Dikirim' },
+        delivered: { icon: 'home', color: 'green', label: 'Sudah Sampai' },
+        completed: { icon: 'check-circle', color: 'green', label: 'Selesai' }
+    };
+    
+    const html = orders.map(order => {
+        let currentStatus = order.shipping_status || 'pending';
+        if (order.status === 'pending') currentStatus = 'pending';
+        if (order.status === 'waiting') currentStatus = 'waiting';
+        
+        const status = statusConfig[currentStatus] || statusConfig.pending;
+        
+        return `
+            <div class="bg-white rounded-xl border-2 border-gray-200 overflow-hidden hover:shadow-lg transition">
+                <!-- Header -->
+                <div class="bg-gray-50 px-6 py-4 flex justify-between items-center border-b">
+                    <div>
+                        <p class="font-bold text-gray-800">${order.invoice_number}</p>
+                        <p class="text-sm text-gray-500">${new Date(order.created_at).toLocaleDateString('id-ID', {
+                            year: 'numeric', month: 'long', day: 'numeric'
+                        })}</p>
+                    </div>
+                    <span class="px-4 py-2 bg-${status.color}-100 text-${status.color}-700 rounded-full text-sm font-semibold">
+                        <i class="fas fa-${status.icon} mr-1"></i>${status.label}
+                    </span>
+                </div>
+                
+                <!-- Items -->
+                <div class="p-6">
+                    <div class="space-y-3 mb-4">
+                        ${order.items.slice(0, 2).map(item => `
+                            <div class="flex gap-3">
+                                <img src="${item.product_image}" class="w-16 h-16 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/64'">
+                                <div class="flex-1">
+                                    <p class="font-semibold text-sm line-clamp-1">${item.product_name}</p>
+                                    <p class="text-xs text-gray-500">${item.quantity}x</p>
+                                </div>
+                                <p class="font-bold text-primary">Rp ${formatNumber(item.subtotal)}</p>
+                            </div>
+                        `).join('')}
+                        ${order.items.length > 2 ? `<p class="text-sm text-gray-500">+${order.items.length - 2} produk lainnya</p>` : ''}
+                    </div>
+                    
+                    <!-- Total -->
+                    <div class="border-t pt-4 flex justify-between items-center mb-4">
+                        <span class="text-gray-600">Total Pembayaran</span>
+                        <span class="text-xl font-bold text-primary">Rp ${formatNumber(order.grand_total)}</span>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="flex gap-3">
+                        ${currentStatus === 'pending' ? `
+                            <button onclick="goToPayment('${order.id}')" class="flex-1 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
+                                <i class="fas fa-upload mr-2"></i>Bayar Sekarang
+                            </button>
+                        ` : currentStatus === 'delivered' ? `
+                            <button onclick="confirmOrderReceived('${order.id}')" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition">
+                                <i class="fas fa-check mr-2"></i>Konfirmasi Pesanan Diterima
+                            </button>
+                        ` : ''}
+                        <button onclick="showOrderDetail('${order.id}')" class="px-6 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition">
+                            Detail
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    container.innerHTML = html;
+}
+
+// Filter orders
+function filterOrders(status) {
+    // Update active button
+    document.querySelectorAll('.order-filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`[data-filter="${status}"]`).classList.add('active');
+    
+    // Load orders with filter
+    loadUserOrders(status);
+}
+
+// Confirm order received
+async function confirmOrderReceived(invoiceId) {
+    if (!confirm('Apakah Anda yakin sudah menerima pesanan ini?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(API_BASE_URL + '/user/confirm_order.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ invoice_id: invoiceId })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('✅ Pesanan berhasil dikonfirmasi!', 'success');
+            loadUserOrders(); // Reload
+        } else {
+            showNotification('❌ ' + result.message, 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Terjadi kesalahan', 'error');
+    }
+}
+
+// Show order detail
+async function showOrderDetail(invoiceId) {
+    // Reuse logic dari showActivityDetail, tapi fetch detail order dulu
+    try {
+        const response = await fetch(API_BASE_URL + `/user/get_order_detail.php?id=${invoiceId}`, {
+            credentials: 'include'
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            showActivityDetail(result.order); // Reuse existing modal
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
 
 // Logout Function

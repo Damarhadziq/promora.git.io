@@ -166,6 +166,7 @@ document.querySelectorAll('button').forEach(button => {
 });
 
 // Cek login saat halaman dibuka
+// Cek login saat halaman dibuka
 async function checkLoginStatus() {
     try {
         const response = await fetch('./backend/api/check_session.php', {
@@ -179,7 +180,7 @@ async function checkLoginStatus() {
             // ✅ CEK ROLE: Jika seller, redirect ke homeSeller.html
             if (data.user.role === 'seller') {
                 window.location.href = 'homeSeller.html';
-                return; // Stop eksekusi selanjutnya
+                return;
             }
             
             // User sudah login (dan bukan seller)
@@ -192,10 +193,20 @@ async function checkLoginStatus() {
                 cartLink.classList.remove('hidden');
             }
             
-            // Set nama user (username saja)
+            // Set nama user
             const userNameEl = document.getElementById('user-name');
             if (userNameEl) {
                 userNameEl.textContent = data.user.username;
+            }
+            
+            // ✅ UPDATE FOTO PROFIL DI NAVBAR
+            const userAvatar = document.getElementById('user-avatar');
+            if (userAvatar && data.user.profile_photo) {
+                userAvatar.src = './backend/uploads/profile_photos/' + data.user.profile_photo;
+                userAvatar.onerror = function() {
+                    // Fallback ke avatar default jika foto tidak ditemukan
+                    this.src = './assets/img/user.png';
+                };
             }
             
             // Simpan ke localStorage sebagai backup
@@ -203,6 +214,7 @@ async function checkLoginStatus() {
             localStorage.setItem('userName', data.user.username);
             localStorage.setItem('userRole', data.user.role);
             localStorage.setItem('userId', data.user.id);
+            localStorage.setItem('userPhoto', data.user.profile_photo || '');
             
         } else {
             // User belum login
@@ -219,6 +231,7 @@ async function checkLoginStatus() {
             localStorage.removeItem('userName');
             localStorage.removeItem('userRole');
             localStorage.removeItem('userId');
+            localStorage.removeItem('userPhoto');
         }
     } catch (error) {
         console.error('Error checking session:', error);
@@ -227,9 +240,9 @@ async function checkLoginStatus() {
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
         const userName = localStorage.getItem('userName');
         const userRole = localStorage.getItem('userRole');
+        const userPhoto = localStorage.getItem('userPhoto');
         const cartLink = document.getElementById('cart-link');
         
-        // ✅ CEK ROLE dari localStorage
         if (isLoggedIn && userRole === 'seller') {
             window.location.href = 'homeSeller.html';
             return;
@@ -244,10 +257,18 @@ async function checkLoginStatus() {
                 cartLink.classList.remove('hidden');
             }
             
-            // Set nama user dari localStorage
             const userNameEl = document.getElementById('user-name');
             if (userNameEl) {
                 userNameEl.textContent = userName;
+            }
+            
+            // ✅ SET FOTO DARI LOCALSTORAGE
+            const userAvatar = document.getElementById('user-avatar');
+            if (userAvatar && userPhoto) {
+                userAvatar.src = './backend/uploads/profile_photos/' + userPhoto;
+                userAvatar.onerror = function() {
+                    this.src = './assets/img/user.png';
+                };
             }
         }
     }
@@ -269,6 +290,7 @@ async function logout() {
             localStorage.removeItem('userName');
             localStorage.removeItem('userRole');
             localStorage.removeItem('userId');
+            localStorage.removeItem('userPhoto'); // ✅ TAMBAHKAN INI
             localStorage.removeItem('cart');
             
             // Update UI
@@ -288,11 +310,11 @@ async function logout() {
     } catch (error) {
         console.error('Logout error:', error);
         
-        // Fallback logout jika server error
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('userName');
         localStorage.removeItem('userRole');
         localStorage.removeItem('userId');
+        localStorage.removeItem('userPhoto'); // ✅ TAMBAHKAN INI
         
         alert('Kamu telah logout 👋');
         window.location.href = 'index.html';

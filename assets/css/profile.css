@@ -236,3 +236,23 @@
         opacity: 1;
     }
 }
+
+/* Order Filter Buttons */
+.order-filter-btn {
+    background: #f3f4f6;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+.order-filter-btn.active {
+    background: #7A5AF8;
+    color: white;
+}
+
+.order-filter-btn:hover {
+    background: #e5e7eb;
+}
+
+.order-filter-btn.active:hover {
+    background: #6941e0;
+}

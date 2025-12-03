@@ -10,17 +10,14 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 include_once '../config/db.php';
 
-// Pastikan method POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(array("message" => "Method not allowed"));
     exit();
 }
 
-// Ambil data POST
 $data = json_decode(file_get_contents("php://input"));
 
-// Validasi input
 if (empty($data->email_or_username) || empty($data->password)) {
     http_response_code(400);
     echo json_encode(array("message" => "Email/Username dan password harus diisi"));
@@ -30,8 +27,8 @@ if (empty($data->email_or_username) || empty($data->password)) {
 $database = new Database();
 $db = $database->getConnection();
 
-// ✅ Query HARUS ambil kolom is_verified
-$query = "SELECT id, first_name, last_name, email, username, password, role, phone, is_verified, created_at 
+// ✅ TAMBAHKAN profile_photo di SELECT
+$query = "SELECT id, first_name, last_name, email, username, password, role, phone, profile_photo, is_verified, created_at 
           FROM users 
           WHERE email = :identifier OR username = :identifier 
           LIMIT 1";
@@ -43,17 +40,14 @@ $stmt->execute();
 if ($stmt->rowCount() > 0) {
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    // ✅ CEK ROLE DULU SEBELUM CEK PASSWORD
     if (isset($data->role) && $data->role !== $row['role']) {
         http_response_code(401);
         echo json_encode(array("message" => "Role yang dipilih tidak sesuai dengan akun Anda"));
         exit();
     }
     
-    // Verifikasi password
     if (password_verify($data->password, $row['password'])) {
         
-        // ✅ CEK VERIFIKASI UNTUK SELLER (SETELAH PASSWORD BENAR)
         if ($row['role'] === 'seller' && isset($row['is_verified']) && $row['is_verified'] == 0) {
             http_response_code(403);
             echo json_encode(array(
@@ -62,7 +56,7 @@ if ($stmt->rowCount() > 0) {
             exit();
         }
         
-        // Simpan data user ke SESSION
+        // ✅ SIMPAN profile_photo KE SESSION
         $_SESSION['user_id'] = $row['id'];
         $_SESSION['username'] = $row['username'];
         $_SESSION['email'] = $row['email'];
@@ -70,6 +64,7 @@ if ($stmt->rowCount() > 0) {
         $_SESSION['last_name'] = $row['last_name'];
         $_SESSION['role'] = $row['role'];
         $_SESSION['phone'] = $row['phone'];
+        $_SESSION['profile_photo'] = $row['profile_photo']; // ✅ TAMBAHKAN INI
         $_SESSION['logged_in'] = true;
         $_SESSION['login_time'] = time();
         
@@ -84,6 +79,7 @@ if ($stmt->rowCount() > 0) {
                 "last_name" => $row['last_name'],
                 "role" => $row['role'],
                 "phone" => $row['phone'],
+                "profile_photo" => $row['profile_photo'], // ✅ KIRIM KE FRONTEND
                 "created_at" => $row['created_at']
             ),
             "session_id" => session_id()

@@ -132,7 +132,7 @@ function renderProducts() {
     `).join('');
 }
 
-// Switch tabs
+// Switch tabs - GANTI FUNGSI INI
 function switchTab(tabName) {
     // Hide all content
     document.getElementById('content-produk').classList.add('hidden');
@@ -149,6 +149,11 @@ function switchTab(tabName) {
     // Show selected content and activate tab
     document.getElementById('content-' + tabName).classList.remove('hidden');
     document.getElementById('tab-' + tabName).className = 'text-purple-700 font-semibold border-b-2 border-purple-700';
+    
+    // Load data jika tab order
+    if (tabName === 'order') {
+        loadOrders();
+    }
 }
 
 // Edit product
@@ -540,6 +545,285 @@ async function saveStoreSettings() {
     } catch (error) {
         console.error('Error saving store:', error);
         alert('Terjadi kesalahan saat menyimpan');
+    }
+}
+
+// Load orders dengan filter shipping_status
+async function loadOrders(shippingStatus = 'all') {
+    try {
+        let url = 'backend/api/seller/get_orders.php';
+        
+        const response = await fetch(url, {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            let orders = data.orders;
+            
+            // Filter by shipping_status jika bukan 'all'
+            if (shippingStatus !== 'all') {
+                orders = orders.filter(o => o.shipping_status === shippingStatus);
+            }
+            
+            renderOrders(orders, shippingStatus);
+        } else {
+            console.error('Failed to load orders:', data.message);
+        }
+    } catch (error) {
+        console.error('Error loading orders:', error);
+    }
+}
+
+// Render orders - GRID 2 COLUMNS
+function renderOrders(orders, currentFilter) {
+    const container = document.getElementById('orders-container');
+    
+    if (orders.length === 0) {
+        container.innerHTML = `
+            <div class="bg-white rounded-xl shadow-sm p-12 text-center">
+                <svg class="w-16 h-16 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
+                <p class="text-gray-500">Belum ada order dengan status ini</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Wrap dalam grid container
+    const ordersHTML = orders.map(order => {
+        const statusBadge = getShippingStatusBadge(order.shipping_status);
+        const statusActions = getShippingStatusActions(order.shipping_status, order.id);
+        
+        return `
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200 hover:shadow-md transition">
+                <!-- Header Compact -->
+                <div class="bg-gray-50 px-4 py-3 border-b">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <p class="font-bold text-gray-900 text-sm">${order.invoice_number}</p>
+                            <p class="text-xs text-gray-500">${new Date(order.created_at).toLocaleDateString('id-ID', {
+                                day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                            })}</p>
+                        </div>
+                        ${statusBadge}
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        <p class="font-semibold text-sm text-gray-900 truncate">${order.customer_name}</p>
+                    </div>
+                </div>
+                
+                <!-- Content Area -->
+                <div class="p-4">
+                    <!-- Items Compact -->
+                    <div class="mb-3">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                            </svg>
+                            <h4 class="font-semibold text-sm text-gray-900">${order.items.length} Produk</h4>
+                        </div>
+                        <div class="space-y-2 max-h-48 overflow-y-auto">
+                            ${order.items.map(item => `
+                                <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+                                    <img src="${item.product_image || 'https://via.placeholder.com/48'}" 
+                                         alt="${item.product_name}" 
+                                         class="w-12 h-12 object-cover rounded flex-shrink-0">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-medium text-sm text-gray-900 truncate">${item.product_name}</p>
+                                        <p class="text-xs text-gray-600">${item.quantity}x • Rp ${parseInt(item.price).toLocaleString('id-ID')}</p>
+                                    </div>
+                                    <p class="font-bold text-sm text-[#7A5AF8] whitespace-nowrap">Rp ${parseInt(item.subtotal).toLocaleString('id-ID')}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <!-- Info Grid Compact -->
+                    <div class="grid grid-cols-2 gap-2 mb-3 text-xs">
+                        <div class="bg-blue-50 p-2 rounded">
+                            <p class="text-gray-600 mb-0.5">Kurir</p>
+                            <p class="font-semibold text-gray-900 truncate">${order.courier_method}</p>
+                        </div>
+                        <div class="bg-green-50 p-2 rounded">
+                            <p class="text-gray-600 mb-0.5">Pembayaran</p>
+                            <p class="font-semibold text-gray-900 capitalize truncate">${order.payment_method}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Total -->
+                    <div class="bg-purple-50 p-2 rounded mb-3">
+                        <div class="flex justify-between items-center">
+                            <p class="text-xs text-gray-600">Total Pembayaran</p>
+                            <p class="font-bold text-[#7A5AF8]">Rp ${parseInt(order.grand_total).toLocaleString('id-ID')}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    ${statusActions}
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Bungkus dalam grid 2 kolom
+    container.innerHTML = `
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            ${ordersHTML}
+        </div>
+    `;
+}
+
+// Get shipping status badge - COMPACT
+function getShippingStatusBadge(status) {
+    const badges = {
+        'pending': '<span class="px-2.5 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full inline-flex items-center gap-1"><span>⏱️</span><span>Pending</span></span>',
+        'processing': '<span class="px-2.5 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full inline-flex items-center gap-1"><span>🎁</span><span>Dikemas</span></span>',
+        'shipped': '<span class="px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full inline-flex items-center gap-1"><span>🚚</span><span>Dikirim</span></span>',
+        'delivered': '<span class="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full inline-flex items-center gap-1"><span>📦</span><span>Sampai</span></span>',
+        'completed': '<span class="px-2.5 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full inline-flex items-center gap-1"><span>✅</span><span>Selesai</span></span>'
+    };
+    return badges[status] || '';
+}
+
+// Get shipping status actions - COMPACT
+function getShippingStatusActions(status, orderId) {
+    if (status === 'pending') {
+        return `
+            <button onclick="updateShippingStatus(${orderId}, 'processing')" 
+                    class="w-full btn-primary text-white py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform">
+                <span>🎁</span>
+                <span>Mulai Proses</span>
+            </button>
+        `;
+    } else if (status === 'processing') {
+        return `
+            <button onclick="updateShippingStatus(${orderId}, 'shipped')" 
+                    class="w-full btn-primary text-white py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform">
+                <span>🚚</span>
+                <span>Tandai Dikirim</span>
+            </button>
+        `;
+    } else if (status === 'shipped') {
+        return `
+            <button onclick="updateShippingStatus(${orderId}, 'delivered')" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-semibold text-sm transition flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform">
+                <span>📦</span>
+                <span>Sampai Tujuan</span>
+            </button>
+        `;
+    } else if (status === 'delivered') {
+        return `
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-center">
+                <p class="text-blue-800 font-semibold text-xs">⏳ Menunggu konfirmasi buyer</p>
+            </div>
+        `;
+    } else if (status === 'completed') {
+        return `
+            <div class="bg-green-50 border border-green-200 rounded-lg p-2.5 text-center">
+                <p class="text-green-800 font-bold text-xs">✅ Order Selesai</p>
+            </div>
+        `;
+    }
+    return '';
+}
+
+// Get shipping status badge
+function getShippingStatusBadge(status) {
+    const badges = {
+        'pending': '<span class="px-3 py-1 bg-yellow-100 text-yellow-700 text-sm font-semibold rounded-full">Menunggu Diproses</span>',
+        'processing': '<span class="px-3 py-1 bg-purple-100 text-purple-700 text-sm font-semibold rounded-full">🎁 Sedang Dibungkus</span>',
+        'shipped': '<span class="px-3 py-1 bg-indigo-100 text-indigo-700 text-sm font-semibold rounded-full">🚚 Dalam Pengiriman</span>',
+        'delivered': '<span class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full">📦 Sudah Sampai</span>',
+        'completed': '<span class="px-3 py-1 bg-green-100 text-green-700 text-sm font-semibold rounded-full">✅ Selesai</span>'
+    };
+    return badges[status] || '';
+}
+
+// Get shipping status actions
+function getShippingStatusActions(status, orderId) {
+    if (status === 'pending') {
+        return `
+            <button onclick="updateShippingStatus(${orderId}, 'processing')" 
+                    class="w-full btn-primary text-white py-3 rounded-lg font-semibold flex items-center justify-center space-x-2">
+                <span>🎁</span>
+                <span>Mulai Proses / Bungkus Pesanan</span>
+            </button>
+        `;
+    } else if (status === 'processing') {
+        return `
+            <button onclick="updateShippingStatus(${orderId}, 'shipped')" 
+                    class="w-full btn-primary text-white py-3 rounded-lg font-semibold flex items-center justify-center space-x-2">
+                <span>🚚</span>
+                <span>Tandai Sudah Dikirim</span>
+            </button>
+        `;
+    } else if (status === 'shipped') {
+        return `
+            <button onclick="updateShippingStatus(${orderId}, 'delivered')" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition flex items-center justify-center space-x-2">
+                <span>📦</span>
+                <span>Konfirmasi Sudah Sampai</span>
+            </button>
+        `;
+    } else if (status === 'delivered') {
+        return `
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+                <p class="text-blue-800 font-medium">Menunggu konfirmasi penerimaan dari buyer</p>
+                <p class="text-sm text-blue-600 mt-1">Order akan otomatis selesai setelah buyer konfirmasi</p>
+            </div>
+        `;
+    } else if (status === 'completed') {
+        return `
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                <p class="text-green-800 font-bold">✅ Order Selesai</p>
+                <p class="text-sm text-green-600 mt-1">Terima kasih!</p>
+            </div>
+        `;
+    }
+    return '';
+}
+
+// Update shipping status
+async function updateShippingStatus(invoiceId, newStatus) {
+    const confirmMessages = {
+        'processing': 'Mulai memproses/membungkus order ini?',
+        'shipped': 'Konfirmasi order ini sudah dikirim ke ekspedisi?',
+        'delivered': 'Konfirmasi paket sudah sampai ke alamat tujuan?'
+    };
+    
+    if (!confirm(confirmMessages[newStatus])) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('backend/api/seller/update_order_status.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                invoice_id: invoiceId,
+                shipping_status: newStatus
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ ' + data.message);
+            loadOrders(); // Reload orders
+        } else {
+            alert('❌ Gagal update status: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan saat update status');
     }
 }
 
