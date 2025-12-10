@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pembayaran Paket Premium - Promora</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .payment-method {
+      transition: all 0.3s ease;
+    }
+    
+    .payment-method:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(122, 90, 248, 0.15);
+    }
+    
+    .payment-method.selected {
+      border-color: #7A5AF8;
+      background-color: #F5F3FF;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+  </style>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { primary: '#7A5AF8' } } } }
+  </script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+<!-- Navbar -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex justify-between items-center">
+          <a href="index.html" class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2">
+              <img
+                class="h-8 flex items-center justify-center"
+                src="./assets/img/Container.png"
+                alt=""
+              />
+            </div>
+          </a>
+
+          <div class="hidden md:flex space-x-8">
+            <button onclick="switchTab('produk')" id="tab-produk" class="text-grey-700 hover:text-purple-700 font-medium">
+              Produk Saya
+            </button>
+
+            <button onclick="switchTab('order')" id="tab-order" class="text-grey-700 hover:text-purple-700 font-medium">
+                Order Masuk
+            </button>
+
+            <button onclick="switchTab('statistik')" id="tab-statistik" class="text-grey-700 hover:text-purple-700 font-medium">
+                Statistik Toko
+            </button>
+
+            <button onclick="switchTab('pengaturan')" id="tab-pengaturan" class="text-grey-700 hover:text-purple-700 font-medium">
+                Pengaturan Toko
+            </button>
+          </div>
+
+          <!-- Tombol Setting -->
+            
+          <div class="flex items-center space-x-4">
+            <a href="pricingCard.html"><span class="px-3 py-1 bg-blue-100 text-blue-600 text-xs font-semibold rounded-full">Verified Seller</span></a>
+            <!-- PROFILE -->
+            <a href="profileSeller.html">
+                <img id="navbarLogo"
+                    src="https://via.placeholder.com/150?text=Store+Logo" 
+                    alt="Profile" 
+                    class="h-10 w-10 rounded-full object-cover border hover:opacity-90 cursor-pointer"/>
+            </a>
+             </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+  <!-- Main Content -->
+  <main class="min-h-screen flex items-center justify-center px-6 py-10">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl">
+
+      <!-- Top Bar: Timer + Total -->
+      <div class="bg-primary text-white p-6 text-center">
+        <div class="flex items-center justify-center gap-3 text-lg mb-3">
+          <i class="fas fa-clock animate-pulse"></i>
+          <span>Batas akhir pembayaran:</span>
+          <span id="countdown" class="font-bold text-xl">23:59:59</span>
+        </div>
+        <div class="text-4xl font-bold mt-2" id="total-bayar">Rp 0</div>
+        <p class="text-sm opacity-90 mt-1">Total Pembayaran</p>
+      </div>
+
+      <div class="p-8 space-y-8">
+
+        <!-- Detail Paket -->
+        <div class="border-t pt-6 mb-6">
+          <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+            <i class="fas fa-box-open text-purple-600"></i>
+            Detail Paket Langganan
+          </h3>
+          <div class="bg-purple-50 rounded-xl p-5 border border-purple-200">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <img id="package-badge" src="assets/img/gold.png" alt="Badge" class="w-12 h-12">
+                <div>
+                  <h4 id="package-name" class="font-bold text-lg text-gray-900">Paket Gold</h4>
+                  <p class="text-sm text-gray-600">Langganan Premium Seller</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p id="package-price" class="text-2xl font-bold text-purple-600">Rp 199.000</p>
+                <p class="text-xs text-gray-500">per bulan</p>
+              </div>
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-purple-200 space-y-2 text-sm">
+              <div class="flex items-center gap-2 text-gray-700">
+                <i class="fas fa-check-circle text-green-500"></i>
+                <span id="benefit-1">Biaya Admin Dalam Negeri: 2%</span>
+              </div>
+              <div class="flex items-center gap-2 text-gray-700">
+                <i class="fas fa-check-circle text-green-500"></i>
+                <span id="benefit-2">Biaya Admin Luar Negeri: 5%</span>
+              </div>
+              <div class="flex items-center gap-2 text-gray-700">
+                <i class="fas fa-check-circle text-green-500"></i>
+                <span id="benefit-3">Banner Dinamis: 10x per minggu</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pilih Metode Pembayaran -->
+        <div class="space-y-5">
+          <h3 class="font-bold text-lg flex items-center gap-2">
+            <i class="fas fa-credit-card text-purple-600"></i>
+            Pilih Metode Pembayaran
+          </h3>
+
+          <!-- Bank Transfer -->
+          <div class="payment-method border-2 rounded-xl p-4 cursor-pointer" onclick="selectPayment('bca', 'BCA Virtual Account')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <i class="fas fa-university text-blue-600 text-xl"></i>
+                </div>
+                <div>
+                  <p class="font-bold text-gray-800">BCA Virtual Account</p>
+                  <p class="text-sm text-gray-500">Transfer ke VA BCA</p>
+                </div>
+              </div>
+              <input type="radio" name="payment" class="w-5 h-5 text-purple-600">
+            </div>
+          </div>
+
+          <!-- Mandiri -->
+          <div class="payment-method border-2 rounded-xl p-4 cursor-pointer" onclick="selectPayment('mandiri', 'Mandiri Virtual Account')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                  <i class="fas fa-university text-yellow-600 text-xl"></i>
+                </div>
+                <div>
+                  <p class="font-bold text-gray-800">Mandiri Virtual Account</p>
+                  <p class="text-sm text-gray-500">Transfer ke VA Mandiri</p>
+                </div>
+              </div>
+              <input type="radio" name="payment" class="w-5 h-5 text-purple-600">
+            </div>
+          </div>
+
+          <!-- E-Wallet -->
+          <div class="payment-method border-2 rounded-xl p-4 cursor-pointer" onclick="selectPayment('gopay', 'GoPay')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <i class="fas fa-wallet text-green-600 text-xl"></i>
+                </div>
+                <div>
+                  <p class="font-bold text-gray-800">GoPay</p>
+                  <p class="text-sm text-gray-500">Bayar dengan GoPay</p>
+                </div>
+              </div>
+              <input type="radio" name="payment" class="w-5 h-5 text-purple-600">
+            </div>
+          </div>
+
+          <!-- OVO -->
+          <div class="payment-method border-2 rounded-xl p-4 cursor-pointer" onclick="selectPayment('ovo', 'OVO')">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <i class="fas fa-wallet text-purple-600 text-xl"></i>
+                </div>
+                <div>
+                  <p class="font-bold text-gray-800">OVO</p>
+                  <p class="text-sm text-gray-500">Bayar dengan OVO</p>
+                </div>
+              </div>
+              <input type="radio" name="payment" class="w-5 h-5 text-purple-600">
+            </div>
+          </div>
+        </div>
+
+        <!-- Ringkasan -->
+        <div class="border-t pt-6 space-y-3">
+          <div class="flex justify-between font-medium">
+            <span>Paket Langganan</span>
+            <span id="summary-package">Paket Gold</span>
+          </div>
+          <div class="flex justify-between text-gray-600">
+            <span>Harga</span>
+            <span id="summary-price">Rp 199.000</span>
+          </div>
+          <div class="flex justify-between text-gray-600">
+            <span>Biaya Admin</span>
+            <span>Rp 0</span>
+          </div>
+
+          <hr class="my-3 border-dashed">
+
+          <div class="flex justify-between text-lg font-bold text-primary">
+            <span>Total Bayar</span>
+            <span id="summary-total">Rp 199.000</span>
+          </div>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div class="flex gap-4 pt-4">
+          <a href="pricingCard.html" class="flex-1 text-center py-4 bg-gray-200 text-gray-700 rounded-full font-bold hover:bg-gray-300 transition text-lg">
+            Batalkan
+          </a>
+          <button onclick="openModal()" id="btn-bayar" class="flex-1 py-4 bg-primary text-white rounded-full font-bold hover:bg-purple-700 transition text-lg shadow-lg opacity-50 cursor-not-allowed" disabled>
+            Lanjut Bayar
+          </button>
+        </div>
+
+        <p class="text-center text-xs text-gray-500 mt-4">
+          Setelah pembayaran terdeteksi, upload bukti dan tunggu verifikasi dari admin.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL UPLOAD BUKTI -->
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md my-8">
+      <div class="p-8">
+        <div class="text-center mb-6">
+          <i class="fas fa-receipt text-6xl text-primary mb-4"></i>
+          <h3 class="text-2xl font-bold">Upload Bukti Transfer</h3>
+          <p class="text-gray-600 mt-2">Kirim bukti agar langganan segera aktif</p>
+        </div>
+
+        <div id="payment-info" class="mb-6 p-4 bg-purple-50 rounded-xl border border-purple-200">
+          <p class="text-sm text-gray-700 mb-2"><strong>Metode:</strong> <span id="selected-method">-</span></p>
+          <p class="text-sm text-gray-700"><strong>Total:</strong> <span id="selected-total">Rp 0</span></p>
+        </div>
+
+        <div id="drop-area" class="border-4 border-dashed border-primary rounded-2xl p-10 text-center cursor-pointer hover:bg-purple-50 transition">
+          <input type="file" id="file-input" accept="image/*" class="hidden">
+          <i class="fas fa-cloud-upload-alt text-5xl text-primary mb-4"></i>
+          <p class="font-medium text-lg">Klik atau drag gambar ke sini</p>
+          <p class="text-sm text-gray-500 mt-2">Maksimal 5MB • JPG/PNG</p>
+        </div>
+
+        <div id="preview" class="mt-6 hidden text-center">
+          <img id="preview-img" class="w-full max-w-xs mx-auto rounded-xl shadow-lg" alt="Preview">
+          <p class="mt-4 text-green-600 font-medium">Bukti siap dikirim!</p>
+        </div>
+
+        <div class="flex gap-4 mt-8">
+          <button onclick="closeModal()" class="flex-1 py-4 bg-gray-200 text-gray-700 rounded-full font-bold hover:bg-gray-300 transition">
+            Batal
+          </button>
+          <button onclick="kirimBukti()" id="btn-kirim" class="flex-1 py-4 bg-primary text-white rounded-full font-bold hover:bg-purple-700 transition opacity-50 cursor-not-allowed" disabled>
+            Kirim Bukti
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifikasi Berhasil -->
+  <div id="notif" class="fixed inset-0 bg-black bg-opacity-80 hidden flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-3xl p-12 text-center max-w-md">
+      <i class="fas fa-check-circle text-6xl text-green-500 mb-6"></i>
+      <h3 class="text-2xl font-bold text-gray-800 mb-4">Pembayaran Berhasil!</h3>
+      <p class="text-gray-600 leading-relaxed">
+        Bukti pembayaran sudah tersimpan. Paket Premium Seller Anda akan segera aktif setelah verifikasi admin.
+      </p>
+      <div class="mt-6 p-4 bg-purple-50 rounded-lg border border-purple-200">
+        <p class="text-sm text-purple-700">
+          <i class="fas fa-info-circle mr-2"></i>
+          Anda akan diarahkan ke halaman seller dalam beberapa detik...
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Data paket dari URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const paketName = urlParams.get('paket') || 'Gold';
+    const paketPrice = parseInt(urlParams.get('harga')) || 199000;
+
+    // Konfigurasi benefit per paket
+    const packageBenefits = {
+      'Gold': {
+        badge: 'assets/img/gold.png',
+        benefit1: 'Biaya Admin Dalam Negeri: 2%',
+        benefit2: 'Biaya Admin Luar Negeri: 5%',
+        benefit3: 'Banner Dinamis: 10x per minggu'
+      },
+      'Silver': {
+        badge: 'assets/img/silver.png',
+        benefit1: 'Biaya Admin Dalam Negeri: 3.5%',
+        benefit2: 'Biaya Admin Luar Negeri: 7%',
+        benefit3: 'Banner Dinamis: 2x per minggu'
+      },
+      'Bronze': {
+        badge: 'assets/img/bronze.png',
+        benefit1: 'Biaya Admin Dalam Negeri: 4%',
+        benefit2: 'Biaya Admin Luar Negeri: 8%',
+        benefit3: 'Banner Dinamis: Tidak tersedia'
+      }
+    };
+
+    // Load data paket
+    function loadPackageData() {
+      const benefits = packageBenefits[paketName];
+      
+      document.getElementById('package-badge').src = benefits.badge;
+      document.getElementById('package-name').textContent = `Paket ${paketName}`;
+      document.getElementById('package-price').textContent = `Rp ${paketPrice.toLocaleString('id-ID')}`;
+      document.getElementById('benefit-1').textContent = benefits.benefit1;
+      document.getElementById('benefit-2').textContent = benefits.benefit2;
+      document.getElementById('benefit-3').textContent = benefits.benefit3;
+      
+      document.getElementById('summary-package').textContent = `Paket ${paketName}`;
+      document.getElementById('summary-price').textContent = `Rp ${paketPrice.toLocaleString('id-ID')}`;
+      document.getElementById('summary-total').textContent = `Rp ${paketPrice.toLocaleString('id-ID')}`;
+      document.getElementById('total-bayar').textContent = `Rp ${paketPrice.toLocaleString('id-ID')}`;
+    }
+
+    // Timer countdown
+    function startCountdown() {
+      let hours = 23, minutes = 59, seconds = 59;
+      
+      setInterval(() => {
+        seconds--;
+        if (seconds < 0) {
+          seconds = 59;
+          minutes--;
+        }
+        if (minutes < 0) {
+          minutes = 59;
+          hours--;
+        }
+        if (hours < 0) {
+          hours = 0;
+          minutes = 0;
+          seconds = 0;
+        }
+        
+        document.getElementById('countdown').textContent = 
+          `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      }, 1000);
+    }
+
+    // Pilih metode pembayaran
+    let selectedPaymentMethod = null;
+
+    function selectPayment(method, name) {
+      selectedPaymentMethod = { method, name };
+      
+      document.querySelectorAll('.payment-method').forEach(el => {
+        el.classList.remove('selected');
+      });
+      
+      event.currentTarget.classList.add('selected');
+      event.currentTarget.querySelector('input[type="radio"]').checked = true;
+      
+      document.getElementById('btn-bayar').disabled = false;
+      document.getElementById('btn-bayar').classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+
+    // Modal
+    function openModal() {
+      if (!selectedPaymentMethod) {
+        alert('Pilih metode pembayaran terlebih dahulu!');
+        return;
+      }
+      
+      document.getElementById('selected-method').textContent = selectedPaymentMethod.name;
+      document.getElementById('selected-total').textContent = `Rp ${paketPrice.toLocaleString('id-ID')}`;
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+      document.getElementById('preview').classList.add('hidden');
+      document.getElementById('file-input').value = '';
+      document.getElementById('btn-kirim').disabled = true;
+      document.getElementById('btn-kirim').classList.add('opacity-50', 'cursor-not-allowed');
+    }
+
+    // Upload file
+    const dropArea = document.getElementById('drop-area');
+    const fileInput = document.getElementById('file-input');
+    const preview = document.getElementById('preview');
+    const previewImg = document.getElementById('preview-img');
+
+    dropArea.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && file.size <= 5242880) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImg.src = e.target.result;
+          preview.classList.remove('hidden');
+          document.getElementById('btn-kirim').disabled = false;
+          document.getElementById('btn-kirim').classList.remove('opacity-50', 'cursor-not-allowed');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert('File terlalu besar! Maksimal 5MB');
+      }
+    });
+
+    dropArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropArea.classList.add('bg-purple-50');
+    });
+
+    dropArea.addEventListener('dragleave', () => {
+      dropArea.classList.remove('bg-purple-50');
+    });
+
+    dropArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropArea.classList.remove('bg-purple-50');
+      const file = e.dataTransfer.files[0];
+      fileInput.files = e.dataTransfer.files;
+      fileInput.dispatchEvent(new Event('change'));
+    });
+
+    // Kirim bukti
+    function kirimBukti() {
+      closeModal();
+      document.getElementById('notif').classList.remove('hidden');
+      
+      setTimeout(() => {
+        window.location.href = 'homeSeller.html';
+      }, 3000);
+    }
+
+    // Initialize
+    loadPackageData();
+    startCountdown();
+  </script>
+</body>
+</html>

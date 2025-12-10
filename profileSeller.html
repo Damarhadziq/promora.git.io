@@ -56,13 +56,46 @@
             background: #6347d8;
             transform: scale(1.1);
         }
+        .badge-gold {
+        display: inline-flex;
+        align-items: center;
+        gap: 1px;
+        padding: 2px 6px;
+        border-radius: 9999px;
+
+        /* Warna gold */
+        background: linear-gradient(135deg, #FFD700, #F2C94C, #E6B800);
+        color: #674300; /* teks gold gelap biar kebaca */
+
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 6px 6px rgba(255, 200, 0, 0.4);
+    }
+            .gold-icon {
+            width: 20px;   /* bebas atur */
+            height: 20px;  /* bebas atur */
+            flex-shrink: 0;
+        }
+        .badge-verified {
+            background: linear-gradient(135deg, #34D399, #059669); /* hijau fresh */
+            color: white;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .badge-verified i {
+            font-size: 16px;
+        }
+
         .gradient-bg { background: linear-gradient(135deg, #7A5AF8 0%, #A78BFA 100%); }
         .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
         .profile-image { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 5px solid white; }
         .upload-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); border-radius: 50%; opacity: 0; transition: opacity 0.3s; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .profile-image-wrapper:hover .upload-overlay { opacity: 1; }
-        .badge-verified { @apply bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium; }
-        .badge-gold { @apply bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-medium; }
         .stat-card { transition: transform 0.2s; }
         .stat-card:hover { transform: translateY(-4px); }
         .notification { position: fixed; top: 20px; right: 20px; background: #10B981; color: white; padding: 16px 24px; border-radius: 12px; display: flex; align-items: center; gap: 12px; z-index: 100; opacity: 0; transform: translateX(100%); transition: all 0.4s; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); }
@@ -130,9 +163,10 @@
                                     <span class="badge-verified">
                                         <i class="fas fa-check-circle mr-1"></i> Terverifikasi
                                     </span>
-                                    <span class="badge-gold">
-                                        <i class="fas fa-crown mr-1"></i> Top Seller
-                                    </span>
+                                    <span class="badge-gold flex items-center gap-1">
+                                    <img src="assets/img/gold.png" class="gold-icon" alt="Gold">
+                                    Gold Seller
+                                </span>
                                 </div>
                             </div>
 
