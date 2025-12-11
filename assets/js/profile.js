@@ -359,14 +359,29 @@ function goToPayment(invoiceId) {
 
 // Show activity detail modal
 function showActivityDetail(activity) {
-    const statusConfig = {
-        pending: { label: 'Menunggu Pembayaran', class: 'text-orange-600 bg-orange-50' },
-        waiting: { label: 'Menunggu Verifikasi', class: 'text-yellow-600 bg-yellow-50' },
-        verified: { label: 'Pembayaran Terverifikasi', class: 'text-green-600 bg-green-50' },  // ✅ GANTI 'success' jadi 'verified'
-        rejected: { label: 'Ditolak', class: 'text-red-600 bg-red-50' }
-    };
     
-    const status = statusConfig[activity.display_status] || statusConfig.pending;
+        const statusConfig = {
+    pending: { label: 'Menunggu Pembayaran', class: 'text-orange-600 bg-orange-50' },
+    waiting: { label: 'Menunggu Verifikasi', class: 'text-yellow-600 bg-yellow-50' },
+    verified: { label: 'Pembayaran Terverifikasi', class: 'text-green-600 bg-green-50' },
+    rejected: { label: 'Ditolak', class: 'text-red-600 bg-red-50' },
+    shipped: { label: 'Sedang Dikirim', class: 'text-blue-600 bg-blue-50' },
+    delivered: { label: 'Sudah Sampai', class: 'text-green-600 bg-green-50' },
+    completed: { label: 'Selesai', class: 'text-green-600 bg-green-50' }
+	};
+    
+    // Tentukan status yang benar
+    let currentDisplayStatus = activity.display_status || activity.status;
+
+    // Jika sudah verified, cek shipping_status
+    if (currentDisplayStatus === 'verified' && activity.shipping_status) {
+        if (activity.shipping_status === 'shipped') currentDisplayStatus = 'shipped';
+        if (activity.shipping_status === 'delivered') currentDisplayStatus = 'delivered';
+        if (activity.shipping_status === 'completed') currentDisplayStatus = 'completed';
+    }
+
+    const status = statusConfig[currentDisplayStatus] || statusConfig.pending;
+ 
     
     const itemsHtml = activity.items.map(item => `
         <div class="flex items-center gap-3 p-3 bg-white rounded-lg border">
@@ -402,7 +417,13 @@ function showActivityDetail(activity) {
                             <p class="text-sm font-medium">Status Pesanan</p>
                             <p class="text-lg font-bold">${status.label}</p>
                         </div>
-                        <i class="fas fa-${activity.display_status === 'verified' ? 'check-circle' : activity.display_status === 'rejected' ? 'times-circle' : 'clock'} text-3xl"></i>
+                        <i class="fas fa-${
+                            currentDisplayStatus === 'completed' || currentDisplayStatus === 'delivered' ? 'check-circle' :
+                            currentDisplayStatus === 'shipped' ? 'truck' :
+                            currentDisplayStatus === 'verified' ? 'check-circle' : 
+                            currentDisplayStatus === 'rejected' ? 'times-circle' : 
+                            'clock'
+                        } text-3xl"></i>
                     </div>
                     
                     ${activity.admin_note && activity.display_status === 'rejected' ? `

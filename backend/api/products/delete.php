@@ -5,59 +5,45 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 header('Content-Type: application/json');
 
-// Check if user is logged in
+// Check login
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     http_response_code(401);
     echo json_encode(['error' => 'Unauthorized - Please login first']);
     exit();
 }
 
-// Get seller ID from session
+// Get seller ID
 $seller_id = $_SESSION['user_id'];
 
-// koneksi database
-$mysqli = new mysqli("localhost", "root", "", "db_promora");
+// Koneksi dengan db.php (PDO)
+require_once __DIR__ . "/../../config/db.php";
+$database = new Database();
+$conn = $database->getConnection();
 
-// cek koneksi
-if ($mysqli->connect_error) {
-    echo json_encode(['error' => 'Database connection failed: ' . $mysqli->connect_error]);
-    exit;
+try {
+
+    // Query: ambil produk milik seller yang login
+    $stmt = $conn->prepare("
+        SELECT 
+            p.*,
+            u.first_name,
+            u.last_name
+        FROM products p
+        LEFT JOIN users u ON p.seller_id = u.id
+        WHERE p.seller_id = :seller_id
+        ORDER BY p.id DESC
+    ");
+
+    $stmt->execute(['seller_id' => $seller_id]);
+
+    // Ambil hasil
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode($products);
+
+} catch (Exception $e) {
+    echo json_encode([
+        'error' => 'Query failed: ' . $e->getMessage()
+    ]);
 }
-
-// Query to get only products from logged-in seller
-$stmt = $mysqli->prepare("
-    SELECT 
-        p.*,
-        u.first_name,
-        u.last_name
-    FROM products p
-    LEFT JOIN users u ON p.seller_id = u.id
-    WHERE p.seller_id = ?
-    ORDER BY p.id DESC
-");
-
-if (!$stmt) {
-    echo json_encode(['error' => 'Prepare failed: ' . $mysqli->error]);
-    exit;
-}
-
-$stmt->bind_param("i", $seller_id);
-$stmt->execute();
-
-$result = $stmt->get_result();
-
-if (!$result) {
-    echo json_encode(['error' => 'Query failed: ' . $mysqli->error]);
-    exit;
-}
-
-$products = [];
-while($row = $result->fetch_assoc()) {
-    $products[] = $row;
-}
-
-echo json_encode($products);
-
-$stmt->close();
-$mysqli->close();
 ?>

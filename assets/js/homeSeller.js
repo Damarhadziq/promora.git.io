@@ -2,6 +2,12 @@
 let products = [];
 let currentUser = null;
 
+// Helper function untuk generate avatar URL
+function getAvatarUrl(name, size = 150) {
+    const initial = name ? name.charAt(0).toUpperCase() : 'S';
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&size=${size}&background=7A5AF8&color=fff&bold=true`;
+}
+
 // Fetch products from database (only for logged-in seller)
 async function fetchProducts() {
     try {
@@ -141,14 +147,14 @@ function switchTab(tabName) {
     document.getElementById('content-pengaturan').classList.add('hidden');
     
     // Remove active class from all tabs
-    document.getElementById('tab-produk').className = 'text-grey-700 hover:text-purple-700 font-medium';
+    document.getElementById('tab-produk').className = 'text-grey-700 hover:text-purple-700 font-medium flex items-center space-x-2';
     document.getElementById('tab-order').className = 'text-grey-700 hover:text-purple-700 font-medium';
     document.getElementById('tab-statistik').className = 'text-grey-700 hover:text-purple-700 font-medium';
     document.getElementById('tab-pengaturan').className = 'text-grey-700 hover:text-purple-700 font-medium';
     
     // Show selected content and activate tab
     document.getElementById('content-' + tabName).classList.remove('hidden');
-    document.getElementById('tab-' + tabName).className = 'text-purple-700 font-semibold border-b-2 border-purple-700';
+    document.getElementById('tab-' + tabName).className = 'text-purple-700 font-medium border-b-2 border-purple-700 flex items-center space-x-2';
     
     // Load data jika tab order
     if (tabName === 'order') {
@@ -202,6 +208,90 @@ async function deleteProduct(id) {
     }
 }
 
+async function loadStoreData() {
+    try {
+        const response = await fetch('./backend/store/get_store_info.php');
+        const data = await response.json();
+        
+        if (data.success) {
+            const store = data.store;
+            
+            // Update logo
+            if (store.logo) {
+                document.getElementById('navbarLogo').src = `./backend/uploads/store_logos/${store.logo}`;
+                document.getElementById('storeLogoMain').src = `./backend/uploads/store_logos/${store.logo}`;
+            }
+            
+            // Update store name & bio
+            document.querySelector('.text-2xl.font-bold.text-gray-900').textContent = store.store_name;
+            document.querySelector('.text-gray-600.mb-4').textContent = store.description || 'Bio Masih Kosong....';
+            
+            // Display package badge
+            displayPackageBadge(store.package_tier, store.package_expires_at);
+            
+            // Update stats
+            document.getElementById('homeRating').textContent = '4.8'; // From your stats
+            document.getElementById('homeTotalOrders').textContent = data.total_orders || '0';
+            document.getElementById('homeTotalProducts').textContent = data.total_products || '0';
+        }
+    } catch (error) {
+        console.error('Error loading store data:', error);
+    }
+}
+
+function displayPackageBadge(packageTier, expiresAt) {
+    const badgeContainer = document.querySelector('.px-3.py-1.bg-blue-100');
+    
+    if (!packageTier || packageTier === 'basic') {
+        badgeContainer.textContent = 'Basic Seller';
+        badgeContainer.className = 'px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full';
+        return;
+    }
+    
+    const packageConfig = {
+        'bronze': {
+            class: 'bg-orange-100 text-orange-700',
+            text: 'Bronze Seller',
+            icon: '🥉'
+        },
+        'silver': {
+            class: 'bg-gray-200 text-gray-700',
+            text: 'Silver Seller',
+            icon: '🥈'
+        },
+        'gold': {
+            class: 'bg-yellow-100 text-yellow-700',
+            text: 'Gold Seller',
+            icon: '🥇'
+        }
+    };
+    
+    const config = packageConfig[packageTier.toLowerCase()];
+    
+    if (config) {
+        badgeContainer.className = `px-3 py-1 ${config.class} text-xs font-semibold rounded-full flex items-center space-x-1`;
+        badgeContainer.innerHTML = `
+            <span>${config.icon}</span>
+            <span>${config.text}</span>
+        `;
+        
+        // Add expiry info if exists
+        if (expiresAt) {
+            const expiryDate = new Date(expiresAt);
+            const daysLeft = Math.ceil((expiryDate - new Date()) / (1000 * 60 * 60 * 24));
+            
+            if (daysLeft > 0) {
+                badgeContainer.title = `Berlaku hingga ${expiryDate.toLocaleDateString('id-ID')} (${daysLeft} hari lagi)`;
+            }
+        }
+    }
+}
+
+// Call on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadStoreData();
+});
+
 // ✅ Load store profile - VERSI FINAL
 async function loadStoreProfile() {
     try {
@@ -216,13 +306,13 @@ async function loadStoreProfile() {
             // Update profile section - Nama Toko
             const storeNameElement = document.querySelector('.text-2xl.font-bold.text-gray-900');
             if (storeNameElement) {
-                storeNameElement.textContent = store.store_name;
+                storeNameElement.textContent = store.store_name || 'Nama Toko';
             }
-            
+
             // Update deskripsi toko
             const descElement = document.querySelector('.text-gray-600.mb-4');
             if (descElement) {
-                descElement.textContent = store.description;
+                descElement.textContent = store.description || 'Bio masih kosong';
             }
             
             // Update stats
@@ -244,13 +334,15 @@ async function loadStoreProfile() {
             // Update pengaturan form
             const settingsInputs = document.querySelectorAll('#content-pengaturan input[type="text"]');
             if (settingsInputs.length >= 1) {
-                settingsInputs[0].value = store.store_name; // Nama Toko
+                settingsInputs[0].value = store.store_name || 'Nama Toko'; // Nama Toko
+                settingsInputs[0].placeholder = 'Masukkan nama toko';
             }
-            
+
             // Update phone number
             const phoneInput = document.getElementById('storePhone');
             if (phoneInput) {
                 phoneInput.value = store.phone || '';
+                phoneInput.placeholder = '+62 812-xxxx-xxxx';
             }
             
             // Update logo di semua tempat (termasuk navbar)
@@ -258,6 +350,12 @@ async function loadStoreProfile() {
                 const logoElements = document.querySelectorAll('#storeLogoMain, #storeLogoPreview, #navbarLogo');
                 logoElements.forEach(el => {
                     el.src = 'backend/uploads/store_logos/' + store.logo;
+                });
+            } else {
+                // Jika belum ada logo, pakai avatar default
+                const logoElements = document.querySelectorAll('#storeLogoMain, #storeLogoPreview, #navbarLogo');
+                logoElements.forEach(el => {
+                    el.src = getAvatarUrl(store.store_name || 'Store');
                 });
             }
 
@@ -312,6 +410,7 @@ if (store.latitude && store.longitude) {
             const settingsTextarea = document.querySelector('#content-pengaturan textarea');
             if (settingsTextarea) {
                 settingsTextarea.value = store.description || '';
+                settingsTextarea.placeholder = 'Tulis deskripsi toko Anda...';
             }
             
             // Update statistik section

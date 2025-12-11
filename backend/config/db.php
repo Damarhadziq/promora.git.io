@@ -1,15 +1,15 @@
 <?php
-// config/database.php
+// config/db.php
 class Database {
-    private $host = "localhost";
-    private $db_name = "db_promora";
-    private $username = "root";
-    private $password = ""; // default XAMPP kosong
+    private $host = "localhost";      // Host lokal XAMPP
+    private $db_name = "db_promora";  // Nama database kamu di phpMyAdmin
+    private $username = "root";       // Default username XAMPP
+    private $password = "";           // Password default XAMPP = kosong
     public $conn;
 
     public function getConnection() {
         $this->conn = null;
-        
+
         try {
             $this->conn = new PDO(
                 "mysql:host=" . $this->host . ";dbname=" . $this->db_name,
@@ -21,7 +21,7 @@ class Database {
         } catch(PDOException $exception) {
             echo "Connection error: " . $exception->getMessage();
         }
-        
+
         return $this->conn;
     }
 }

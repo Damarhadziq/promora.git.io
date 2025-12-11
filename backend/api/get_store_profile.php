@@ -30,10 +30,6 @@ try {
         $store = $stmt->fetch(PDO::FETCH_ASSOC);
         
         // Tambahkan data dummy
-        $store['rating'] = '4.8';
-        $store['total_orders'] = '156';
-        $store['total_products'] = '24';
-        $store['total_sales'] = '15750000';
         $store['is_verified'] = true;
         
         echo json_encode([

@@ -311,166 +311,347 @@
   </div>
 
   <script>
-    // Data paket dari URL parameter
-    const urlParams = new URLSearchParams(window.location.search);
-    const paketName = urlParams.get('paket') || 'Gold';
-    const paketPrice = parseInt(urlParams.get('harga')) || 199000;
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        // Cek session menggunakan endpoint yang sama dengan homeSeller
+        const response = await fetch('backend/api/get_store_profile.php', {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (!data.success || !data.store) {
+            alert('Silakan login terlebih dahulu!');
+            window.location.href = 'lamanLogin.html';
+            return;
+        }
+        
+        console.log('Store logged in:', data.store.store_name, 'ID:', data.store.seller_id);
+        
+        // Load package data setelah verify session
+        loadPackageData();
+        startCountdown();
+    } catch (error) {
+        console.error('Session check error:', error);
+        alert('Gagal memeriksa status login. Silakan login kembali.');
+        window.location.href = 'lamanLogin.html';
+    }
+});
 
-    // Konfigurasi benefit per paket
-    const packageBenefits = {
-      'Gold': {
+// ============================================
+// 2. GET URL PARAMETERS (FIX)
+// ============================================
+const urlParams = new URLSearchParams(window.location.search);
+const paketName = urlParams.get('paket') || 'Gold';
+const paketPrice = parseInt(urlParams.get('harga')) || 199000;
+const duration = parseInt(urlParams.get('durasi')) || 1;
+const totalPrice = parseInt(urlParams.get('total')) || paketPrice;
+
+console.log('URL Parameters:', { paketName, paketPrice, duration, totalPrice });
+
+// ============================================
+// 3. PACKAGE BENEFITS CONFIG
+// ============================================
+const packageBenefits = {
+    'Gold': {
         badge: 'assets/img/gold.png',
         benefit1: 'Biaya Admin Dalam Negeri: 2%',
         benefit2: 'Biaya Admin Luar Negeri: 5%',
         benefit3: 'Banner Dinamis: 10x per minggu'
-      },
-      'Silver': {
+    },
+    'Silver': {
         badge: 'assets/img/silver.png',
         benefit1: 'Biaya Admin Dalam Negeri: 3.5%',
         benefit2: 'Biaya Admin Luar Negeri: 7%',
         benefit3: 'Banner Dinamis: 2x per minggu'
-      },
-      'Bronze': {
+    },
+    'Bronze': {
         badge: 'assets/img/bronze.png',
         benefit1: 'Biaya Admin Dalam Negeri: 4%',
         benefit2: 'Biaya Admin Luar Negeri: 8%',
         benefit3: 'Banner Dinamis: Tidak tersedia'
-      }
-    };
-
-    // Load data paket
-    function loadPackageData() {
-      const benefits = packageBenefits[paketName];
-      
-      document.getElementById('package-badge').src = benefits.badge;
-      document.getElementById('package-name').textContent = `Paket ${paketName}`;
-      document.getElementById('package-price').textContent = `Rp ${paketPrice.toLocaleString('id-ID')}`;
-      document.getElementById('benefit-1').textContent = benefits.benefit1;
-      document.getElementById('benefit-2').textContent = benefits.benefit2;
-      document.getElementById('benefit-3').textContent = benefits.benefit3;
-      
-      document.getElementById('summary-package').textContent = `Paket ${paketName}`;
-      document.getElementById('summary-price').textContent = `Rp ${paketPrice.toLocaleString('id-ID')}`;
-      document.getElementById('summary-total').textContent = `Rp ${paketPrice.toLocaleString('id-ID')}`;
-      document.getElementById('total-bayar').textContent = `Rp ${paketPrice.toLocaleString('id-ID')}`;
     }
+};
 
-    // Timer countdown
-    function startCountdown() {
-      let hours = 23, minutes = 59, seconds = 59;
-      
-      setInterval(() => {
+// ============================================
+// 4. LOAD PACKAGE DATA (FIX TOTAL DISPLAY)
+// ============================================
+function loadPackageData() {
+    const benefits = packageBenefits[paketName];
+    
+    if (!benefits) {
+        console.error('Package not found:', paketName);
+        alert('Paket tidak ditemukan!');
+        window.location.href = 'pricingCard.html';
+        return;
+    }
+    
+    // Update package details
+    document.getElementById('package-badge').src = benefits.badge;
+    document.getElementById('package-name').textContent = `Paket ${paketName}`;
+    document.getElementById('package-price').textContent = `Rp ${paketPrice.toLocaleString('id-ID')}`;
+    document.getElementById('benefit-1').textContent = benefits.benefit1;
+    document.getElementById('benefit-2').textContent = benefits.benefit2;
+    document.getElementById('benefit-3').textContent = benefits.benefit3;
+    
+    // Update summary section
+    const summaryText = duration === 1 
+        ? `Paket ${paketName}` 
+        : `Paket ${paketName} (${duration} bulan)`;
+    
+    document.getElementById('summary-package').textContent = summaryText;
+    document.getElementById('summary-price').textContent = `Rp ${totalPrice.toLocaleString('id-ID')}`;
+    document.getElementById('summary-total').textContent = `Rp ${totalPrice.toLocaleString('id-ID')}`;
+    
+    // **FIX: Update total bayar di header**
+    document.getElementById('total-bayar').textContent = `Rp ${totalPrice.toLocaleString('id-ID')}`;
+    
+    // Tambahkan info detail harga jika lebih dari 1 bulan
+    const priceContainer = document.getElementById('summary-price').parentElement;
+    const existingDetail = priceContainer.querySelector('.text-xs.text-gray-500');
+    
+    // Hapus detail lama jika ada
+    if (existingDetail && existingDetail.textContent.includes('×')) {
+        existingDetail.remove();
+    }
+    
+    if (duration > 1) {
+        const priceDetail = document.createElement('p');
+        priceDetail.className = 'text-xs text-gray-500 mt-1';
+        priceDetail.textContent = `${duration} bulan × Rp ${paketPrice.toLocaleString('id-ID')}`;
+        priceContainer.appendChild(priceDetail);
+    }
+    
+    console.log('Package data loaded successfully');
+}
+
+// ============================================
+// 5. COUNTDOWN TIMER
+// ============================================
+function startCountdown() {
+    let hours = 23, minutes = 59, seconds = 59;
+    
+    setInterval(() => {
         seconds--;
         if (seconds < 0) {
-          seconds = 59;
-          minutes--;
+            seconds = 59;
+            minutes--;
         }
         if (minutes < 0) {
-          minutes = 59;
-          hours--;
+            minutes = 59;
+            hours--;
         }
         if (hours < 0) {
-          hours = 0;
-          minutes = 0;
-          seconds = 0;
+            hours = 0;
+            minutes = 0;
+            seconds = 0;
         }
         
-        document.getElementById('countdown').textContent = 
-          `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-      }, 1000);
-    }
+        const countdownElement = document.getElementById('countdown');
+        if (countdownElement) {
+            countdownElement.textContent = 
+                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+    }, 1000);
+}
 
-    // Pilih metode pembayaran
-    let selectedPaymentMethod = null;
+// ============================================
+// 6. PAYMENT METHOD SELECTION
+// ============================================
+let selectedPaymentMethod = null;
 
-    function selectPayment(method, name) {
-      selectedPaymentMethod = { method, name };
-      
-      document.querySelectorAll('.payment-method').forEach(el => {
+function selectPayment(method, name) {
+    selectedPaymentMethod = { method, name };
+    
+    document.querySelectorAll('.payment-method').forEach(el => {
         el.classList.remove('selected');
-      });
-      
-      event.currentTarget.classList.add('selected');
-      event.currentTarget.querySelector('input[type="radio"]').checked = true;
-      
-      document.getElementById('btn-bayar').disabled = false;
-      document.getElementById('btn-bayar').classList.remove('opacity-50', 'cursor-not-allowed');
-    }
+    });
+    
+    event.currentTarget.classList.add('selected');
+    event.currentTarget.querySelector('input[type="radio"]').checked = true;
+    
+    const btnBayar = document.getElementById('btn-bayar');
+    btnBayar.disabled = false;
+    btnBayar.classList.remove('opacity-50', 'cursor-not-allowed');
+    
+    console.log('Payment method selected:', method, name);
+}
 
-    // Modal
-    function openModal() {
-      if (!selectedPaymentMethod) {
+// ============================================
+// 7. MODAL FUNCTIONS
+// ============================================
+function openModal() {
+    if (!selectedPaymentMethod) {
         alert('Pilih metode pembayaran terlebih dahulu!');
         return;
-      }
-      
-      document.getElementById('selected-method').textContent = selectedPaymentMethod.name;
-      document.getElementById('selected-total').textContent = `Rp ${paketPrice.toLocaleString('id-ID')}`;
-      document.getElementById('modal').classList.remove('hidden');
     }
+    
+    document.getElementById('selected-method').textContent = selectedPaymentMethod.name;
+    document.getElementById('selected-total').textContent = `Rp ${totalPrice.toLocaleString('id-ID')}`;
+    document.getElementById('modal').classList.remove('hidden');
+}
 
-    function closeModal() {
-      document.getElementById('modal').classList.add('hidden');
-      document.getElementById('preview').classList.add('hidden');
-      document.getElementById('file-input').value = '';
-      document.getElementById('btn-kirim').disabled = true;
-      document.getElementById('btn-kirim').classList.add('opacity-50', 'cursor-not-allowed');
-    }
+function closeModal() {
+    document.getElementById('modal').classList.add('hidden');
+    document.getElementById('preview').classList.add('hidden');
+    document.getElementById('file-input').value = '';
+    
+    const btnKirim = document.getElementById('btn-kirim');
+    btnKirim.disabled = true;
+    btnKirim.classList.add('opacity-50', 'cursor-not-allowed');
+}
 
-    // Upload file
-    const dropArea = document.getElementById('drop-area');
-    const fileInput = document.getElementById('file-input');
-    const preview = document.getElementById('preview');
-    const previewImg = document.getElementById('preview-img');
+// ============================================
+// 8. FILE UPLOAD HANDLING
+// ============================================
+const dropArea = document.getElementById('drop-area');
+const fileInput = document.getElementById('file-input');
+const preview = document.getElementById('preview');
+const previewImg = document.getElementById('preview-img');
 
-    dropArea.addEventListener('click', () => fileInput.click());
+dropArea.addEventListener('click', () => fileInput.click());
 
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file && file.size <= 5242880) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          previewImg.src = e.target.result;
-          preview.classList.remove('hidden');
-          document.getElementById('btn-kirim').disabled = false;
-          document.getElementById('btn-kirim').classList.remove('opacity-50', 'cursor-not-allowed');
-        };
-        reader.readAsDataURL(file);
-      } else {
+fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (file.size > 5242880) {
         alert('File terlalu besar! Maksimal 5MB');
-      }
-    });
+        fileInput.value = '';
+        return;
+    }
+    
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!validTypes.includes(file.type)) {
+        alert('Format file tidak valid! Gunakan JPG/PNG');
+        fileInput.value = '';
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        previewImg.src = e.target.result;
+        preview.classList.remove('hidden');
+        
+        const btnKirim = document.getElementById('btn-kirim');
+        btnKirim.disabled = false;
+        btnKirim.classList.remove('opacity-50', 'cursor-not-allowed');
+    };
+    reader.readAsDataURL(file);
+});
 
-    dropArea.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      dropArea.classList.add('bg-purple-50');
-    });
+dropArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropArea.classList.add('bg-purple-50');
+});
 
-    dropArea.addEventListener('dragleave', () => {
-      dropArea.classList.remove('bg-purple-50');
-    });
+dropArea.addEventListener('dragleave', () => {
+    dropArea.classList.remove('bg-purple-50');
+});
 
-    dropArea.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropArea.classList.remove('bg-purple-50');
-      const file = e.dataTransfer.files[0];
-      fileInput.files = e.dataTransfer.files;
-      fileInput.dispatchEvent(new Event('change'));
-    });
+dropArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropArea.classList.remove('bg-purple-50');
+    
+    const file = e.dataTransfer.files[0];
+    if (file) {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        fileInput.files = dataTransfer.files;
+        fileInput.dispatchEvent(new Event('change'));
+    }
+});
 
-    // Kirim bukti
-    function kirimBukti() {
-      closeModal();
-      document.getElementById('notif').classList.remove('hidden');
-      
-      setTimeout(() => {
-        window.location.href = 'homeSeller.html';
-      }, 3000);
+// ============================================
+// 9. SUBMIT PAYMENT PROOF (FIX ERROR 500)
+// ============================================
+async function kirimBukti() {
+    const file = fileInput.files[0];
+    if (!file) {
+        alert('Pilih bukti pembayaran terlebih dahulu!');
+        return;
     }
 
-    // Initialize
-    loadPackageData();
-    startCountdown();
+    const btnKirim = document.getElementById('btn-kirim');
+    const originalText = btnKirim.textContent;
+    btnKirim.disabled = true;
+    btnKirim.textContent = 'Mengirim...';
+
+    const formData = new FormData();
+    formData.append('payment_proof', file);
+    formData.append('package_tier', paketName.toLowerCase());
+    formData.append('price', paketPrice);
+    formData.append('duration_months', duration);
+    formData.append('total_price', totalPrice);
+    formData.append('payment_method', selectedPaymentMethod.method);
+
+    console.log('📤 Submitting payment:', {
+        package: paketName.toLowerCase(),
+        price: paketPrice,
+        duration: duration,
+        total: totalPrice,
+        method: selectedPaymentMethod.method,
+        file: {
+            name: file.name,
+            size: (file.size / 1024).toFixed(2) + ' KB',
+            type: file.type
+        }
+    });
+
+    try {
+        const response = await fetch('backend/subscription/create_subscription.php', {
+            method: 'POST',
+            credentials: 'include',
+            body: formData
+        });
+
+        console.log('📥 Response status:', response.status);
+        console.log('📥 Response headers:', Object.fromEntries(response.headers));
+
+        // Ambil response sebagai text dulu
+        const responseText = await response.text();
+        console.log('📥 Raw response:', responseText);
+
+        // Cek apakah response kosong
+        if (!responseText || responseText.trim() === '') {
+            throw new Error('Server mengembalikan response kosong. Cek error log PHP.');
+        }
+
+        // Parse JSON
+        let result;
+        try {
+            result = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error('❌ JSON Parse Error:', parseError);
+            console.error('Response yang diterima:', responseText.substring(0, 500));
+            throw new Error('Server response bukan JSON valid. Mungkin ada PHP error.');
+        }
+
+        console.log('✅ Parsed response:', result);
+        
+        if (result.success) {
+            closeModal();
+            document.getElementById('notif').classList.remove('hidden');
+            
+            setTimeout(() => {
+                window.location.href = 'homeSeller.html';
+            }, 3000);
+        } else {
+            alert('❌ Gagal: ' + (result.message || 'Unknown error'));
+            console.error('Server error:', result);
+            btnKirim.disabled = false;
+            btnKirim.textContent = originalText;
+        }
+    } catch (error) {
+        console.error('❌ Submit error:', error);
+        alert('Terjadi kesalahan:\n' + error.message + '\n\nCek console untuk detail.');
+        btnKirim.disabled = false;
+        btnKirim.textContent = originalText;
+    }
+}
+
+// Initialize
+loadPackageData();
+startCountdown();
   </script>
 </body>
 </html>

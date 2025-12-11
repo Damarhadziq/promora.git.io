@@ -1,0 +1,17 @@
+[11-Dec-2025 10:36:50 Europe/Berlin] === NEW SUBSCRIPTION REQUEST ===
+[11-Dec-2025 10:36:50 Europe/Berlin] SESSION: {"user_id":"21","username":"aliya","email":"aliya@gmail.com","first_name":"Aliya","last_name":"Putri","role":"seller","phone":"+62840102482","profile_photo":null,"logged_in":true,"login_time":1765443802}
+[11-Dec-2025 10:36:50 Europe/Berlin] POST: {"package_tier":"silver","price":"99000","duration_months":"6","total_price":"594000","payment_method":"bca"}
+[11-Dec-2025 10:36:50 Europe/Berlin] FILES: {"payment_proof":{"name":"images (3).jpeg","size":13483,"error":0}}
+[11-Dec-2025 10:36:50 Europe/Berlin] General Exception: Database config not found at: C:\xampp\htdocs\promora.git.io\backend\subscription/../../config/db.php
+[11-Dec-2025 10:36:50 Europe/Berlin] Stack trace: #0 {main}
+[11-Dec-2025 10:38:19 Europe/Berlin] === NEW SUBSCRIPTION REQUEST ===
+[11-Dec-2025 10:38:19 Europe/Berlin] SESSION: {"user_id":"21","username":"aliya","email":"aliya@gmail.com","first_name":"Aliya","last_name":"Putri","role":"seller","phone":"+62840102482","profile_photo":null,"logged_in":true,"login_time":1765443802}
+[11-Dec-2025 10:38:19 Europe/Berlin] POST: {"package_tier":"silver","price":"99000","duration_months":"6","total_price":"594000","payment_method":"bca"}
+[11-Dec-2025 10:38:19 Europe/Berlin] FILES: {"payment_proof":{"name":"images (3).jpeg","size":13483,"error":0}}
+[11-Dec-2025 10:38:19 Europe/Berlin] Database connected successfully
+[11-Dec-2025 10:38:19 Europe/Berlin] Store found: Aliya Jastip (ID: 5)
+[11-Dec-2025 10:38:19 Europe/Berlin] Input validated: silver, 6 months, Rp 594000
+[11-Dec-2025 10:38:19 Europe/Berlin] File received: images (3).jpeg (13483 bytes)
+[11-Dec-2025 10:38:19 Europe/Berlin] Saving file to: C:\xampp\htdocs\promora.git.io\backend\subscription/../../uploads/subscription_payments/payment_5_1765445899_693a910bbcaa1.jpeg
+[11-Dec-2025 10:38:19 Europe/Berlin] File saved: payment_5_1765445899_693a910bbcaa1.jpeg
+[11-Dec-2025 10:38:20 Europe/Berlin] Subscription created: ID=1

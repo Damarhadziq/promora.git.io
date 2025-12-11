@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-include '../config/db.php';
+include '../../config/db.php';
 
 $result = $conn->query("SELECT * FROM products ORDER BY created_at DESC");
 $products = [];

@@ -12,52 +12,40 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
-// Get seller ID from session
+// Seller ID dari session
 $seller_id = $_SESSION['user_id'];
 
-// koneksi database
-$mysqli = new mysqli("localhost", "root", "", "db_promora");
+// Koneksi menggunakan db.php (PDO)
+require_once __DIR__ . "/../../config/db.php";
+$database = new Database();
+$conn = $database->getConnection();
 
-// cek koneksi
-if ($mysqli->connect_error) {
-    echo json_encode(['error' => 'Database connection failed: ' . $mysqli->connect_error]);
-    exit;
+try {
+
+    // Query untuk ambil produk sesuai seller yg login
+    $stmt = $conn->prepare("
+        SELECT 
+            p.*,
+            u.first_name,
+            u.last_name
+        FROM products p
+        LEFT JOIN users u ON p.seller_id = u.id
+        WHERE p.seller_id = :seller_id
+        ORDER BY p.id DESC
+    ");
+
+    $stmt->execute(['seller_id' => $seller_id]);
+
+    // Ambil hasil
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode($products);
+
+} catch (Exception $e) {
+
+    echo json_encode([
+        'error' => 'Query failed: ' . $e->getMessage()
+    ]);
+
 }
-
-// Query to get only products from logged-in seller
-$stmt = $mysqli->prepare("
-    SELECT 
-        p.*,
-        u.first_name,
-        u.last_name
-    FROM products p
-    LEFT JOIN users u ON p.seller_id = u.id
-    WHERE p.seller_id = ?
-    ORDER BY p.id DESC
-");
-
-if (!$stmt) {
-    echo json_encode(['error' => 'Prepare failed: ' . $mysqli->error]);
-    exit;
-}
-
-$stmt->bind_param("i", $seller_id);
-$stmt->execute();
-
-$result = $stmt->get_result();
-
-if (!$result) {
-    echo json_encode(['error' => 'Query failed: ' . $mysqli->error]);
-    exit;
-}
-
-$products = [];
-while($row = $result->fetch_assoc()) {
-    $products[] = $row;
-}
-
-echo json_encode($products);
-
-$stmt->close();
-$mysqli->close();
 ?>

@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil Penjual - Promora</title>
     <script src="https://cdn.tailwindcss.com"></script>
+            <link
+      rel="shortcut icon"
+      href="./assets/img/logo.png"
+      type="image/x-icon"
+    />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css"/>
     <script>
@@ -56,7 +61,7 @@
             background: #6347d8;
             transform: scale(1.1);
         }
-        .badge-gold {
+                .badge-gold {
         display: inline-flex;
         align-items: center;
         gap: 1px;
@@ -146,7 +151,7 @@
                         <!-- Profile Image -->
                         <div class="px-6 pb-6 -mt-16">
                             <div class="profile-image-wrapper">
-                                <img id="profileImage" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop" 
+                                <img id="profileImage" src="https://ui-avatars.com/api/?name=Store&size=300&background=7A5AF8&color=fff&bold=true" 
                                      alt="Store Logo" class="profile-image">
                                 <label for="imageUpload" class="upload-overlay">
                                     <i class="fas fa-camera text-white"></i>
@@ -155,7 +160,7 @@
                             </div>
                             
                             <div class="text-center mt-4">
-                                <h2 class="text-2xl font-bold text-gray-800" id="displayName">Sarah Jastip</h2>
+                                <h2 class="text-2xl font-bold text-gray-800" id="displayName">Nama Toko</h2>
                                 <p class="text-primary font-semibold">@sarahjastip</p>
                                 <p class="text-gray-500 text-sm mt-1">Jakarta • Bergabung Maret 2024</p>
                                 
@@ -166,22 +171,22 @@
                                     <span class="badge-gold flex items-center gap-1">
                                     <img src="assets/img/gold.png" class="gold-icon" alt="Gold">
                                     Gold Seller
-                                </span>
+                                    </span>
                                 </div>
                             </div>
 
                             <!-- Seller Stats -->
                             <div class="grid grid-cols-3 gap-4 mt-8 pt-6 border-t">
                                 <div class="text-center">
-                                    <div class="text-2xl font-bold text-primary">127</div>
+                                    <div class="text-2xl font-bold text-primary" id="sidebarProductCount">0</div>
                                     <div class="text-xs text-gray-500">Produk Aktif</div>
                                 </div>
                                 <div class="text-center">
-                                    <div class="text-2xl font-bold text-primary">892</div>
+                                    <div class="text-2xl font-bold text-primary" id="sidebarOrderCount">0</div>
                                     <div class="text-xs text-gray-500">Pesanan Selesai</div>
                                 </div>
                                 <div class="text-center">
-                                    <div class="text-2xl font-bold text-primary">4.9</div>
+                                    <div class="text-2xl font-bold text-primary" id="sidebarRating">0.0</div>
                                     <div class="text-xs text-gray-500">Rating</div>
                                 </div>
                             </div>
@@ -331,7 +336,7 @@
                                     </div>
                                     <div class="mt-4">
                                         <p class="text-sm text-gray-500">Bio Toko</p>
-                                        <p class="text-gray-700 leading-relaxed">Spesialis jastip mall premium Jakarta & Bandung. Update promo setiap hari! Fast response, packing aman, pengiriman cepat.</p>
+                                        <p class="text-gray-700 leading-relaxed">Bio Masih Kosong.</p>
                                     </div>
                                 </div>
                             </div>
@@ -343,7 +348,7 @@
                                     <div class="grid md:grid-cols-2 gap-6">
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700 mb-2">Nama Toko</label>
-                                            <input type="text" value="Sarah Jastip Official" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none">
+                                            <input type="text" value="Masukkan Nama Toko" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none">
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
@@ -353,7 +358,7 @@
 
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">Bio Toko</label>
-                                        <textarea rows="4" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none">Spesialis jastip mall premium Jakarta & Bandung. Update promo setiap hari! Fast response, packing aman, pengiriman cepat.</textarea>
+                                        <textarea rows="4" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none">Deskripsi toko anda......</textarea>
                                     </div>
 
                                     <div>
@@ -497,21 +502,23 @@ function updateStoreDisplay(store) {
     }
     
     // Update bio toko di dashboard
-    const bioDashboard = document.querySelector('#overviewTab .text-gray-700.leading-relaxed');
+    const bioDashboard = document.getElementById('dashboardBio');
     if (bioDashboard) {
-        bioDashboard.textContent = store.description || 'Belum ada deskripsi toko';
+        bioDashboard.textContent = store.description || 'Bio masih kosong';
     }
     
     // Update form edit profil
     const editInputs = document.querySelectorAll('#editTab input[type="text"]');
     if (editInputs.length >= 2) {
-        editInputs[0].value = store.store_name; // Nama Toko
+        editInputs[0].value = store.store_name || ''; // Nama Toko - kosongkan jika null
+        editInputs[0].placeholder = 'Masukkan nama toko';
         editInputs[1].value = '@' + currentUser.username; // Username
     }
-    
+
     const editTextarea = document.querySelector('#editTab textarea');
     if (editTextarea) {
         editTextarea.value = store.description || '';
+        editTextarea.placeholder = 'Tulis deskripsi toko Anda...';
     }
     
     // Update stats (dummy data)
@@ -524,16 +531,17 @@ function updateStats(store) {
     if (statCards.length >= 3) {
         statCards[0].textContent = 'Rp 3.8Jt'; // Dummy
         statCards[1].textContent = '24'; // Dummy
-        statCards[2].textContent = '4.9 ★'; // Dummy
+        statCards[2].textContent = '0.0 ★'; // Rating = 0
     }
     
-    // Sidebar stats
-    const sidebarStats = document.querySelectorAll('.grid.grid-cols-3 .text-2xl.font-bold');
-    if (sidebarStats.length >= 3) {
-        sidebarStats[0].textContent = store.total_products || '0';
-        sidebarStats[1].textContent = store.total_orders || '0';
-        sidebarStats[2].textContent = store.rating || '0.0';
-    }
+    // Sidebar stats - DINAMIS dari database
+    const sidebarProductCount = document.getElementById('sidebarProductCount');
+    const sidebarOrderCount = document.getElementById('sidebarOrderCount');
+    const sidebarRating = document.getElementById('sidebarRating');
+    
+    if (sidebarProductCount) sidebarProductCount.textContent = store.total_products || '0';
+    if (sidebarOrderCount) sidebarOrderCount.textContent = store.total_orders || '0';
+    if (sidebarRating) sidebarRating.textContent = '0.0'; // Rating selalu 0
 }
 
 // Save seller profile

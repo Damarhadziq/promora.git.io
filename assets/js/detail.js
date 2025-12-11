@@ -251,7 +251,7 @@ async function chatSeller() {
         }
         
         // Jika sudah login, redirect ke halaman chat
-        window.location.href = `chat.html?id=${productId}`;
+        window.location.href = `talk.html?id=${productId}`;
         
     } catch (error) {
         console.error('Error checking session:', error);

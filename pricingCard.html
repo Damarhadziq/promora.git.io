@@ -187,6 +187,7 @@
                         <div class="font-medium text-gray-900">Analitik mendalam</div>
                     </div>
                     
+                    <!-- JADI INI -->
                     <button onclick="selectPackage('Gold', 199000)" class="btn-primary w-full text-white font-semibold py-3 px-6 rounded-lg mt-6">
                         Pilih Paket Gold
                     </button>
@@ -258,9 +259,9 @@
                         <div class="font-medium text-gray-900">Analitik mendalam</div>
                     </div>
                     
-                    <button onclick="selectPackage('Gold', 99000)" class="btn-primary w-full text-white font-semibold py-3 px-6 rounded-lg mt-6">
-                        Pilih Paket Silver
-                    </button>
+                <button onclick="selectPackage('Silver', 99000)" class="btn-primary w-full text-white font-semibold py-3 px-6 rounded-lg mt-6">
+                    Pilih Paket Silver
+                </button>
                 </div>
             </div>
 
@@ -329,9 +330,9 @@
                         <div class="font-medium text-gray-900">Analitik mendalam</div>
                     </div>
                     
-                    <button onclick="selectPackage('Gold', 49000)" class="btn-primary w-full text-white font-semibold py-3 px-6 rounded-lg mt-6">
-                        Pilih Paket Bronze
-                    </button>
+                <button onclick="selectPackage('Bronze', 49000)" class="btn-primary w-full text-white font-semibold py-3 px-6 rounded-lg mt-6">
+                    Pilih Paket Bronze
+                </button>
                 </div>
             </div>
         </div>
@@ -348,71 +349,142 @@
     </div>
 
     <!-- Modal Konfirmasi (SUDAH DIPERBAIKI & DIPERHALUS) -->
-    <div id="confirmModal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 transform transition-all scale-100 modal-animate">
-            <div class="text-center mb-8">
-                <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-5">
-                    <svg class="w-12 h-12 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-900" id="modalTitle">Konfirmasi Paket Gold</h3>
-                <p class="text-4xl font-bold text-purple-600 mt-4" id="modalPrice">Rp199.000</p>
-                <p class="text-gray-600">per bulan</p>
+    
+<!-- Modal Konfirmasi (REPLACE EXISTING MODAL) -->
+<div id="confirmModal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 transform transition-all scale-100 modal-animate">
+        <div class="text-center mb-8">
+            <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-5">
+                <svg class="w-12 h-12 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
             </div>
+            <h3 class="text-2xl font-bold text-gray-900" id="modalTitle">Konfirmasi Paket</h3>
+            <p class="text-4xl font-bold text-purple-600 mt-4" id="modalPrice">Rp 0</p>
+            <p class="text-gray-600">per bulan</p>
+        </div>
 
-            <div class="flex gap-4">
-                <button onclick="closeModal()" class="flex-1 py-3 px-6 border border-gray-300 rounded-xl font-medium hover:bg-gray-50 transition">
-                    Batal
-                </button>
-                <button onclick="proceedPayment()" class="flex-1 bg-purple-600 text-white py-3 px-6 rounded-xl font-semibold hover:bg-purple-700 transition shadow-lg">
-                    Lanjutkan ke Pembayaran
-                </button>
+        <!-- Dropdown Durasi Langganan -->
+        <div class="mb-6">
+            <label class="block text-sm font-semibold text-gray-700 mb-3">Pilih Durasi Langganan</label>
+            <select id="duration-select" onchange="updateTotalPrice()" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring focus:ring-purple-200 transition">
+                <option value="1">1 Bulan</option>
+                <option value="3">3 Bulan</option>
+                <option value="6">6 Bulan</option>
+                <option value="12">12 Bulan</option>
+            </select>
+        </div>
+
+        <!-- Total Harga -->
+        <div class="bg-purple-50 rounded-xl p-4 mb-6 border border-purple-200">
+            <div class="flex justify-between items-center">
+                <span class="text-gray-700 font-medium">Total Pembayaran</span>
+                <span id="total-payment" class="text-2xl font-bold text-purple-600">Rp 0</span>
             </div>
+            <p class="text-xs text-gray-500 mt-2">
+                <span id="duration-text">1 bulan</span> × <span id="price-per-month">Rp 0</span>
+            </p>
+        </div>
+
+        <div class="flex gap-4">
+            <button onclick="closeModal()" class="flex-1 py-3 px-6 border border-gray-300 rounded-xl font-medium hover:bg-gray-50 transition">
+                Batal
+            </button>
+            <button onclick="proceedPayment()" class="flex-1 bg-purple-600 text-white py-3 px-6 rounded-xl font-semibold hover:bg-purple-700 transition shadow-lg">
+                Lanjutkan
+            </button>
         </div>
     </div>
-
+</div>
     <script>
-        let selectedPackage = { name: '', price: 0 };
-
-        function selectPackage(name, price) {
-            // Hapus border active
-            document.querySelectorAll('.card').forEach(card => {
-                card.classList.remove('active');
-            });
-
-            // Tambah border active ke kartu yang dipilih
-            document.getElementById(`card-${name.toLowerCase()}`).classList.add('active');
-
-            // Simpan pilihan
-            selectedPackage = { name, price };
-
-            // Update modal
-            document.getElementById('modalTitle').textContent = `Konfirmasi Paket ${name}`;
-            document.getElementById('modalPrice').textContent = 'Rp' + price.toLocaleString('id-ID');
-
-            // Tampilkan modal
-            const modal = document.getElementById('confirmModal');
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.querySelector('.modal-animate').classList.add('show'), 10);
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('confirmModal');
-            modal.classList.add('hidden'); 
-            
-            window.location.href = `pricingCard.html?paket=${selectedPackage.name}&harga=${selectedPackage.price}`;
-        }
-
-        function proceedPayment() {
-            alert(`Mengalihkan ke pembayaran...\nPaket: ${selectedPackage.name}\nHarga: Rp${selectedPackage.price.toLocaleString('id-ID')}/bulan`);
-            window.location.href = "pembayaranSeller.html";
-        }
-
-        // Klik di luar modal = tutup
-        document.getElementById('confirmModal').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        // Cek session dulu sebelum load apapun
+        const response = await fetch('backend/api/get_store_profile.php', {
+            credentials: 'include'
         });
-    </script>
+        const data = await response.json();
+        
+        if (!data.success || !data.store) {
+            alert('Silakan login terlebih dahulu!');
+            window.location.href = 'lamaLogin.html';
+            return;
+        }
+        
+        console.log('Store logged in:', data.store.store_name, 'ID:', data.store.seller_id);;
+    } catch (error) {
+        console.error('Session check error:', error);
+        alert('Gagal memeriksa status login. Silakan login kembali.');
+        window.location.href = 'lamanLogin.html';
+    }
+});
+
+// ============================================
+// 2. SELECT PACKAGE (SUDAH BENAR)
+// ============================================
+let selectedPackage = { name: '', price: 0 };
+
+function selectPackage(name, price) {
+    selectedPackage = { name, price };
+
+    // Update modal
+    document.getElementById('modalTitle').textContent = `Konfirmasi Paket ${name}`;
+    document.getElementById('modalPrice').textContent = 'Rp ' + price.toLocaleString('id-ID');
+
+    // Reset durasi ke 1 bulan
+    document.getElementById('duration-select').value = '1';
+    updateTotalPrice();
+
+    // Tampilkan modal
+    const modal = document.getElementById('confirmModal');
+    modal.classList.remove('hidden');
+}
+
+// ============================================
+// 3. UPDATE TOTAL PRICE (SUDAH BENAR)
+// ============================================
+function updateTotalPrice() {
+    const duration = parseInt(document.getElementById('duration-select').value);
+    const basePrice = selectedPackage.price;
+    
+    const totalPrice = basePrice * duration;
+    
+    document.getElementById('total-payment').textContent = 'Rp ' + totalPrice.toLocaleString('id-ID');
+    document.getElementById('price-per-month').textContent = 'Rp ' + basePrice.toLocaleString('id-ID');
+    document.getElementById('duration-text').textContent = duration + ' bulan';
+}
+
+function closeModal() {
+    document.getElementById('confirmModal').classList.add('hidden');
+}
+
+// ============================================
+// 4. PROCEED PAYMENT - FIX PARAMETER PASSING
+// ============================================
+function proceedPayment() {
+    const duration = document.getElementById('duration-select').value;
+    const totalElement = document.getElementById('total-payment');
+    
+    // Remove "Rp " dan titik separator
+    const totalPriceText = totalElement.textContent.replace('Rp ', '').replace(/\./g, '');
+    const totalPrice = parseInt(totalPriceText);
+    
+    // Debug log
+    console.log('Payment Data:', {
+        paket: selectedPackage.name,
+        harga: selectedPackage.price,
+        durasi: duration,
+        total: totalPrice
+    });
+    
+    // Redirect dengan parameter yang benar
+    window.location.href = `pembayaranSeller.html?paket=${encodeURIComponent(selectedPackage.name)}&harga=${selectedPackage.price}&durasi=${duration}&total=${totalPrice}`;
+}
+
+// Klik di luar modal = tutup
+document.getElementById('confirmModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+</script>
 </body>
 </html>

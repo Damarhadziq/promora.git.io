@@ -34,7 +34,7 @@ try {
     
     if (move_uploaded_file($file['tmp_name'], $filepath)) {
         // Update invoice
-        $query = "UPDATE invoices SET payment_proof = :proof, status = 'pending' 
+        $query = "UPDATE invoices SET payment_proof = :proof, status = 'waiting' 
                   WHERE id = :id AND user_id = :user_id";
         $stmt = $db->prepare($query);
         $stmt->bindParam(':proof', $filename);
