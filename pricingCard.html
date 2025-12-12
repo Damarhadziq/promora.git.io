@@ -419,6 +419,96 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 });
 
+// TAMBAHKAN SETELAH DOMContentLoaded
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        // Cek session dan subscription status
+        const response = await fetch('backend/api/get_store_profile.php', {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (!data.success || !data.store) {
+            alert('Silakan login terlebih dahulu!');
+            window.location.href = 'lamanLogin.html';
+            return;
+        }
+        
+        const store = data.store;
+        
+        // CEK APAKAH SUDAH PUNYA SUBSCRIPTION AKTIF
+        if (store.package_tier && store.package_tier !== 'basic' && store.package_expires_at) {
+            const expiryDate = new Date(store.package_expires_at);
+            const today = new Date();
+            const daysLeft = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+            
+            if (daysLeft > 0) {
+                // BLOKIR SEMUA TOMBOL PILIH PAKET
+                blockAllPackageButtons(store.package_tier, expiryDate, daysLeft);
+            }
+        }
+        
+        console.log('Store logged in:', data.store.store_name, 'ID:', data.store.seller_id);
+    } catch (error) {
+        console.error('Session check error:', error);
+        alert('Gagal memeriksa status login. Silakan login kembali.');
+        window.location.href = 'lamanLogin.html';
+    }
+});
+
+// FUNGSI BARU: Blokir semua tombol paket
+function blockAllPackageButtons(currentTier, expiryDate, daysLeft) {
+    // Sembunyikan badge "Paling Populer"
+    const popularBadge = document.querySelector('.popular-badge');
+    if (popularBadge) {
+        popularBadge.style.display = 'none';
+    }
+    
+    // Tampilkan warning banner di atas cards
+    const cardsContainer = document.querySelector('.grid.md\\:grid-cols-3');
+    const warningBanner = document.createElement('div');
+    warningBanner.className = 'col-span-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl p-6 mb-6 shadow-lg';
+    warningBanner.innerHTML = `
+        <div class="flex items-start gap-4">
+            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-crown text-2xl"></i>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-xl font-bold mb-2">Anda Sudah Berlangganan Paket ${currentTier.toUpperCase()}</h3>
+                <p class="text-blue-100 mb-3">
+                    Langganan aktif Anda berlaku hingga <strong>${expiryDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</strong> 
+                    (${daysLeft} hari lagi)
+                </p>
+                <p class="text-sm text-blue-50">
+                    💡 Anda dapat upgrade atau perpanjang langganan setelah masa aktif berakhir
+                </p>
+            </div>
+            <button onclick="window.location.href='homeSeller.html'" 
+                    class="px-6 py-2 bg-white text-indigo-600 rounded-lg font-semibold hover:bg-blue-50 transition whitespace-nowrap">
+                Kembali ke Dashboard
+            </button>
+        </div>
+    `;
+    cardsContainer.parentElement.insertBefore(warningBanner, cardsContainer);
+    
+    // Disable dan ubah semua tombol "Pilih Paket"
+    const allButtons = document.querySelectorAll('button[onclick^="selectPackage"]');
+    allButtons.forEach(button => {
+        button.disabled = true;
+        button.classList.remove('btn-primary', 'hover:bg-purple-700');
+        button.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+        button.innerHTML = '<i class="fas fa-lock mr-2"></i>Tidak Tersedia';
+        button.onclick = null; // Remove click handler
+    });
+    
+    // Tambahkan overlay pada setiap card
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        card.style.opacity = '0.6';
+        card.style.pointerEvents = 'none';
+    });
+}
+
 // ============================================
 // 2. SELECT PACKAGE (SUDAH BENAR)
 // ============================================

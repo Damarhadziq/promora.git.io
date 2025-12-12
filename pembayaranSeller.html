@@ -38,55 +38,6 @@
 </head>
 <body class="bg-gray-100 font-sans">
 
-<!-- Navbar -->
-    <nav class="bg-white shadow-sm sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-6 py-4">
-        <div class="flex justify-between items-center">
-          <a href="index.html" class="flex items-center space-x-2">
-            <div class="flex items-center space-x-2">
-              <img
-                class="h-8 flex items-center justify-center"
-                src="./assets/img/Container.png"
-                alt=""
-              />
-            </div>
-          </a>
-
-          <div class="hidden md:flex space-x-8">
-            <button onclick="switchTab('produk')" id="tab-produk" class="text-grey-700 hover:text-purple-700 font-medium">
-              Produk Saya
-            </button>
-
-            <button onclick="switchTab('order')" id="tab-order" class="text-grey-700 hover:text-purple-700 font-medium">
-                Order Masuk
-            </button>
-
-            <button onclick="switchTab('statistik')" id="tab-statistik" class="text-grey-700 hover:text-purple-700 font-medium">
-                Statistik Toko
-            </button>
-
-            <button onclick="switchTab('pengaturan')" id="tab-pengaturan" class="text-grey-700 hover:text-purple-700 font-medium">
-                Pengaturan Toko
-            </button>
-          </div>
-
-          <!-- Tombol Setting -->
-            
-          <div class="flex items-center space-x-4">
-            <a href="pricingCard.html"><span class="px-3 py-1 bg-blue-100 text-blue-600 text-xs font-semibold rounded-full">Verified Seller</span></a>
-            <!-- PROFILE -->
-            <a href="profileSeller.html">
-                <img id="navbarLogo"
-                    src="https://via.placeholder.com/150?text=Store+Logo" 
-                    alt="Profile" 
-                    class="h-10 w-10 rounded-full object-cover border hover:opacity-90 cursor-pointer"/>
-            </a>
-             </div>
-          </div>
-        </div>
-      </div>
-    </nav>
-
   <!-- Main Content -->
   <main class="min-h-screen flex items-center justify-center px-6 py-10">
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl">
@@ -143,76 +94,183 @@
         </div>
 
         <!-- Pilih Metode Pembayaran -->
-        <div class="space-y-5">
-          <h3 class="font-bold text-lg flex items-center gap-2">
-            <i class="fas fa-credit-card text-purple-600"></i>
-            Pilih Metode Pembayaran
-          </h3>
+<div class="space-y-5" id="payment-methods-container">
+  <h3 class="font-bold text-lg flex items-center gap-2">
+    <i class="fas fa-credit-card text-purple-600"></i>
+    Pilih Metode Pembayaran
+  </h3>
 
-          <!-- Bank Transfer -->
-          <div class="payment-method border-2 rounded-xl p-4 cursor-pointer" onclick="selectPayment('bca', 'BCA Virtual Account')">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <i class="fas fa-university text-blue-600 text-xl"></i>
-                </div>
-                <div>
-                  <p class="font-bold text-gray-800">BCA Virtual Account</p>
-                  <p class="text-sm text-gray-500">Transfer ke VA BCA</p>
-                </div>
-              </div>
-              <input type="radio" name="payment" class="w-5 h-5 text-purple-600">
-            </div>
-          </div>
-
-          <!-- Mandiri -->
-          <div class="payment-method border-2 rounded-xl p-4 cursor-pointer" onclick="selectPayment('mandiri', 'Mandiri Virtual Account')">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                  <i class="fas fa-university text-yellow-600 text-xl"></i>
-                </div>
-                <div>
-                  <p class="font-bold text-gray-800">Mandiri Virtual Account</p>
-                  <p class="text-sm text-gray-500">Transfer ke VA Mandiri</p>
-                </div>
-              </div>
-              <input type="radio" name="payment" class="w-5 h-5 text-purple-600">
-            </div>
-          </div>
-
-          <!-- E-Wallet -->
-          <div class="payment-method border-2 rounded-xl p-4 cursor-pointer" onclick="selectPayment('gopay', 'GoPay')">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <i class="fas fa-wallet text-green-600 text-xl"></i>
-                </div>
-                <div>
-                  <p class="font-bold text-gray-800">GoPay</p>
-                  <p class="text-sm text-gray-500">Bayar dengan GoPay</p>
-                </div>
-              </div>
-              <input type="radio" name="payment" class="w-5 h-5 text-purple-600">
-            </div>
-          </div>
-
-          <!-- OVO -->
-          <div class="payment-method border-2 rounded-xl p-4 cursor-pointer" onclick="selectPayment('ovo', 'OVO')">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <i class="fas fa-wallet text-purple-600 text-xl"></i>
-                </div>
-                <div>
-                  <p class="font-bold text-gray-800">OVO</p>
-                  <p class="text-sm text-gray-500">Bayar dengan OVO</p>
-                </div>
-              </div>
-              <input type="radio" name="payment" class="w-5 h-5 text-purple-600">
-            </div>
-          </div>
+  <!-- Bank BRI -->
+  <div onclick="selectPayment('bri', 'Bank BRI')" class="payment-method border-2 rounded-xl p-4 cursor-pointer">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/BRI_2020.svg/240px-BRI_2020.svg.png" alt="BRI" class="w-10 h-10 object-contain">
         </div>
+        <div>
+          <p class="font-bold text-gray-800">Bank BRI</p>
+          <p class="text-sm text-gray-500">Transfer ke rekening BRI</p>
+        </div>
+      </div>
+      <input type="radio" name="payment" class="w-5 h-5 text-purple-600">
+    </div>
+    <div id="detail-bri" class="mt-4 hidden bg-white border border-purple-200 rounded-xl p-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs text-gray-500 uppercase mb-2">Nomor Rekening BRI</p>
+          <p class="text-2xl font-mono font-bold tracking-wider text-primary">0024 0123 4567 890</p>
+          <p class="text-sm text-gray-600 mt-1">a.n. PROMORA JASTIP INDONESIA</p>
+        </div>
+        <button onclick="copy('002401234567890'); event.stopPropagation();" class="px-4 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-purple-700 transition">
+          <i class="fas fa-copy mr-1"></i>Salin
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bank BNI -->
+  <div onclick="selectPayment('bni', 'Bank BNI')" class="payment-method border-2 rounded-xl p-4 cursor-pointer">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+          <img src="./assets/img/bni.png" alt="BNI" class="w-10 h-10 object-contain">
+        </div>
+        <div>
+          <p class="font-bold text-gray-800">Bank BNI</p>
+          <p class="text-sm text-gray-500">Transfer ke rekening BNI</p>
+        </div>
+      </div>
+      <input type="radio" name="payment" class="w-5 h-5 text-purple-600">
+    </div>
+    <div id="detail-bni" class="mt-4 hidden bg-white border border-purple-200 rounded-xl p-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs text-gray-500 uppercase mb-2">Nomor Rekening BNI</p>
+          <p class="text-2xl font-mono font-bold tracking-wider text-primary">0461 2345 6789 012</p>
+          <p class="text-sm text-gray-600 mt-1">a.n. PROMORA JASTIP INDONESIA</p>
+        </div>
+        <button onclick="copy('046123456789012'); event.stopPropagation();" class="px-4 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-purple-700 transition">
+          <i class="fas fa-copy mr-1"></i>Salin
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QRIS -->
+  <div onclick="selectPayment('qris', 'QRIS')" class="payment-method border-2 rounded-xl p-4 cursor-pointer">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/QRIS_logo.svg/240px-QRIS_logo.svg.png" alt="QRIS" class="w-10 h-10 object-contain">
+        </div>
+        <div>
+          <p class="font-bold text-gray-800">QRIS</p>
+          <p class="text-sm text-gray-500">Scan QR untuk bayar</p>
+        </div>
+      </div>
+      <input type="radio" name="payment" class="w-5 h-5 text-purple-600">
+    </div>
+    <div id="detail-qris" class="mt-4 hidden text-center bg-white border border-purple-200 rounded-xl p-4">
+      <p class="text-sm text-gray-600 mb-3">Scan QR Code dengan aplikasi:</p>
+      <div class="flex justify-center gap-2 mb-3 flex-wrap">
+        <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">GoPay</span>
+        <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">OVO</span>
+        <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">DANA</span>
+        <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">ShopeePay</span>
+      </div>
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=00020101021226670016ID.CO.QRIS.WWW0118ID1234567890123456520454995303360540510000.005802ID5925PROMORA%20JASTIP%20INDO6007JAKARTA61051234062070703A0163044BCA" 
+           alt="QRIS" class="mx-auto w-48 h-48 rounded-xl shadow-lg border-2 border-purple-200 bg-white p-2">
+      <p class="mt-3 text-xs text-gray-500">
+        <i class="fas fa-info-circle mr-1"></i>
+        Nominal akan terdeteksi otomatis saat scan QR
+      </p>
+    </div>
+  </div>
+
+  <!-- E-Wallet OVO -->
+  <div onclick="selectPayment('ovo', 'OVO')" class="payment-method border-2 rounded-xl p-4 cursor-pointer">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Logo_ovo_purple.svg/240px-Logo_ovo_purple.svg.png" alt="OVO" class="w-10 h-10 object-contain">
+        </div>
+        <div>
+          <p class="font-bold text-gray-800">OVO</p>
+          <p class="text-sm text-gray-500">Transfer ke nomor OVO</p>
+        </div>
+      </div>
+      <input type="radio" name="payment" class="w-5 h-5 text-purple-600">
+    </div>
+    <div id="detail-ovo" class="mt-4 hidden bg-white border border-purple-200 rounded-xl p-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs text-gray-500 uppercase mb-2">Nomor OVO</p>
+          <p class="text-2xl font-mono font-bold tracking-wider text-primary">0812-3456-7890</p>
+          <p class="text-sm text-gray-600 mt-1">a.n. PROMORA JASTIP</p>
+        </div>
+        <button onclick="copy('081234567890'); event.stopPropagation();" class="px-4 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-purple-700 transition">
+          <i class="fas fa-copy mr-1"></i>Salin
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- E-Wallet GoPay -->
+  <div onclick="selectPayment('gopay', 'GoPay')" class="payment-method border-2 rounded-xl p-4 cursor-pointer">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Gopay_logo.svg/240px-Gopay_logo.svg.png" alt="GoPay" class="w-10 h-10 object-contain">
+        </div>
+        <div>
+          <p class="font-bold text-gray-800">GoPay</p>
+          <p class="text-sm text-gray-500">Transfer ke nomor GoPay</p>
+        </div>
+      </div>
+      <input type="radio" name="payment" class="w-5 h-5 text-purple-600">
+    </div>
+    <div id="detail-gopay" class="mt-4 hidden bg-white border border-purple-200 rounded-xl p-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs text-gray-500 uppercase mb-2">Nomor GoPay</p>
+          <p class="text-2xl font-mono font-bold tracking-wider text-primary">0812-3456-7890</p>
+          <p class="text-sm text-gray-600 mt-1">a.n. PROMORA JASTIP</p>
+        </div>
+        <button onclick="copy('081234567890'); event.stopPropagation();" class="px-4 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-purple-700 transition">
+          <i class="fas fa-copy mr-1"></i>Salin
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- E-Wallet DANA -->
+  <div onclick="selectPayment('dana', 'DANA')" class="payment-method border-2 rounded-xl p-4 cursor-pointer">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Logo_dana_blue.svg/240px-Logo_dana_blue.svg.png" alt="DANA" class="w-10 h-10 object-contain">
+        </div>
+        <div>
+          <p class="font-bold text-gray-800">DANA</p>
+          <p class="text-sm text-gray-500">Transfer ke nomor DANA</p>
+        </div>
+      </div>
+      <input type="radio" name="payment" class="w-5 h-5 text-purple-600">
+    </div>
+    <div id="detail-dana" class="mt-4 hidden bg-white border border-purple-200 rounded-xl p-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs text-gray-500 uppercase mb-2">Nomor DANA</p>
+          <p class="text-2xl font-mono font-bold tracking-wider text-primary">0812-3456-7890</p>
+          <p class="text-sm text-gray-600 mt-1">a.n. PROMORA JASTIP</p>
+        </div>
+        <button onclick="copy('081234567890'); event.stopPropagation();" class="px-4 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-purple-700 transition">
+          <i class="fas fa-copy mr-1"></i>Salin
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
         <!-- Ringkasan -->
         <div class="border-t pt-6 space-y-3">
@@ -459,22 +517,37 @@ function startCountdown() {
 // ============================================
 let selectedPaymentMethod = null;
 
+// Fungsi selectPayment untuk pembayaranSeller.html
 function selectPayment(method, name) {
     selectedPaymentMethod = { method, name };
     
+    // Remove selected dari semua
     document.querySelectorAll('.payment-method').forEach(el => {
         el.classList.remove('selected');
+        el.classList.remove('border-primary', 'bg-purple-50');
+        el.classList.add('border-transparent');
     });
     
-    event.currentTarget.classList.add('selected');
+    // Hide semua detail
+    document.querySelectorAll('[id^="detail-"]').forEach(el => el.classList.add('hidden'));
+    
+    // Tandai yang dipilih
+    event.currentTarget.classList.add('selected', 'border-primary', 'bg-purple-50');
+    event.currentTarget.classList.remove('border-transparent');
     event.currentTarget.querySelector('input[type="radio"]').checked = true;
     
+    // Show detail yang dipilih
+    const detail = document.getElementById('detail-' + method);
+    if (detail) detail.classList.remove('hidden');
+    
+    // Enable tombol bayar
     const btnBayar = document.getElementById('btn-bayar');
     btnBayar.disabled = false;
     btnBayar.classList.remove('opacity-50', 'cursor-not-allowed');
     
     console.log('Payment method selected:', method, name);
 }
+
 
 // ============================================
 // 7. MODAL FUNCTIONS
@@ -560,6 +633,18 @@ dropArea.addEventListener('drop', (e) => {
         fileInput.dispatchEvent(new Event('change'));
     }
 });
+
+// Fungsi copy nomor
+function copy(text) {
+    navigator.clipboard.writeText(text);
+    
+    const notif = document.createElement('div');
+    notif.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-bounce';
+    notif.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Nomor berhasil disalin!';
+    document.body.appendChild(notif);
+    
+    setTimeout(() => notif.remove(), 2000);
+}
 
 // ============================================
 // 9. SUBMIT PAYMENT PROOF (FIX ERROR 500)

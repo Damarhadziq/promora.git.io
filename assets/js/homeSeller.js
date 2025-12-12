@@ -1027,38 +1027,17 @@ function showSubscriptionModal(tier, expiresAt) {
         'bronze': {
             icon: 'fa-medal',
             name: 'Bronze Seller',
-            badgeClass: 'bg-gradient-to-r from-orange-400 to-orange-600 text-white',
-            benefits: [
-                '• Upload hingga 50 produk',
-                '• Badge Bronze di toko',
-                '• Customer support prioritas',
-                '• Analitik penjualan basic'
-            ]
+            badgeClass: 'bg-gradient-to-r from-orange-400 to-orange-600 text-white'
         },
         'silver': {
             icon: 'fa-award',
             name: 'Silver Seller',
-            badgeClass: 'bg-gradient-to-r from-gray-300 to-gray-500 text-gray-900',
-            benefits: [
-                '• Upload hingga 150 produk',
-                '• Badge Silver di toko',
-                '• Customer support premium',
-                '• Analitik penjualan lengkap',
-                '• Featured di homepage'
-            ]
+            badgeClass: 'bg-gradient-to-r from-gray-300 to-gray-500 text-gray-900'
         },
         'gold': {
             icon: 'fa-crown',
             name: 'Gold Seller',
-            badgeClass: 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-900',
-            benefits: [
-                '• Upload produk unlimited',
-                '• Badge Gold eksklusif',
-                '• Customer support VIP 24/7',
-                '• Analitik advanced + AI insights',
-                '• Top placement di search',
-                '• Promosi gratis bulanan'
-            ]
+            badgeClass: 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-900'
         }
     };
     
@@ -1096,14 +1075,76 @@ function showSubscriptionModal(tier, expiresAt) {
             modalDaysLeft.textContent = 'Sudah berakhir';
             modalDaysLeft.className = 'font-semibold text-red-600';
         }
-    } else {
-        modalExpiryDate.textContent = 'Tidak tersedia';
-        modalDaysLeft.textContent = '-';
+        
+        // UPDATE: Ganti bagian action buttons
+        const modalContent = document.querySelector('#subscriptionModal .p-6');
+        
+        // Hapus notice lama jika ada
+        const existingNotice = modalContent.querySelector('.bg-blue-50');
+        if (existingNotice) {
+            existingNotice.remove();
+        }
+        
+        // Hapus tombol lama
+        const oldActionArea = modalContent.querySelector('.flex.gap-3');
+        if (oldActionArea) {
+            oldActionArea.remove();
+        }
+        
+        if (daysLeft > 0) {
+            // MASIH AKTIF - Tampilkan notice + tombol tutup
+            modalContent.innerHTML += `
+                <!-- Notice Langganan Aktif -->
+                <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 mb-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-info-circle text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-blue-900 mb-1">💎 Langganan Masih Aktif</p>
+                            <p class="text-sm text-blue-700 leading-relaxed">Anda dapat upgrade atau perpanjang setelah masa aktif berakhir pada <strong>${expiryDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</strong></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tombol Tutup -->
+                <button onclick="closeSubscriptionModal()" 
+                        class="w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition">
+                    Tutup
+                </button>
+            `;
+        } else {
+            // SUDAH EXPIRED - Bisa perpanjang
+            modalContent.innerHTML += `
+                <!-- Notice Expired -->
+                <div class="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-exclamation-triangle text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-red-900 mb-1">⚠️ Langganan Telah Berakhir</p>
+                            <p class="text-sm text-red-700 leading-relaxed">Perpanjang langganan Anda untuk tetap menikmati benefit premium seller</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tombol Actions -->
+                <div class="flex gap-3">
+                    <button onclick="closeSubscriptionModal()" 
+                            class="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition">
+                        Tutup
+                    </button>
+                    <button onclick="upgradeSubscription()" 
+                            class="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition flex items-center justify-center gap-2">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>Perpanjang</span>
+                    </button>
+                </div>
+            `;
+        }
     }
     
-
-    
-    // Show modal
     modal.classList.remove('hidden');
 }
 

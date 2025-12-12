@@ -37,3 +37,25 @@
 [12-Dec-2025 14:56:45 Europe/Berlin] Saving file to: C:\xampp\htdocs\promora.git.io\backend\subscription/../../uploads/subscription_payments/payment_4_1765547805_693c1f1d576f6.jpg
 [12-Dec-2025 14:56:45 Europe/Berlin] File saved: payment_4_1765547805_693c1f1d576f6.jpg
 [12-Dec-2025 14:56:45 Europe/Berlin] Subscription created: ID=3
+[12-Dec-2025 15:33:59 Europe/Berlin] === NEW SUBSCRIPTION REQUEST ===
+[12-Dec-2025 15:33:59 Europe/Berlin] SESSION: {"user_id":"6","username":"ghulamun","email":"ghulam@gmail.com","first_name":"ghulam","last_name":"jaizun","role":"seller","phone":"0897294294","profile_photo":null,"logged_in":true,"login_time":1765549898}
+[12-Dec-2025 15:33:59 Europe/Berlin] POST: {"package_tier":"gold","price":"199000","duration_months":"1","total_price":"199000","payment_method":"dana"}
+[12-Dec-2025 15:33:59 Europe/Berlin] FILES: {"payment_proof":{"name":"addie.jpg","size":23014,"error":0}}
+[12-Dec-2025 15:33:59 Europe/Berlin] Database connected successfully
+[12-Dec-2025 15:33:59 Europe/Berlin] Store found: Ghulam Jastip (ID: 6)
+[12-Dec-2025 15:33:59 Europe/Berlin] Input validated: gold, 1 months, Rp 199000
+[12-Dec-2025 15:33:59 Europe/Berlin] File received: addie.jpg (23014 bytes)
+[12-Dec-2025 15:33:59 Europe/Berlin] Saving file to: C:\xampp\htdocs\promora.git.io\backend\subscription/../../uploads/subscription_payments/payment_6_1765550039_693c27d7eebad.jpg
+[12-Dec-2025 15:33:59 Europe/Berlin] File saved: payment_6_1765550039_693c27d7eebad.jpg
+[12-Dec-2025 15:33:59 Europe/Berlin] Subscription created: ID=4
+[12-Dec-2025 15:40:42 Europe/Berlin] === NEW SUBSCRIPTION REQUEST ===
+[12-Dec-2025 15:40:42 Europe/Berlin] SESSION: {"user_id":"6","username":"ghulamun","email":"ghulam@gmail.com","first_name":"ghulam","last_name":"jaizun","role":"seller","phone":"0897294294","profile_photo":null,"logged_in":true,"login_time":1765549898}
+[12-Dec-2025 15:40:42 Europe/Berlin] POST: {"package_tier":"bronze","price":"49000","duration_months":"1","total_price":"49000","payment_method":"dana"}
+[12-Dec-2025 15:40:42 Europe/Berlin] FILES: {"payment_proof":{"name":"144701318p.jpg","size":37957,"error":0}}
+[12-Dec-2025 15:40:42 Europe/Berlin] Database connected successfully
+[12-Dec-2025 15:40:42 Europe/Berlin] Store found: Ghulam Jastip (ID: 6)
+[12-Dec-2025 15:40:42 Europe/Berlin] Input validated: bronze, 1 months, Rp 49000
+[12-Dec-2025 15:40:42 Europe/Berlin] File received: 144701318p.jpg (37957 bytes)
+[12-Dec-2025 15:40:42 Europe/Berlin] Saving file to: C:\xampp\htdocs\promora.git.io\backend\subscription/../../uploads/subscription_payments/payment_6_1765550442_693c296a8c160.jpg
+[12-Dec-2025 15:40:42 Europe/Berlin] File saved: payment_6_1765550442_693c296a8c160.jpg
+[12-Dec-2025 15:40:42 Europe/Berlin] Subscription created: ID=5
