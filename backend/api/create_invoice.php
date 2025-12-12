@@ -116,13 +116,25 @@ try {
         
         $invoice_id = $db->lastInsertId();
         
+        // **AMBIL TIER SELLER SAAT INI**
+        $tierQuery = "SELECT package_tier FROM stores WHERE user_id = :seller_id";
+        $tierStmt = $db->prepare($tierQuery);
+        $tierStmt->bindParam(':seller_id', $seller_id);
+        $tierStmt->execute();
+        $currentTier = $tierStmt->fetchColumn();
+        
+        // Jika tidak ada tier atau null, set default 'basic'
+        if (!$currentTier) {
+            $currentTier = 'basic';
+        }
+        
         // Insert invoice items & update stock
         foreach ($products as $prod) {
             $subtotal = ($prod['price'] * $prod['quantity']) + $prod['fee'];
             
-            // Insert invoice item
-            $query = "INSERT INTO invoice_items (invoice_id, product_id, quantity, price, fee, subtotal) 
-                      VALUES (:invoice_id, :product_id, :quantity, :price, :fee, :subtotal)";
+            // **INSERT INVOICE ITEM DENGAN TIER_AT_PURCHASE**
+            $query = "INSERT INTO invoice_items (invoice_id, product_id, quantity, price, fee, subtotal, tier_at_purchase) 
+                      VALUES (:invoice_id, :product_id, :quantity, :price, :fee, :subtotal, :tier_at_purchase)";
             $stmt = $db->prepare($query);
             $stmt->bindParam(':invoice_id', $invoice_id);
             $stmt->bindParam(':product_id', $prod['id']);
@@ -130,6 +142,7 @@ try {
             $stmt->bindParam(':price', $prod['price']);
             $stmt->bindParam(':fee', $prod['fee']);
             $stmt->bindParam(':subtotal', $subtotal);
+            $stmt->bindParam(':tier_at_purchase', $currentTier);
             $stmt->execute();
             
             // Update stock

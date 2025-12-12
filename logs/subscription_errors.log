@@ -26,3 +26,14 @@
 [12-Dec-2025 08:56:07 Europe/Berlin] Saving file to: C:\xampp\htdocs\promora.git.io\backend\subscription/../../uploads/subscription_payments/payment_1_1765526167_693bca9798871.png
 [12-Dec-2025 08:56:07 Europe/Berlin] File saved: payment_1_1765526167_693bca9798871.png
 [12-Dec-2025 08:56:07 Europe/Berlin] Subscription created: ID=2
+[12-Dec-2025 14:56:45 Europe/Berlin] === NEW SUBSCRIPTION REQUEST ===
+[12-Dec-2025 14:56:45 Europe/Berlin] SESSION: {"user_id":"20","username":"handoko","email":"handokur@gmail.com","first_name":"handoko","last_name":"surya","role":"seller","phone":"+6292893828932","profile_photo":null,"logged_in":true,"login_time":1765547764}
+[12-Dec-2025 14:56:45 Europe/Berlin] POST: {"package_tier":"bronze","price":"49000","duration_months":"12","total_price":"588000","payment_method":"ovo"}
+[12-Dec-2025 14:56:45 Europe/Berlin] FILES: {"payment_proof":{"name":"IMG_20251212_102829.jpg","size":68669,"error":0}}
+[12-Dec-2025 14:56:45 Europe/Berlin] Database connected successfully
+[12-Dec-2025 14:56:45 Europe/Berlin] Store found: handoko surya (ID: 4)
+[12-Dec-2025 14:56:45 Europe/Berlin] Input validated: bronze, 12 months, Rp 588000
+[12-Dec-2025 14:56:45 Europe/Berlin] File received: IMG_20251212_102829.jpg (68669 bytes)
+[12-Dec-2025 14:56:45 Europe/Berlin] Saving file to: C:\xampp\htdocs\promora.git.io\backend\subscription/../../uploads/subscription_payments/payment_4_1765547805_693c1f1d576f6.jpg
+[12-Dec-2025 14:56:45 Europe/Berlin] File saved: payment_4_1765547805_693c1f1d576f6.jpg
+[12-Dec-2025 14:56:45 Europe/Berlin] Subscription created: ID=3
