@@ -15,3 +15,14 @@
 [11-Dec-2025 10:38:19 Europe/Berlin] Saving file to: C:\xampp\htdocs\promora.git.io\backend\subscription/../../uploads/subscription_payments/payment_5_1765445899_693a910bbcaa1.jpeg
 [11-Dec-2025 10:38:19 Europe/Berlin] File saved: payment_5_1765445899_693a910bbcaa1.jpeg
 [11-Dec-2025 10:38:20 Europe/Berlin] Subscription created: ID=1
+[12-Dec-2025 08:56:07 Europe/Berlin] === NEW SUBSCRIPTION REQUEST ===
+[12-Dec-2025 08:56:07 Europe/Berlin] SESSION: {"user_id":"3","username":"budisantoso","email":"Budisantoso123@gmail.com","first_name":"Budi","last_name":"Santoso","role":"seller","phone":"+629812039201","profile_photo":null,"logged_in":true,"login_time":1765526120}
+[12-Dec-2025 08:56:07 Europe/Berlin] POST: {"package_tier":"gold","price":"199000","duration_months":"1","total_price":"199000","payment_method":"bca"}
+[12-Dec-2025 08:56:07 Europe/Berlin] FILES: {"payment_proof":{"name":"homepage-Stripe.png","size":239146,"error":0}}
+[12-Dec-2025 08:56:07 Europe/Berlin] Database connected successfully
+[12-Dec-2025 08:56:07 Europe/Berlin] Store found: Budi Bangkok (ID: 1)
+[12-Dec-2025 08:56:07 Europe/Berlin] Input validated: gold, 1 months, Rp 199000
+[12-Dec-2025 08:56:07 Europe/Berlin] File received: homepage-Stripe.png (239146 bytes)
+[12-Dec-2025 08:56:07 Europe/Berlin] Saving file to: C:\xampp\htdocs\promora.git.io\backend\subscription/../../uploads/subscription_payments/payment_1_1765526167_693bca9798871.png
+[12-Dec-2025 08:56:07 Europe/Berlin] File saved: payment_1_1765526167_693bca9798871.png
+[12-Dec-2025 08:56:07 Europe/Berlin] Subscription created: ID=2

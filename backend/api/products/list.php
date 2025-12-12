@@ -22,17 +22,16 @@ $conn = $database->getConnection();
 
 try {
 
-    // Query untuk ambil produk sesuai seller yg login
-    $stmt = $conn->prepare("
-        SELECT 
-            p.*,
-            u.first_name,
-            u.last_name
-        FROM products p
-        LEFT JOIN users u ON p.seller_id = u.id
-        WHERE p.seller_id = :seller_id
-        ORDER BY p.id DESC
-    ");
+$stmt = $conn->prepare("
+    SELECT 
+        p.*,
+        u.first_name,
+        u.last_name
+    FROM products p
+    LEFT JOIN users u ON p.seller_id = u.id
+    WHERE p.seller_id = :seller_id AND p.is_deleted = 0
+    ORDER BY p.id DESC
+");
 
     $stmt->execute(['seller_id' => $seller_id]);
 

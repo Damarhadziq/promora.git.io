@@ -32,6 +32,9 @@ async function fetchProducts() {
         products = data;
         console.log(`Loaded ${products.length} products for current seller`);
         renderProducts();
+        
+        // TAMBAHKAN INI - Check deleted products setelah load
+        await checkDeletedProducts();
     } catch (error) {
         console.error('Fetch error:', error);
         alert('Gagal memuat produk dari server');
@@ -208,13 +211,22 @@ async function deleteProduct(id) {
     }
 }
 
+// Update loadStoreData to save subscription info - GANTI FUNGSI YANG ADA
 async function loadStoreData() {
     try {
-        const response = await fetch('./backend/store/get_store_info.php');
+        const response = await fetch('backend/api/get_store_profile.php', {
+            credentials: 'include'
+        });
         const data = await response.json();
         
         if (data.success) {
             const store = data.store;
+            
+            // SIMPAN DATA SUBSCRIPTION
+            currentSubscription = {
+                package_tier: store.package_tier || 'basic',
+                package_expires_at: store.package_expires_at
+            };
             
             // Update logo
             if (store.logo) {
@@ -227,15 +239,66 @@ async function loadStoreData() {
             document.querySelector('.text-gray-600.mb-4').textContent = store.description || 'Bio Masih Kosong....';
             
             // Display package badge
-            displayPackageBadge(store.package_tier, store.package_expires_at);
+            updatePackageBadgeHome(store.package_tier || 'basic', store.package_expires_at);
             
-            // Update stats
-            document.getElementById('homeRating').textContent = '4.8'; // From your stats
-            document.getElementById('homeTotalOrders').textContent = data.total_orders || '0';
-            document.getElementById('homeTotalProducts').textContent = data.total_products || '0';
+document.getElementById('homeTotalOrders').textContent = store.total_orders || '0';
+document.getElementById('homeTotalProducts').textContent = store.total_products || '0';
         }
     } catch (error) {
         console.error('Error loading store data:', error);
+    }
+}
+// Update package badge di home page
+function updatePackageBadgeHome(tier, expiresAt) {
+    const badge = document.getElementById('packageBadgeHome');
+    if (!badge) return;
+    
+    // Pastikan tier tidak kosong, default ke 'basic'
+    if (!tier || tier === '') {
+        tier = 'basic';
+    }
+    
+    const tierData = {
+        'basic': {
+            class: 'badge-home-basic',
+            icon: 'fa-user',
+            text: 'Basic'
+        },
+        'bronze': {
+            class: 'badge-home-bronze',
+            icon: 'fa-medal',
+            text: 'Bronze Seller'
+        },
+        'silver': {
+            class: 'badge-home-silver',
+            icon: 'fa-award',
+            text: 'Silver Seller'
+        },
+        'gold': {
+            class: 'badge-home-gold',
+            icon: 'fa-crown',
+            text: 'Gold Seller'
+        }
+    };
+    
+    // Ambil data tier, kalau tidak ada gunakan basic
+    const data = tierData[tier.toLowerCase()] || tierData['basic'];
+    
+    // Update class dan content
+    badge.className = `px-3 py-1 ${data.class} text-xs font-semibold rounded-full flex items-center gap-1.5`;
+    badge.innerHTML = `
+        <i class="fas ${data.icon}"></i>
+        <span>${data.text}</span>
+    `;
+    
+    // Add expiry info if exists
+    if (expiresAt) {
+        const expiryDate = new Date(expiresAt);
+        const daysLeft = Math.ceil((expiryDate - new Date()) / (1000 * 60 * 60 * 24));
+        
+        if (daysLeft > 0) {
+            badge.title = `Berlaku hingga ${expiryDate.toLocaleDateString('id-ID')} (${daysLeft} hari lagi)`;
+        }
     }
 }
 
@@ -292,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadStoreData();
 });
 
-// ✅ Load store profile - VERSI FINAL
+// âœ… Load store profile - VERSI FINAL
 async function loadStoreProfile() {
     try {
         const response = await fetch('backend/api/get_store_profile.php', {
@@ -480,7 +543,7 @@ function openMapsPicker() {
         
         // Add tile layer (peta)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors',
+            attribution: 'Â© OpenStreetMap contributors',
             maxZoom: 19
         }).addTo(map);
         
@@ -734,7 +797,7 @@ function renderOrders(orders, currentFilter) {
                                          class="w-12 h-12 object-cover rounded flex-shrink-0">
                                     <div class="flex-1 min-w-0">
                                         <p class="font-medium text-sm text-gray-900 truncate">${item.product_name}</p>
-                                        <p class="text-xs text-gray-600">${item.quantity}x • Rp ${parseInt(item.price).toLocaleString('id-ID')}</p>
+                                        <p class="text-xs text-gray-600">${item.quantity}x Rp ${parseInt(item.price).toLocaleString('id-ID')}</p>
                                     </div>
                                     <p class="font-bold text-sm text-[#7A5AF8] whitespace-nowrap">Rp ${parseInt(item.subtotal).toLocaleString('id-ID')}</p>
                                 </div>
@@ -834,11 +897,11 @@ function getShippingStatusActions(status, orderId) {
 // Get shipping status badge
 function getShippingStatusBadge(status) {
     const badges = {
-        'pending': '<span class="px-3 py-1 bg-yellow-100 text-yellow-700 text-sm font-semibold rounded-full">Menunggu Diproses</span>',
-        'processing': '<span class="px-3 py-1 bg-purple-100 text-purple-700 text-sm font-semibold rounded-full">🎁 Sedang Dibungkus</span>',
-        'shipped': '<span class="px-3 py-1 bg-indigo-100 text-indigo-700 text-sm font-semibold rounded-full">🚚 Dalam Pengiriman</span>',
-        'delivered': '<span class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full">📦 Sudah Sampai</span>',
-        'completed': '<span class="px-3 py-1 bg-green-100 text-green-700 text-sm font-semibold rounded-full">✅ Selesai</span>'
+        'pending': '<span class="px-2.5 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full inline-flex items-center gap-1"><span>⏱️</span><span>Pending</span></span>',
+        'processing': '<span class="px-2.5 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full inline-flex items-center gap-1"><span>🎁</span><span>Dikemas</span></span>',
+        'shipped': '<span class="px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full inline-flex items-center gap-1"><span>🚚</span><span>Dikirim</span></span>',
+        'delivered': '<span class="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full inline-flex items-center gap-1"><span>📦</span><span>Sampai</span></span>',
+        'completed': '<span class="px-2.5 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full inline-flex items-center gap-1"><span>✅</span><span>Selesai</span></span>'
     };
     return badges[status] || '';
 }
@@ -915,10 +978,10 @@ async function updateShippingStatus(invoiceId, newStatus) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(data.message);
             loadOrders(); // Reload orders
         } else {
-            alert('❌ Gagal update status: ' + data.message);
+            alert('Gagal update status: ' + data.message);
         }
     } catch (error) {
         console.error('Error:', error);
@@ -926,8 +989,243 @@ async function updateShippingStatus(invoiceId, newStatus) {
     }
 }
 
+// Store current subscription data
+let currentSubscription = null;
+
+// Check subscription status when crown clicked
+function checkSubscription() {
+    // Get current tier from loaded store data
+    if (!currentSubscription || !currentSubscription.package_tier) {
+        // If no subscription data, redirect to pricing
+        window.location.href = 'pricingCard.html';
+        return;
+    }
+    
+    const tier = currentSubscription.package_tier;
+    
+    // If basic, redirect to pricing
+    if (!tier || tier === 'basic') {
+        window.location.href = 'pricingCard.html';
+        return;
+    }
+    
+    // If has active subscription (bronze/silver/gold), show modal
+    showSubscriptionModal(tier, currentSubscription.package_expires_at);
+}
+
+// Show subscription modal
+function showSubscriptionModal(tier, expiresAt) {
+    const modal = document.getElementById('subscriptionModal');
+    const modalBadge = document.getElementById('modalBadge');
+    const modalTierIcon = document.getElementById('modalTierIcon');
+    const modalTierTitle = document.getElementById('modalTierTitle');
+    const modalExpiryDate = document.getElementById('modalExpiryDate');
+    const modalDaysLeft = document.getElementById('modalDaysLeft');
+    
+    // Tier configuration
+    const tierConfig = {
+        'bronze': {
+            icon: 'fa-medal',
+            name: 'Bronze Seller',
+            badgeClass: 'bg-gradient-to-r from-orange-400 to-orange-600 text-white',
+            benefits: [
+                '• Upload hingga 50 produk',
+                '• Badge Bronze di toko',
+                '• Customer support prioritas',
+                '• Analitik penjualan basic'
+            ]
+        },
+        'silver': {
+            icon: 'fa-award',
+            name: 'Silver Seller',
+            badgeClass: 'bg-gradient-to-r from-gray-300 to-gray-500 text-gray-900',
+            benefits: [
+                '• Upload hingga 150 produk',
+                '• Badge Silver di toko',
+                '• Customer support premium',
+                '• Analitik penjualan lengkap',
+                '• Featured di homepage'
+            ]
+        },
+        'gold': {
+            icon: 'fa-crown',
+            name: 'Gold Seller',
+            badgeClass: 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-900',
+            benefits: [
+                '• Upload produk unlimited',
+                '• Badge Gold eksklusif',
+                '• Customer support VIP 24/7',
+                '• Analitik advanced + AI insights',
+                '• Top placement di search',
+                '• Promosi gratis bulanan'
+            ]
+        }
+    };
+    
+    const config = tierConfig[tier.toLowerCase()] || tierConfig['bronze'];
+    
+    // Update modal content
+    modalTierIcon.className = `fas ${config.icon} text-yellow-300`;
+    modalTierTitle.textContent = `Status Langganan ${config.name}`;
+    
+    modalBadge.className = `inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-3 ${config.badgeClass}`;
+    modalBadge.innerHTML = `
+        <i class="fas ${config.icon}"></i>
+        <span>${config.name}</span>
+    `;
+    
+    // Calculate days left
+    if (expiresAt) {
+        const expiryDate = new Date(expiresAt);
+        const today = new Date();
+        const daysLeft = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+        
+        modalExpiryDate.textContent = expiryDate.toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+        
+        if (daysLeft > 0) {
+            modalDaysLeft.textContent = `${daysLeft} hari lagi`;
+            modalDaysLeft.className = 'font-semibold text-gray-900';
+        } else if (daysLeft === 0) {
+            modalDaysLeft.textContent = 'Berakhir hari ini';
+            modalDaysLeft.className = 'font-semibold text-orange-600';
+        } else {
+            modalDaysLeft.textContent = 'Sudah berakhir';
+            modalDaysLeft.className = 'font-semibold text-red-600';
+        }
+    } else {
+        modalExpiryDate.textContent = 'Tidak tersedia';
+        modalDaysLeft.textContent = '-';
+    }
+    
+
+    
+    // Show modal
+    modal.classList.remove('hidden');
+}
+
+// Close subscription modal
+function closeSubscriptionModal() {
+    const modal = document.getElementById('subscriptionModal');
+    modal.classList.add('hidden');
+}
+
+// Upgrade subscription - redirect to pricing
+function upgradeSubscription() {
+    window.location.href = 'pricingCard.html';
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('subscriptionModal');
+    if (event.target === modal) {
+        closeSubscriptionModal();
+    }
+});
+
+// Check if there are deleted products and show trash button
+async function checkDeletedProducts() {
+    try {
+        const response = await fetch('backend/api/products/get_deleted_products.php');
+        const products = await response.json();
+        
+        const trashBtn = document.getElementById('trashBtn');
+        if (products.length > 0) {
+            trashBtn.classList.remove('hidden');
+            // Update badge count
+            trashBtn.innerHTML = `
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                <span>Sampah (${products.length})</span>
+            `;
+        } else {
+            trashBtn.classList.add('hidden');
+        }
+    } catch (error) {
+        console.error('Error checking deleted products:', error);
+    }
+}
+
+// Open trash modal
+async function openTrash() {
+    try {
+        const response = await fetch('backend/api/products/get_deleted_products.php');
+        const products = await response.json();
+        
+        const container = document.getElementById('trashContainer');
+        
+        if (products.length === 0) {
+            container.innerHTML = '<p class="text-center text-gray-500 py-8">Tidak ada produk dihapus</p>';
+        } else {
+            container.innerHTML = products.map(product => `
+                <div class="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:shadow-md transition">
+                    <img src="${product.image || 'https://via.placeholder.com/80'}" 
+                         alt="${product.name}" 
+                         class="w-20 h-20 object-cover rounded-lg">
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-gray-900">${product.name}</h4>
+                        <p class="text-sm text-gray-600">${product.brand} • ${product.category}</p>
+                        <p class="text-sm text-gray-500 mt-1">Rp ${parseInt(product.price).toLocaleString('id-ID')}</p>
+                    </div>
+                    <button onclick="restoreProduct(${product.id})" 
+                            class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        <span>Pulihkan</span>
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        document.getElementById('trashModal').classList.remove('hidden');
+    } catch (error) {
+        console.error('Error loading trash:', error);
+        alert('Gagal memuat produk dihapus');
+    }
+}
+
+// Close trash modal
+function closeTrash() {
+    document.getElementById('trashModal').classList.add('hidden');
+}
+
+// Restore product
+async function restoreProduct(productId) {
+    if (!confirm('Pulihkan produk ini kembali ke daftar produk aktif?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('backend/api/products/restore.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: productId })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('✅ Produk berhasil dipulihkan!');
+            closeTrash();
+            loadProducts(); // Reload active products
+            checkDeletedProducts(); // Update trash button
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        console.error('Error restoring product:', error);
+        alert('❌ Gagal memulihkan produk: ' + error.message);
+    }
+}
+
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
+       checkDeletedProducts();
     // Load profile first, then products and store
     fetchUserProfile().then(() => {
         fetchProducts();

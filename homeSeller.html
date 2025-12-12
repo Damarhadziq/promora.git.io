@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Promora - Platform Jasa Titip Terpercaya</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <link
       rel="shortcut icon"
       href="./assets/img/logo.png"
@@ -91,6 +92,28 @@
     border-bottom: 2px solid #7A5AF8;
     padding-bottom: 0.3rem;
 }
+
+/* Package Badge Styles */
+.badge-home-basic {
+    background: linear-gradient(135deg, #9CA3AF, #6B7280);
+    color: white;
+}
+
+.badge-home-bronze {
+    background: linear-gradient(135deg, #CD7F32, #A0522D);
+    color: white;
+}
+
+.badge-home-silver {
+    background: linear-gradient(135deg, #E5E7EB, #9CA3AF);
+    color: #1F2937;
+}
+
+.badge-home-gold {
+    background: linear-gradient(135deg, #FFD700, #F2C94C);
+    color: #674300;
+}
+
     </style>
 </head>
 <body class="bg-gray-50">
@@ -140,12 +163,12 @@
           </div>
             
           <div class="flex items-center space-x-4">
-            <!-- CROWN ICON - Link to Pricing -->
-            <a href="pricingCard.html" class="crown-icon mr-2" title="Upgrade ke Premium">
-              <img src="https://cdn-icons-png.flaticon.com/512/890/890953.png" 
-                   alt="Premium" 
-                   class="h-8 w-8">
-            </a>
+            <!-- CROWN ICON - Check subscription -->
+            <button onclick="checkSubscription()" class="crown-icon mr-2" title="Kelola Langganan">
+                <img src="https://cdn-icons-png.flaticon.com/512/890/890953.png" 
+                    alt="Premium" 
+                    class="h-8 w-8">
+            </button>
             <!-- PROFILE -->
             <a href="profileSeller.html">
             <img id="navbarLogo"
@@ -179,7 +202,10 @@
                     <div>
                         <div class="flex items-center space-x-3 mb-2">
                             <h1 class="text-2xl font-bold text-gray-900">Nama Toko</h1>
-                            <span class="px-3 py-1 bg-blue-100 text-blue-600 text-xs font-semibold rounded-full">Verified Seller</span>
+                            <span id="packageBadgeHome" class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full flex items-center gap-1.5">
+                                <i class="fas fa-user"></i>
+                                <span>Basic</span>
+                            </span>
                         </div>
                         <p class="text-gray-600 mb-4">Bio Masih Kosong....</p>
                         
@@ -211,11 +237,11 @@
                     </div>
                 </div>
                 
-                <button class="px-5 py-2 border border-[#7A5AF8] text-[#7A5AF8] rounded-lg font-medium hover:bg-[#7A5AF8] hover:text-white transition flex items-center space-x-2">
+                <button onclick="switchTab('pengaturan')" class="px-5 py-2 border border-[#7A5AF8] text-[#7A5AF8] rounded-lg font-medium hover:bg-[#7A5AF8] hover:text-white transition flex items-center space-x-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                     </svg>
-                    <a href="profileSeller.html"><span>Edit Profil Toko</span></a>
+                    <span>Edit Profil Toko</span>
                 </button>
             </div>
         </div>
@@ -227,12 +253,23 @@
         <div id="content-produk">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-gray-900">Produk Kamu</h2>
-                <button onclick="window.location.href='uploadProduk.html'" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    <span>Tambah Produk Baru</span>
-                </button>
+                <div class="flex items-center space-x-3">
+                    <!-- Tombol Sampah -->
+                    <button onclick="openTrash()" id="trashBtn" class="hidden px-4 py-3 border-2 border-red-400 text-red-600 rounded-lg font-semibold hover:bg-red-50 transition flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        <span>Sampah</span>
+                    </button>
+                    
+                    <!-- Tombol Tambah Produk -->
+                    <button onclick="window.location.href='uploadProduk.html'" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <span>Tambah Produk Baru</span>
+                    </button>
+                </div>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="products-grid">
@@ -395,6 +432,90 @@
         </div>
     </div>
 
+        <!-- Modal Subscription Info -->
+    <div id="subscriptionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all">
+            <!-- Header with gradient -->
+            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i id="modalTierIcon" class="fas fa-crown text-yellow-300"></i>
+                        <span id="modalTierTitle">Status Langganan</span>
+                    </h3>
+                    <button onclick="closeSubscriptionModal()" class="text-white hover:text-gray-200 transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Content -->
+            <div class="p-6">
+                <div class="text-center mb-6">
+                    <div id="modalBadge" class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-3">
+                        <i class="fas fa-crown"></i>
+                        <span>Gold Seller</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Paket langganan Anda saat ini</p>
+                </div>
+                
+                <!-- Info Grid -->
+                <div class="space-y-3 mb-6">
+                    <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-calendar-check text-purple-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Berlaku Hingga</p>
+                                <p id="modalExpiryDate" class="font-semibold text-gray-900">31 Desember 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-clock text-green-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Sisa Waktu</p>
+                                <p id="modalDaysLeft" class="font-semibold text-gray-900">45 hari lagi</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between py-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-star text-blue-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Status</p>
+                                <p class="font-semibold text-green-600">Aktif</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                <!-- Action Buttons -->
+                <div class="flex gap-3">
+                    <button onclick="closeSubscriptionModal()" 
+                            class="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition">
+                        Tutup
+                    </button>
+                    <button onclick="upgradeSubscription()" 
+                            class="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition flex items-center justify-center gap-2">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>Upgrade</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="bg-[#7A5AF8] text-white py-12 mt-12">
         <div class="max-w-7xl mx-auto px-6">
@@ -458,6 +579,32 @@
             </div>
         </div>
     </footer>
+    <!-- Modal Trash/Sampah -->
+<div id="trashModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
+        <!-- Header -->
+        <div class="bg-red-500 px-6 py-4 flex items-center justify-between">
+            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                <span>Produk Dihapus</span>
+            </h3>
+            <button onclick="closeTrash()" class="text-white hover:text-gray-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Content -->
+        <div class="p-6 overflow-y-auto max-h-[calc(80vh-120px)]">
+            <div id="trashContainer" class="space-y-4">
+                <!-- Deleted products will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
     <script src="./assets/js/homeSeller.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

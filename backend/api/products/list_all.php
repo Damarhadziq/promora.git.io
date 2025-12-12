@@ -13,7 +13,7 @@ $database = new Database();
 $conn = $database->getConnection();
 
 try {
-    // Query lengkap dengan store info
+    // Query lengkap dengan store info - FILTER is_deleted
     $query = "
         SELECT 
             p.*, 
@@ -23,6 +23,7 @@ try {
             s.longitude
         FROM products p
         LEFT JOIN stores s ON p.seller_id = s.user_id
+        WHERE p.is_deleted = 0
         ORDER BY p.created_at DESC
     ";
 

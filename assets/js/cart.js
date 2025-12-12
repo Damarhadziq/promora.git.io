@@ -192,14 +192,13 @@ function checkCheckoutReady() {
     }
 }
 
-// Tambahkan fungsi baru ini:
 async function createInvoiceAndRedirect() {
     const selectedItems = [];
     document.querySelectorAll('.item-check:checked').forEach(checkbox => {
         const item = checkbox.closest('.cart-item');
         selectedItems.push({
             cart_id: parseInt(item.dataset.id),
-            product_id: parseInt(item.dataset.productId),  // ✅ BENAR
+            product_id: parseInt(item.dataset.productId),
             quantity: parseInt(item.querySelector('.qty-input').value)
         });
     });
@@ -224,9 +223,25 @@ async function createInvoiceAndRedirect() {
         const data = await response.json();
         
         if (data.success) {
-            // Simpan invoice_id untuk halaman pembayaran
-            localStorage.setItem('invoice_id', data.invoice_id);
-            localStorage.setItem('invoice_number', data.invoice_number);
+            // ✅ SIMPAN DATA UNTUK MULTIPLE INVOICES
+            if (data.invoices && data.invoices.length > 0) {
+                // Simpan array invoice IDs
+                const invoiceIds = data.invoices.map(inv => inv.invoice_id);
+                localStorage.setItem('invoice_ids', JSON.stringify(invoiceIds));
+                
+                // Simpan detail lengkap
+                localStorage.setItem('invoices_data', JSON.stringify(data.invoices));
+                
+                // Hitung total semua invoice
+                const totalGrandTotal = data.invoices.reduce((sum, inv) => sum + inv.grand_total, 0);
+                localStorage.setItem('totalBayar', totalGrandTotal);
+                
+                // Tampilkan notifikasi jika multi-seller
+                if (data.invoices.length > 1) {
+                    alert(`✅ ${data.message}\n\nTotal pembayaran: Rp ${totalGrandTotal.toLocaleString('id-ID')}`);
+                }
+            }
+            
             window.location.href = 'pembayaran.html';
         } else {
             alert('Gagal membuat invoice: ' + data.message);

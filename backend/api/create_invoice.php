@@ -14,7 +14,6 @@ try {
     $db = $database->getConnection();
     $user_id = $_SESSION['user_id'];
     
-    // Get POST data
     $data = json_decode(file_get_contents('php://input'), true);
     
     $cart_items = $data['cart_items'] ?? [];
@@ -26,18 +25,15 @@ try {
         exit;
     }
     
-    // Start transaction
     $db->beginTransaction();
     
-    // PERBAIKAN: Cek stok dan kurangi dalam 1 loop
-    $total_price = 0;
-    $total_fee = 0;
-    $seller_id = null;
-    $products_data = []; // Simpan data produk untuk digunakan nanti
+    // ===== STEP 1: GROUP PRODUCTS BY SELLER =====
+    $products_by_seller = [];
     
     foreach ($cart_items as $item) {
-        // Lock row dan ambil data produk
-        $query = "SELECT id, price, fee, seller_id, stock FROM products WHERE id = :id FOR UPDATE";
+        $query = "SELECT p.id, p.price, p.fee, p.seller_id, p.stock, p.name 
+                  FROM products p
+                  WHERE p.id = :id FOR UPDATE";
         $stmt = $db->prepare($query);
         $stmt->bindParam(':id', $item['product_id']);
         $stmt->execute();
@@ -49,85 +45,111 @@ try {
             exit;
         }
         
-        // Cek apakah stok cukup
         if ($product['stock'] < $item['quantity']) {
             $db->rollBack();
-            echo json_encode(['success' => false, 'message' => 'Stok tidak cukup untuk produk: ' . $product['id']]);
+            echo json_encode(['success' => false, 'message' => 'Stok tidak cukup untuk: ' . $product['name']]);
             exit;
         }
         
-        // Set seller_id (ambil dari produk pertama)
-        if ($seller_id === null) {
-            $seller_id = $product['seller_id'];
+        $seller_id = $product['seller_id'];
+        
+        // Group by seller
+        if (!isset($products_by_seller[$seller_id])) {
+            $products_by_seller[$seller_id] = [];
         }
         
-        // Hitung total
-        $total_price += $product['price'] * $item['quantity'];
-        $total_fee += $product['fee'];
-        
-        // Simpan data produk untuk nanti
-        $products_data[] = [
+        $products_by_seller[$seller_id][] = [
             'id' => $product['id'],
             'price' => $product['price'],
             'fee' => $product['fee'],
             'quantity' => $item['quantity'],
-            'new_stock' => $product['stock'] - $item['quantity']
+            'cart_id' => $item['cart_id'],
+            'stock' => $product['stock']
         ];
     }
     
-    // Sekarang kurangi stok semua produk setelah validasi selesai
-    foreach ($products_data as $prod) {
-        $update_query = "UPDATE products SET stock = :new_stock WHERE id = :id";
-        $update_stmt = $db->prepare($update_query);
-        $update_stmt->bindParam(':new_stock', $prod['new_stock']);
-        $update_stmt->bindParam(':id', $prod['id']);
-        $update_stmt->execute();
+    // ===== STEP 2: CREATE SEPARATE INVOICE FOR EACH SELLER =====
+    $created_invoices = [];
+    
+    // Hitung total price dari semua produk untuk proporsi ongkir
+    $all_total_price = 0;
+    foreach ($products_by_seller as $products) {
+        foreach ($products as $prod) {
+            $all_total_price += $prod['price'] * $prod['quantity'];
+        }
     }
     
-    $shipping_cost = $courier_data['price'];
-    $grand_total = $total_price + $total_fee + $shipping_cost;
-    
-    // Generate invoice number
-    $invoice_number = 'INV-' . date('Ymd') . '-' . strtoupper(substr(md5(uniqid()), 0, 6));
-    
-    // Insert invoice
-    $query = "INSERT INTO invoices (invoice_number, user_id, seller_id, total_price, total_fee, 
-              shipping_cost, grand_total, payment_method, courier_method, courier_estimate, status) 
-              VALUES (:invoice_number, :user_id, :seller_id, :total_price, :total_fee, 
-              :shipping_cost, :grand_total, :payment_method, :courier_method, :courier_estimate, 'pending')";
-    
-    $stmt = $db->prepare($query);
-    $stmt->bindParam(':invoice_number', $invoice_number);
-    $stmt->bindParam(':user_id', $user_id);
-    $stmt->bindParam(':seller_id', $seller_id);
-    $stmt->bindParam(':total_price', $total_price);
-    $stmt->bindParam(':total_fee', $total_fee);
-    $stmt->bindParam(':shipping_cost', $shipping_cost);
-    $stmt->bindParam(':grand_total', $grand_total);
-    $stmt->bindParam(':payment_method', $payment_method);
-    $stmt->bindParam(':courier_method', $courier_data['type']);
-    $stmt->bindParam(':courier_estimate', $courier_data['estimate']);
-    $stmt->execute();
-    
-    $invoice_id = $db->lastInsertId();
-    
-    // Insert invoice items (gunakan data yang sudah disimpan)
-    foreach ($products_data as $prod) {
-        $subtotal = ($prod['price'] * $prod['quantity']) + $prod['fee'];
+    foreach ($products_by_seller as $seller_id => $products) {
+        $total_price = 0;
+        $total_fee = 0;
         
-        $query = "INSERT INTO invoice_items (invoice_id, product_id, quantity, price, fee, subtotal) 
-                  VALUES (:invoice_id, :product_id, :quantity, :price, :fee, :subtotal)";
+        foreach ($products as $prod) {
+            $total_price += $prod['price'] * $prod['quantity'];
+            $total_fee += $prod['fee'];
+        }
+        
+        // Bagi ongkir secara proporsional berdasarkan total_price
+        $shipping_cost = round(($total_price / $all_total_price) * $courier_data['price']);
+        $grand_total = $total_price + $total_fee + $shipping_cost;
+        
+        // Generate invoice number
+        $invoice_number = 'INV-' . date('Ymd') . '-' . strtoupper(substr(md5(uniqid()), 0, 6));
+        
+        // Insert invoice
+        $query = "INSERT INTO invoices (invoice_number, user_id, seller_id, total_price, total_fee, 
+                  shipping_cost, grand_total, payment_method, courier_method, courier_estimate, status) 
+                  VALUES (:invoice_number, :user_id, :seller_id, :total_price, :total_fee, 
+                  :shipping_cost, :grand_total, :payment_method, :courier_method, :courier_estimate, 'pending')";
+        
         $stmt = $db->prepare($query);
-        $stmt->bindParam(':invoice_id', $invoice_id);
-        $stmt->bindParam(':product_id', $prod['id']);
-        $stmt->bindParam(':quantity', $prod['quantity']);
-        $stmt->bindParam(':price', $prod['price']);
-        $stmt->bindParam(':fee', $prod['fee']);
-        $stmt->bindParam(':subtotal', $subtotal);
+        $stmt->bindParam(':invoice_number', $invoice_number);
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->bindParam(':seller_id', $seller_id);
+        $stmt->bindParam(':total_price', $total_price);
+        $stmt->bindParam(':total_fee', $total_fee);
+        $stmt->bindParam(':shipping_cost', $shipping_cost);
+        $stmt->bindParam(':grand_total', $grand_total);
+        $stmt->bindParam(':payment_method', $payment_method);
+        $stmt->bindParam(':courier_method', $courier_data['type']);
+        $stmt->bindParam(':courier_estimate', $courier_data['estimate']);
         $stmt->execute();
+        
+        $invoice_id = $db->lastInsertId();
+        
+        // Insert invoice items & update stock
+        foreach ($products as $prod) {
+            $subtotal = ($prod['price'] * $prod['quantity']) + $prod['fee'];
+            
+            // Insert invoice item
+            $query = "INSERT INTO invoice_items (invoice_id, product_id, quantity, price, fee, subtotal) 
+                      VALUES (:invoice_id, :product_id, :quantity, :price, :fee, :subtotal)";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':invoice_id', $invoice_id);
+            $stmt->bindParam(':product_id', $prod['id']);
+            $stmt->bindParam(':quantity', $prod['quantity']);
+            $stmt->bindParam(':price', $prod['price']);
+            $stmt->bindParam(':fee', $prod['fee']);
+            $stmt->bindParam(':subtotal', $subtotal);
+            $stmt->execute();
+            
+            // Update stock
+            $new_stock = $prod['stock'] - $prod['quantity'];
+            $update_query = "UPDATE products SET stock = :new_stock WHERE id = :id";
+            $update_stmt = $db->prepare($update_query);
+            $update_stmt->bindParam(':new_stock', $new_stock);
+            $update_stmt->bindParam(':id', $prod['id']);
+            $update_stmt->execute();
+        }
+        
+        $created_invoices[] = [
+            'invoice_id' => $invoice_id,
+            'invoice_number' => $invoice_number,
+            'seller_id' => $seller_id,
+            'grand_total' => $grand_total
+        ];
     }
     
-    // Delete cart items
+    // ===== STEP 3: DELETE CART ITEMS =====
     $cart_ids = array_column($cart_items, 'cart_id');
     $placeholders = implode(',', array_fill(0, count($cart_ids), '?'));
     $query = "DELETE FROM cart WHERE user_id = ? AND id IN ($placeholders)";
@@ -136,10 +158,15 @@ try {
     
     $db->commit();
     
+    // Return multiple invoices or single invoice
     echo json_encode([
         'success' => true, 
-        'invoice_id' => $invoice_id,
-        'invoice_number' => $invoice_number
+        'invoices' => $created_invoices,
+        'invoice_id' => $created_invoices[0]['invoice_id'], // For backward compatibility
+        'invoice_number' => $created_invoices[0]['invoice_number'],
+        'message' => count($created_invoices) > 1 
+            ? 'Berhasil membuat ' . count($created_invoices) . ' invoice dari ' . count($created_invoices) . ' seller berbeda' 
+            : 'Invoice berhasil dibuat'
     ]);
     
 } catch (Exception $e) {

@@ -131,6 +131,19 @@
         .stock-btn:hover {
             background: #6344E6;
         }
+
+        input[type="radio"]:checked + div {
+            color: #7A5AF8;
+        }
+
+        input[type="radio"]:checked {
+            accent-color: #7A5AF8;
+        }
+
+        label:has(input[type="radio"]:checked) {
+            border-color: #7A5AF8 !important;
+            background-color: #F8F7FF;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -211,65 +224,82 @@
                     <input type="text" id="brand" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50">
                 </div>
 
-                <!-- Harga Original dan Diskon -->
-                <div class="grid grid-cols-2 gap-6 mb-6">
-                    <div>
-                        <label class="block text-gray-800 font-semibold mb-3">Harga Original</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-3 text-gray-500">Rp</span>
-                            <input type="text" id="originalPrice" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50">
-                        </div>
-                        <p class="text-gray-500 text-sm mt-2">Harga sebelum diskon</p>
-                    </div>
-                    <div>
-                        <label class="block text-gray-800 font-semibold mb-3">Diskon (%)</label>
-                        <input type="number" id="discount" min="0" max="100" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50" placeholder="0">
-                        <p class="text-gray-500 text-sm mt-2">Persentase diskon dari harga original</p>
-                    </div>
-                </div>
+<!-- Harga Original, Diskon, Harga Promo, dan Fee -->
+<div class="grid grid-cols-4 gap-4 mb-6">
+    <div>
+        <label class="block text-gray-800 font-semibold mb-3">Harga Original</label>
+        <div class="relative">
+            <span class="absolute left-4 top-3 text-gray-500">Rp</span>
+            <input type="text" id="originalPrice" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50">
+        </div>
+        <p class="text-gray-500 text-sm mt-2">Harga sebelum promo</p>
+    </div>
+    <div>
+        <label class="block text-gray-800 font-semibold mb-3">Diskon (%)</label>
+        <input type="number" id="discount" min="0" max="100" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50" placeholder="0">
+        <p class="text-gray-500 text-sm mt-2">Persentase diskon</p>
+    </div>
+    <div>
+        <label class="block text-gray-800 font-semibold mb-3">Harga Promo</label>
+        <div class="relative">
+            <span class="absolute left-4 top-3 text-gray-500">Rp</span>
+            <input type="text" id="price" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg bg-gray-100 focus:outline-none" placeholder="0" readonly>
+        </div>
+        <p class="text-gray-500 text-sm mt-2">Otomatis terhitung</p>
+    </div>
+    <div>
+        <label class="block text-gray-800 font-semibold mb-3">Fee Jastip</label>
+        <div class="relative">
+            <span class="absolute left-4 top-3 text-gray-500">Rp</span>
+            <input type="text" id="fee" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50">
+        </div>
+        <p class="text-gray-500 text-sm mt-2">Fee akan ditambahkan</p>
+    </div>
+</div>
 
-                <!-- Harga dan Fee -->
-                <div class="grid grid-cols-2 gap-6 mb-6">
-                    <div>
-                        <label class="block text-gray-800 font-semibold mb-3">Harga Promo</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-3 text-gray-500">Rp</span>
-                            <input type="text" id="price" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-gray-800 font-semibold mb-3">Fee Jastip</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-3 text-gray-500">Rp</span>
-                            <input type="text" id="fee" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50">
-                        </div>
-                        <p class="text-gray-500 text-sm mt-2">Fee jastip akan muncul di harga total pembeli</p>
-                    </div>
-                </div>
+<!-- Stok dan Kategori -->
+<div class="grid grid-cols-2 gap-6 mb-6">
+    <div>
+        <label class="block text-gray-800 font-semibold mb-3">Kuota Barang</label>
+        <div class="stock-input-group">
+            <input type="number" id="stock" class="w-full px-4 py-3 pr-14 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50">
+            <div class="stock-btn" onclick="increaseStock()">+1</div>
+        </div>
+        <p class="text-gray-500 text-sm mt-2">Klik tombol +1 untuk menambah kuota dengan cepat</p>
+    </div>
+    <div>
+        <label class="block text-gray-800 font-semibold mb-3">Kategori</label>
+        <select id="category" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-gray-700 bg-gray-50">
+            <option value="fashion">Fashion</option>
+            <option value="elektronik">Elektronik</option>
+            <option value="makanan">Makanan & Minuman</option>
+            <option value="kecantikan">Kecantikan</option>
+            <option value="olahraga">Olahraga</option>
+            <option value="mainan">Mainan & Hobi</option>
+        </select>
+    </div>
+</div>
 
-                <!-- Stok dan Kategori -->
-                <div class="grid grid-cols-2 gap-6 mb-6">
-                    <div>
-                        <label class="block text-gray-800 font-semibold mb-3">Kuota Barang</label>
-                        <div class="stock-input-group">
-                            <input type="number" id="stock" class="w-full px-4 py-3 pr-14 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-gray-50">
-                            <div class="stock-btn" onclick="increaseStock()">+1</div>
-                        </div>
-                        <p class="text-gray-500 text-sm mt-2">Klik tombol +1 untuk menambah kuota dengan cepat</p>
-                    </div>
-                    <div>
-                        <label class="block text-gray-800 font-semibold mb-3">Kategori</label>
-                        <select id="category" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-gray-700 bg-gray-50">
-                            <option value="fashion">Fashion</option>
-                            <option value="elektronik">Elektronik</option>
-                            <option value="makanan">Makanan & Minuman</option>
-                            <option value="kecantikan">Kecantikan</option>
-                            <option value="olahraga">Olahraga</option>
-                            <option value="mainan">Mainan & Hobi</option>
-                        </select>
-                    </div>
-                </div>
-
+<!-- TAMBAHKAN INI - Tipe Produk -->
+<div class="mb-6">
+    <label class="block text-gray-800 font-semibold mb-3">Tipe Produk</label>
+    <div class="grid grid-cols-2 gap-4">
+        <label class="flex items-center justify-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-primary transition">
+            <input type="radio" name="productType" value="lokal" class="mr-3">
+            <div>
+                <p class="font-semibold text-gray-800">Lokal</p>
+                <p class="text-sm text-gray-500">Produk dalam negeri</p>
+            </div>
+        </label>
+        <label class="flex items-center justify-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-primary transition">
+            <input type="radio" name="productType" value="internasional" class="mr-3">
+            <div>
+                <p class="font-semibold text-gray-800">Internasional</p>
+                <p class="text-sm text-gray-500">Produk luar negeri</p>
+            </div>
+        </label>
+    </div>
+</div>
                 <!-- Deskripsi -->
                 <div class="mb-8">
                     <label class="block text-gray-800 font-semibold mb-3">Deskripsi Produk</label>
@@ -509,44 +539,53 @@
         }
     }
 
-    // Populate form with product data
-    function populateForm(product) {
-        if (!product) return;
-        
-        currentProduct = product;
-        
-        console.log('Populating form with:', product);
-        
-        // Populate all fields
-        document.getElementById('productName').value = product.name || '';
-        document.getElementById('brand').value = product.brand || '';
-        document.getElementById('price').value = product.price || '';
-        document.getElementById('originalPrice').value = product.original_price || '';
-        document.getElementById('discount').value = product.discount || '';
-        document.getElementById('fee').value = product.fee || '';
-        document.getElementById('stock').value = product.stock || '';
-        document.getElementById('description').value = product.description || '';
-        
-        const categorySelect = document.getElementById('category');
-        if (product.category) {
-            categorySelect.value = product.category;
-        }
-        
-        // Load existing images
-        productImages = [
-            product.image || null,
-            product.image2 || null,
-            product.image3 || null,
-            product.image4 || null,
-            product.image5 || null
-        ];
-        
-        renderImages();
-        
-        isActive = true;
-        console.log('✅ Form populated successfully');
+// Populate form with product data
+function populateForm(product) {
+    if (!product) return;
+    
+    currentProduct = product;
+    
+    console.log('Populating form with:', product);
+    
+    // Populate all fields
+    document.getElementById('productName').value = product.name || '';
+    document.getElementById('brand').value = product.brand || '';
+    document.getElementById('originalPrice').value = product.original_price || '';
+    document.getElementById('discount').value = product.discount || '';
+    document.getElementById('price').value = product.price || ''; // Akan di-calculate ulang
+    document.getElementById('fee').value = product.fee || '';
+    document.getElementById('stock').value = product.stock || '';
+    document.getElementById('description').value = product.description || '';
+    
+    const categorySelect = document.getElementById('category');
+    if (product.category) {
+        categorySelect.value = product.category;
     }
-
+    
+    // Set product type radio button
+    const productType = product.product_type || 'lokal';
+    const radioBtn = document.querySelector(`input[name="productType"][value="${productType}"]`);
+    if (radioBtn) {
+        radioBtn.checked = true;
+    }
+    
+    // Load existing images
+    productImages = [
+        product.image || null,
+        product.image2 || null,
+        product.image3 || null,
+        product.image4 || null,
+        product.image5 || null
+    ];
+    
+    renderImages();
+    
+    // Calculate harga promo setelah data dimuat
+    calculatePromoPrice();
+    
+    isActive = true;
+    console.log('✅ Form populated successfully');
+}
     // Initialize page
     async function initPage() {
         productId = getProductIdFromURL();
@@ -572,11 +611,26 @@
         stockInput.value = current + 1;
     }
 
-    // Format angka menjadi mata uang
-    function formatCurrency(input) {
-        let value = input.value.replace(/\D/g, '');
-        input.value = value;
+// Format angka menjadi mata uang
+function formatCurrency(input) {
+    let value = input.value.replace(/\D/g, '');
+    input.value = value;
+    calculatePromoPrice(); // Panggil fungsi hitung otomatis
+}
+
+function calculatePromoPrice() {
+    const originalPrice = parseInt(document.getElementById('originalPrice').value) || 0;
+    const discount = parseInt(document.getElementById('discount').value) || 0;
+    
+    if (originalPrice > 0 && discount >= 0 && discount <= 100) {
+        const promoPrice = originalPrice - (originalPrice * discount / 100);
+        document.getElementById('price').value = Math.round(promoPrice);
+    } else if (originalPrice > 0) {
+        document.getElementById('price').value = originalPrice;
+    } else {
+        document.getElementById('price').value = '';
     }
+}
 
     // Format tampilan harga dengan titik
     function formatRupiah(angka) {
@@ -588,15 +642,18 @@
         console.log('Page loaded, initializing...');
         
         // Format otomatis saat mengetik harga & fee
-        ['price', 'fee', 'originalPrice'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                el.addEventListener('input', function () {
-                    formatCurrency(this);
-                });
-            }
+        document.getElementById('originalPrice').addEventListener('input', function() {
+            formatCurrency(this);
         });
 
+        document.getElementById('discount').addEventListener('input', function() {
+            calculatePromoPrice();
+        });
+
+        document.getElementById('fee').addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            this.value = value;
+        });
         // Ganti/Tambah foto produk
         const changePhotoBtn = document.getElementById('changePhotoBtn');
         if (changePhotoBtn) {
@@ -691,39 +748,46 @@ if (fileInput) {
     });
 }
         // Submit form (update product)
-        const editForm = document.getElementById('editProductForm');
-        if (editForm) {
-            editForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
+const editForm = document.getElementById('editProductForm');
+if (editForm) {
+    editForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-                // Validasi
-                const name = document.getElementById('productName').value.trim();
-                const price = parseInt(document.getElementById('price').value) || 0;
-                const stock = parseInt(document.getElementById('stock').value) || 0;
+        // Validasi
+        const name = document.getElementById('productName').value.trim();
+        const price = parseInt(document.getElementById('price').value) || 0;
+        const stock = parseInt(document.getElementById('stock').value) || 0;
+        const productType = document.querySelector('input[name="productType"]:checked')?.value; // TAMBAHKAN INI
 
-                if (!name || price <= 0 || stock < 0) {
-                    alert('Pastikan Nama Produk, Harga, dan Kuota diisi dengan benar.');
-                    return;
-                }
+        if (!name || price <= 0 || stock < 0) {
+            alert('Pastikan Nama Produk, Harga, dan Kuota diisi dengan benar.');
+            return;
+        }
 
-                // Check if at least one image exists
-                if (!productImages.some(img => img !== null)) {
-                    alert('Minimal harus ada 1 foto produk!');
-                    return;
-                }
+        if (!productType) {
+            alert('Pilih tipe produk (Lokal/Internasional)!');
+            return;
+        }
 
-                // Prepare FormData
-                const formData = new FormData();
-                formData.append('id', productId);
-                formData.append('name', name);
-                formData.append('brand', document.getElementById('brand').value.trim());
-                formData.append('price', price);
-                formData.append('fee', parseInt(document.getElementById('fee').value) || 0);
-                formData.append('stock', stock);
-                formData.append('original_price', parseInt(document.getElementById('originalPrice').value) || 0);
-                formData.append('discount', parseInt(document.getElementById('discount').value) || 0);
-                formData.append('category', document.getElementById('category').value);
-                formData.append('description', document.getElementById('description').value.trim());
+        // Check if at least one image exists
+        if (!productImages.some(img => img !== null)) {
+            alert('Minimal harus ada 1 foto produk!');
+            return;
+        }
+
+        // Prepare FormData
+        const formData = new FormData();
+        formData.append('id', productId);
+        formData.append('name', name);
+        formData.append('brand', document.getElementById('brand').value.trim());
+        formData.append('price', price);
+        formData.append('fee', parseInt(document.getElementById('fee').value) || 0);
+        formData.append('stock', stock);
+        formData.append('original_price', parseInt(document.getElementById('originalPrice').value) || 0);
+        formData.append('discount', parseInt(document.getElementById('discount').value) || 0);
+        formData.append('category', document.getElementById('category').value);
+        formData.append('product_type', productType); // TAMBAHKAN INI
+        formData.append('description', document.getElementById('description').value.trim());
 
                 // PERBAIKAN: Kirim semua gambar dengan benar
                 let newImageFiles = [];

@@ -96,6 +96,51 @@
             font-size: 16px;
         }
 
+        .badge-basic {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #9CA3AF, #6B7280);
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 4px 6px rgba(107, 114, 128, 0.3);
+}
+
+.badge-bronze {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #CD7F32, #A0522D);
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 4px 6px rgba(205, 127, 50, 0.4);
+}
+
+.badge-silver {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #E5E7EB, #9CA3AF);
+    color: #1F2937;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 4px 6px rgba(156, 163, 175, 0.4);
+}
+
+.badge-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
         .gradient-bg { background: linear-gradient(135deg, #7A5AF8 0%, #A78BFA 100%); }
         .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
         .profile-image { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 5px solid white; }
@@ -168,9 +213,9 @@
                                     <span class="badge-verified">
                                         <i class="fas fa-check-circle mr-1"></i> Terverifikasi
                                     </span>
-                                    <span class="badge-gold flex items-center gap-1">
-                                    <img src="assets/img/gold.png" class="gold-icon" alt="Gold">
-                                    Gold Seller
+                                    <span id="packageBadge" class="badge-basic flex items-center gap-1">
+                                        <i class="fas fa-user"></i>
+                                        Basic
                                     </span>
                                 </div>
                             </div>
@@ -432,7 +477,7 @@
     <footer class="bg-primary text-white py-12 mt-20">
         <!-- ... footer kamu yang lama ... -->
         <div class="max-w-7xl mx-auto px-6 text-center">
-            <p class="text-purple-200">© 2025 Promora — Platform Jastip & Promo Terpercaya</p>
+            <p class="text-purple-200">Â© 2025 Promora â€” Platform Jastip & Promo Terpercaya</p>
         </div>
     </footer>
 
@@ -494,6 +539,10 @@ function updateStoreDisplay(store) {
             profileImg.src = 'backend/uploads/store_logos/' + store.logo;
         }
     }
+    
+    // Update package badge - GUNAKAN 'basic' JIKA KOSONG
+    const packageTier = store.package_tier || 'basic';
+    updatePackageBadge(packageTier);
 
     // Update di dashboard tab
     const dashboardStoreName = document.querySelector('#overviewTab .font-semibold.text-gray-800');
@@ -510,9 +559,9 @@ function updateStoreDisplay(store) {
     // Update form edit profil
     const editInputs = document.querySelectorAll('#editTab input[type="text"]');
     if (editInputs.length >= 2) {
-        editInputs[0].value = store.store_name || ''; // Nama Toko - kosongkan jika null
+        editInputs[0].value = store.store_name || '';
         editInputs[0].placeholder = 'Masukkan nama toko';
-        editInputs[1].value = '@' + currentUser.username; // Username
+        editInputs[1].value = '@' + currentUser.username;
     }
 
     const editTextarea = document.querySelector('#editTab textarea');
@@ -521,8 +570,49 @@ function updateStoreDisplay(store) {
         editTextarea.placeholder = 'Tulis deskripsi toko Anda...';
     }
     
-    // Update stats (dummy data)
+    // Update stats
     updateStats(store);
+}
+
+// Update package badge display
+function updatePackageBadge(tier) {
+    const badge = document.getElementById('packageBadge');
+    if (!badge) return;
+    
+    // Pastikan tier tidak kosong, default ke 'basic'
+    if (!tier || tier === '') {
+        tier = 'basic';
+    }
+    
+    const tierData = {
+        'basic': {
+            class: 'badge-basic',
+            icon: '<i class="fas fa-user badge-icon"></i>',
+            text: 'Basic'
+        },
+        'bronze': {
+            class: 'badge-bronze',
+            icon: '<i class="fas fa-medal badge-icon"></i>',
+            text: 'Bronze Seller'
+        },
+        'silver': {
+            class: 'badge-silver',
+            icon: '<i class="fas fa-award badge-icon"></i>',
+            text: 'Silver Seller'
+        },
+        'gold': {
+            class: 'badge-gold',
+            icon: '<i class="fas fa-crown badge-icon" style="color: #FFD700;"></i>',
+            text: 'Gold Seller'
+        }
+    };
+    
+    // Ambil data tier, kalau tidak ada gunakan basic
+    const data = tierData[tier.toLowerCase()] || tierData['basic'];
+    
+    // Update class dan content
+    badge.className = data.class + ' flex items-center gap-1';
+    badge.innerHTML = data.icon + ' ' + data.text;
 }
 
 // Update statistics

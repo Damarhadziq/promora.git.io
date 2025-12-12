@@ -46,6 +46,7 @@ try {
     $name           = $_POST['name'];
     $brand          = $_POST['brand'];
     $category       = $_POST['category'];
+    $product_type   = $_POST['product_type']; // TAMBAHKAN INI
     $price          = intval($_POST['price']);
     $original_price = intval($_POST['original_price']);
     $discount       = intval($_POST['discount']);
@@ -54,33 +55,33 @@ try {
     $description    = $_POST['description'];
     $location       = $_POST['location'];
 
-    // ---------- PREPARE INSERT QUERY ----------
-    $query = "INSERT INTO products
-        (seller_id, name, brand, category, price, original_price, discount, fee, stock, description, location, image, image2, image3, image4, image5)
-        VALUES
-        (:seller_id, :name, :brand, :category, :price, :original_price, :discount, :fee, :stock, :description, :location, :image, :image2, :image3, :image4, :image5)";
+// ---------- PREPARE INSERT QUERY ----------
+$query = "INSERT INTO products
+    (seller_id, name, brand, category, product_type, price, original_price, discount, fee, stock, description, location, image, image2, image3, image4, image5)
+    VALUES
+    (:seller_id, :name, :brand, :category, :product_type, :price, :original_price, :discount, :fee, :stock, :description, :location, :image, :image2, :image3, :image4, :image5)";
 
     $stmt = $conn->prepare($query);
 
     $stmt->execute([
-        ":seller_id"      => $seller_id,
-        ":name"           => $name,
-        ":brand"          => $brand,
-        ":category"       => $category,
-        ":price"          => $price,
-        ":original_price" => $original_price,
-        ":discount"       => $discount,
-        ":fee"            => $fee,
-        ":stock"          => $stock,
-        ":description"    => $description,
-        ":location"       => $location,
-        ":image"          => $imagePaths[0],
-        ":image2"         => $imagePaths[1],
-        ":image3"         => $imagePaths[2],
-        ":image4"         => $imagePaths[3],
-        ":image5"         => $imagePaths[4]
-    ]);
-
+    ":seller_id"      => $seller_id,
+    ":name"           => $name,
+    ":brand"          => $brand,
+    ":category"       => $category,
+    ":product_type"   => $product_type, // TAMBAHKAN INI
+    ":price"          => $price,
+    ":original_price" => $original_price,
+    ":discount"       => $discount,
+    ":fee"            => $fee,
+    ":stock"          => $stock,
+    ":description"    => $description,
+    ":location"       => $location,
+    ":image"          => $imagePaths[0],
+    ":image2"         => $imagePaths[1],
+    ":image3"         => $imagePaths[2],
+    ":image4"         => $imagePaths[3],
+    ":image5"         => $imagePaths[4]
+]);
     $response["success"] = true;
     $response["message"] = "Produk berhasil dibuat.";
     $response["product_id"] = $conn->lastInsertId();

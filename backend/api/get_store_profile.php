@@ -16,12 +16,20 @@ try {
     $database = new Database();
     $conn = $database->getConnection();
     
-    // Get store data with user phone
-    $query = "SELECT s.*, u.phone 
-              FROM stores s 
-              JOIN users u ON s.user_id = u.id 
-              WHERE s.user_id = :user_id";
-    
+    // Get store data with counts
+    $query = "SELECT s.*, u.phone,
+            (SELECT COUNT(*) 
+            FROM products p 
+            WHERE p.seller_id = s.user_id 
+            AND p.is_deleted = 0) as total_products,
+            (SELECT COUNT(DISTINCT i.id) 
+            FROM invoices i 
+            WHERE i.seller_id = s.user_id 
+            AND i.status = 'verified') as total_orders
+            FROM stores s 
+            JOIN users u ON s.user_id = u.id 
+            WHERE s.user_id = :user_id";
+          
     $stmt = $conn->prepare($query);
     $stmt->bindParam(':user_id', $user_id);
     $stmt->execute();

@@ -172,57 +172,72 @@
                 </div>
 
                 <!-- Harga Original, Diskon, Harga Promo, dan Fee -->
-                <div class="grid grid-cols-4 gap-4 mb-6">
-                    <div>
-                        <label class="block text-gray-800 font-semibold mb-3">Harga Original</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-3 text-gray-500">Rp</span>
-                            <input type="text" id="originalPrice" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="550000">
-                        </div>
-                        <p class="text-gray-500 text-sm mt-2">Harga sebelum promo</p>
-                    </div>
-                    <div>
-                        <label class="block text-gray-800 font-semibold mb-3">Diskon (%)</label>
-                        <input type="number" id="discount" min="0" max="100" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="15">
-                        <p class="text-gray-500 text-sm mt-2">Persentase diskon</p>
-                    </div>
-                    <div>
-                        <label class="block text-gray-800 font-semibold mb-3">Harga Promo</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-3 text-gray-500">Rp</span>
-                            <input type="text" id="price" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="480000">
-                        </div>
-                        <p class="text-gray-500 text-sm mt-2">Harga setelah diskon</p>
-                    </div>
-                    <div>
-                        <label class="block text-gray-800 font-semibold mb-3">Fee Jastip</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-3 text-gray-500">Rp</span>
-                            <input type="text" id="fee" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="35000">
-                        </div>
-                        <p class="text-gray-500 text-sm mt-2">Fee akan ditambahkan</p>
-                    </div>
-                </div>
+<div class="grid grid-cols-4 gap-4 mb-6">
+    <div>
+        <label class="block text-gray-800 font-semibold mb-3">Harga Original</label>
+        <div class="relative">
+            <span class="absolute left-4 top-3 text-gray-500">Rp</span>
+            <input type="text" id="originalPrice" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="550000">
+        </div>
+        <p class="text-gray-500 text-sm mt-2">Harga sebelum promo</p>
+    </div>
+    <div>
+        <label class="block text-gray-800 font-semibold mb-3">Diskon (%)</label>
+        <input type="number" id="discount" min="0" max="100" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="15">
+        <p class="text-gray-500 text-sm mt-2">Persentase diskon</p>
+    </div>
+    <div>
+        <label class="block text-gray-800 font-semibold mb-3">Harga Promo</label>
+        <div class="relative">
+            <span class="absolute left-4 top-3 text-gray-500">Rp</span>
+            <input type="text" id="price" readonly class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0">
+        </div>
+        <p class="text-green-600 text-sm mt-2">Otomatis terhitung</p>
+    </div>
+    <div>
+        <label class="block text-gray-800 font-semibold mb-3">Fee Jastip</label>
+        <div class="relative">
+            <span class="absolute left-4 top-3 text-gray-500">Rp</span>
+            <input type="text" id="fee" class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="35000">
+        </div>
+        <p class="text-gray-500 text-sm mt-2">Fee akan ditambahkan</p>
+    </div>
+</div>
 
                 <!-- Stok dan Kategori -->
-                <div class="grid grid-cols-2 gap-6 mb-6">
-                    <div>
-                        <label class="block text-gray-800 font-semibold mb-3">Kuota Barang</label>
-                        <input type="number" id="stock" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="10">
-                    </div>
-                    <div>
-                        <label class="block text-gray-800 font-semibold mb-3">Kategori</label>
-                        <select id="category" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-gray-700">
-                            <option value="">Pilih Kategori</option>
-                            <option value="fashion">Fashion</option>
-                            <option value="elektronik">Elektronik</option>
-                            <option value="makanan">Makanan & Minuman</option>
-                            <option value="kecantikan">Kecantikan</option>
-                            <option value="olahraga">Olahraga</option>
-                            <option value="mainan">Mainan & Hobi</option>
-                        </select>
-                    </div>
-                </div>
+<div class="grid grid-cols-2 gap-6 mb-6">
+    <div>
+        <label class="block text-gray-800 font-semibold mb-3">Kuota Barang</label>
+        <input type="number" id="stock" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="10">
+    </div>
+    <div>
+        <label class="block text-gray-800 font-semibold mb-3">Kategori</label>
+        <select id="category" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-gray-700">
+            <option value="">Pilih Kategori</option>
+            <option value="fashion">Fashion</option>
+            <option value="elektronik">Elektronik</option>
+            <option value="makanan">Makanan & Minuman</option>
+            <option value="kecantikan">Kecantikan</option>
+            <option value="olahraga">Olahraga</option>
+            <option value="mainan">Mainan & Hobi</option>
+        </select>
+    </div>
+</div>
+
+<!-- TAMBAHKAN BAGIAN INI -->
+<div class="mb-6">
+    <label class="block text-gray-800 font-semibold mb-3">Tipe Produk</label>
+    <div class="flex gap-4">
+        <label class="flex items-center cursor-pointer">
+            <input type="radio" name="productType" value="Inter" id="typeInter" class="w-4 h-4 text-primary focus:ring-primary">
+            <span class="ml-2 text-gray-700">International (Luar Negeri)</span>
+        </label>
+        <label class="flex items-center cursor-pointer">
+            <input type="radio" name="productType" value="Lokal" id="typeLokal" checked class="w-4 h-4 text-primary focus:ring-primary">
+            <span class="ml-2 text-gray-700">Lokal (Dalam Negeri)</span>
+        </label>
+    </div>
+</div>
 
                 <!-- Deskripsi -->
                 <div class="mb-8">
@@ -399,23 +414,37 @@
             uploadedFiles.forEach((file, i) => displayPreview(file, i));
         };
         
-        // Format currency input
-        function formatCurrency(input) {
-            let value = input.value.replace(/\D/g, '');
-            input.value = value;
-        }
-        
-        document.getElementById('originalPrice').addEventListener('input', function() {
-            formatCurrency(this);
-        });
+// Format currency input
+function formatCurrency(input) {
+    let value = input.value.replace(/\D/g, '');
+    input.value = value;
+}
 
-        document.getElementById('price').addEventListener('input', function() {
-            formatCurrency(this);
-        });
-        
-        document.getElementById('fee').addEventListener('input', function() {
-            formatCurrency(this);
-        });
+// Hitung harga promo otomatis
+function calculatePromoPrice() {
+    const originalPrice = parseInt(document.getElementById('originalPrice').value) || 0;
+    const discount = parseInt(document.getElementById('discount').value) || 0;
+    
+    if (originalPrice > 0 && discount > 0) {
+        const promoPrice = originalPrice - (originalPrice * discount / 100);
+        document.getElementById('price').value = Math.round(promoPrice);
+    } else {
+        document.getElementById('price').value = originalPrice;
+    }
+}
+
+document.getElementById('originalPrice').addEventListener('input', function() {
+    formatCurrency(this);
+    calculatePromoPrice();
+});
+
+document.getElementById('discount').addEventListener('input', function() {
+    calculatePromoPrice();
+});
+
+document.getElementById('fee').addEventListener('input', function() {
+    formatCurrency(this);
+});
         
         // Tambahkan di awal script, sebelum form submission
         let currentUserId = null;
@@ -453,8 +482,8 @@
             const stock = document.getElementById('stock').value;
             const category = document.getElementById('category').value;
             const description = document.getElementById('description').value;
-
             const discount = document.getElementById('discount').value;
+            const productType = document.querySelector('input[name="productType"]:checked').value;
 
             if (!productName || !brand || !originalPrice || !price || !fee || !stock || !category || !description) {
                 alert('Mohon lengkapi semua field!');
@@ -468,6 +497,7 @@
             formData.append("name", productName);
             formData.append("brand", brand);
             formData.append("category", category);
+            formData.append("product_type", productType); // TAMBAHKAN INI
             formData.append("price", price);
             formData.append("original_price", originalPrice);
             formData.append("discount", discount || 0);

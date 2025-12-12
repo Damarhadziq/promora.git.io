@@ -12,21 +12,24 @@ try {
     $database = new Database();
     $conn = $database->getConnection();
 
-    // Data dari POST
-    $data = $_POST;
+// Data dari POST
+$data = $_POST;
 
-    if (!isset($data['id']) || empty($data['name'])) {
-        throw new Exception('Invalid data: ID or Name missing');
-    }
+if (!isset($data['id']) || empty($data['name'])) {
+    throw new Exception('Invalid data: ID or Name missing');
+}
 
-    $id          = intval($data['id']);
-    $name        = $data['name'];
-    $brand       = $data['brand'] ?? '';
-    $price       = intval($data['price'] ?? 0);
-    $fee         = intval($data['fee'] ?? 0);
-    $stock       = intval($data['stock'] ?? 0);
-    $category    = $data['category'] ?? '';
-    $description = $data['description'] ?? '';
+$id           = intval($data['id']);
+$name         = $data['name'];
+$brand        = $data['brand'] ?? '';
+$price        = intval($data['price'] ?? 0);
+$fee          = intval($data['fee'] ?? 0);
+$stock        = intval($data['stock'] ?? 0);
+$category     = $data['category'] ?? '';
+$product_type = $data['product_type'] ?? 'lokal'; // TAMBAHKAN INI
+$original_price = intval($data['original_price'] ?? 0); // TAMBAHKAN INI
+$discount     = intval($data['discount'] ?? 0); // TAMBAHKAN INI
+$description  = $data['description'] ?? '';
 
     // HANDLE GAMBAR (5 slot)
     $imagePaths = [null, null, null, null, null];
@@ -67,42 +70,47 @@ try {
         }
     }
 
-    // UPDATE QUERY (12 kolom gambar)
-    $sql = "
-        UPDATE products SET 
-            name = :name,
-            brand = :brand,
-            price = :price,
-            fee = :fee,
-            stock = :stock,
-            category = :category,
-            description = :description,
-            image = :img1,
-            image2 = :img2,
-            image3 = :img3,
-            image4 = :img4,
-            image5 = :img5
-        WHERE id = :id
-    ";
+    // UPDATE QUERY
+$sql = "
+    UPDATE products SET 
+        name = :name,
+        brand = :brand,
+        price = :price,
+        original_price = :original_price,
+        discount = :discount,
+        product_type = :product_type,
+        fee = :fee,
+        stock = :stock,
+        category = :category,
+        description = :description,
+        image = :img1,
+        image2 = :img2,
+        image3 = :img3,
+        image4 = :img4,
+        image5 = :img5
+    WHERE id = :id
+";
 
-    $stmt = $conn->prepare($sql);
+$stmt = $conn->prepare($sql);
 
-    $stmt->execute([
-        'name'  => $name,
-        'brand' => $brand,
-        'price' => $price,
-        'fee'   => $fee,
-        'stock' => $stock,
-        'category' => $category,
-        'description' => $description,
-        'img1' => $imagePaths[0],
-        'img2' => $imagePaths[1],
-        'img3' => $imagePaths[2],
-        'img4' => $imagePaths[3],
-        'img5' => $imagePaths[4],
-        'id'   => $id
-    ]);
-
+$stmt->execute([
+    'name'  => $name,
+    'brand' => $brand,
+    'price' => $price,
+    'original_price' => $original_price,
+    'discount' => $discount,
+    'product_type' => $product_type,
+    'fee'   => $fee,
+    'stock' => $stock,
+    'category' => $category,
+    'description' => $description,
+    'img1' => $imagePaths[0],
+    'img2' => $imagePaths[1],
+    'img3' => $imagePaths[2],
+    'img4' => $imagePaths[3],
+    'img5' => $imagePaths[4],
+    'id'   => $id
+]);
     echo json_encode(['success' => true, 'message' => 'Product updated successfully']);
 
 } catch (Exception $e) {

@@ -58,8 +58,18 @@ function autoRejectInvoice() {
 
 // Ganti fungsi loadInvoiceData dengan yang lebih lengkap ini:
 async function loadInvoiceData() {
-    const invoice_id = localStorage.getItem('invoice_id');
+    // ✅ CEK APAKAH MULTI-INVOICE ATAU SINGLE
+    const invoicesData = JSON.parse(localStorage.getItem('invoices_data') || '[]');
     const payment_method = localStorage.getItem('paymentMethod');
+    
+    // Jika ada multi-invoice (dari opsi 1)
+    if (invoicesData.length > 0) {
+        await loadMultiInvoiceData(invoicesData, payment_method);
+        return;
+    }
+    
+    // Jika single invoice (backward compatibility)
+    const invoice_id = localStorage.getItem('invoice_id');
     
     if (!invoice_id) {
         alert('Invoice tidak ditemukan');
@@ -97,7 +107,7 @@ async function loadInvoiceData() {
             // Tampilkan daftar produk
             displayProducts(inv.items);
             
-            // Tampilkan metode pembayaran sesuai pilihan (setelah grand total di-set)
+            // Tampilkan metode pembayaran sesuai pilihan
             displayPaymentMethod(payment_method || inv.payment_method);
             
             // Simpan untuk upload bukti
@@ -114,6 +124,112 @@ async function loadInvoiceData() {
         console.error('Error:', error);
         alert('Terjadi kesalahan');
     }
+}
+
+// ✅ FUNGSI BARU UNTUK MULTI-INVOICE
+async function loadMultiInvoiceData(invoicesData, payment_method) {
+    try {
+        let allProducts = [];
+        let totalItems = 0;
+        let totalPromo = 0;
+        let totalFee = 0;
+        let totalGrandTotal = 0;
+        let earliestCreatedAt = null;
+        
+        // Load semua invoice
+        for (const invoice of invoicesData) {
+            const response = await fetch(`backend/api/get_invoice.php?invoice_id=${invoice.invoice_id}`, {
+                credentials: 'include'
+            });
+            const data = await response.json();
+            
+            if (data.success && data.invoice.items) {
+                const inv = data.invoice;
+                
+                allProducts = allProducts.concat(inv.items);
+                totalItems += inv.items.length;
+                totalPromo += parseInt(inv.total_price);
+                totalFee += parseInt(inv.total_fee) + parseInt(inv.shipping_cost);
+                totalGrandTotal += parseInt(inv.grand_total);
+                
+                // Ambil created_at paling awal untuk countdown
+                if (!earliestCreatedAt || new Date(inv.created_at) < new Date(earliestCreatedAt)) {
+                    earliestCreatedAt = inv.created_at;
+                }
+            }
+        }
+        
+        // Set grand total global
+        window.grandTotal = totalGrandTotal;
+        
+        // Update tampilan
+        document.querySelectorAll(".total-bayar").forEach(el => 
+            el.textContent = formatRupiah(totalGrandTotal)
+        );
+        document.querySelectorAll(".total-promo").forEach(el => 
+            el.textContent = formatRupiah(totalPromo)
+        );
+        document.querySelectorAll(".total-fee").forEach(el => 
+            el.textContent = formatRupiah(totalFee)
+        );
+        document.querySelectorAll(".jumlah-barang").forEach(el => 
+            el.textContent = totalItems + " barang"
+        );
+        
+        // Tampilkan info multi-invoice
+        displayMultiInvoiceInfo(invoicesData);
+        
+        // Tampilkan produk
+        displayProducts(allProducts);
+        
+        // Tampilkan metode pembayaran
+        displayPaymentMethod(payment_method);
+        
+        // Start countdown dari invoice paling awal
+        if (earliestCreatedAt) {
+            startCountdown(earliestCreatedAt);
+        }
+        
+    } catch (error) {
+        console.error('Error loading multi-invoice:', error);
+        alert('Gagal memuat data invoice');
+    }
+}
+
+// ✅ FUNGSI BARU UNTUK TAMPILKAN INFO MULTI-INVOICE
+function displayMultiInvoiceInfo(invoicesData) {
+    if (invoicesData.length <= 1) return;
+    
+    const container = document.getElementById('payment-methods-container');
+    if (!container) return;
+    
+    const infoDiv = document.createElement('div');
+    infoDiv.className = 'bg-blue-50 border-2 border-blue-200 rounded-2xl p-5 mb-6';
+    infoDiv.innerHTML = `
+        <div class="flex items-start gap-3">
+            <i class="fas fa-info-circle text-blue-600 text-2xl mt-1"></i>
+            <div class="flex-1">
+                <h4 class="font-bold text-blue-900 mb-2 text-lg">Pembayaran untuk ${invoicesData.length} Invoice</h4>
+                <p class="text-sm text-blue-700 mb-3">Anda membeli dari <strong>${invoicesData.length} seller berbeda</strong>. Cukup upload <strong>1 bukti transfer</strong> untuk semua invoice.</p>
+                <div class="bg-white rounded-lg p-3 space-y-2">
+                    ${invoicesData.map(inv => `
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-blue-600 font-medium">${inv.invoice_number}</span>
+                            <span class="text-blue-900 font-semibold">${formatRupiah(inv.grand_total)}</span>
+                        </div>
+                    `).join('')}
+                    <hr class="my-2 border-blue-200">
+                    <div class="flex justify-between items-center font-bold text-blue-900">
+                        <span>TOTAL SEMUA INVOICE</span>
+                        <span class="text-lg">${formatRupiah(window.grandTotal)}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Insert di awal container
+    container.insertBefore(infoDiv, container.firstChild);
 }
 
 // Fungsi baru untuk menampilkan daftar produk
@@ -409,44 +525,71 @@ window.addEventListener("load", loadInvoiceData);
       }
     }
 
-function kirimBukti() {
+async function kirimBukti() {
     const fileInput = document.getElementById('file-input');
     const file = fileInput.files[0];
+    const btnKirim = document.getElementById('btn-kirim');
     
     if (!file) {
         alert('Pilih file terlebih dahulu');
         return;
     }
     
+    btnKirim.disabled = true;
+    btnKirim.textContent = 'Mengirim...';
+    
     const formData = new FormData();
     formData.append('payment_proof', file);
-    formData.append('invoice_id', window.currentInvoiceId);
     
-    fetch('backend/api/upload_payment_proof.php', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include'
-    })
-    .then(response => response.json())
-    .then(data => {
+    // ✅ CEK APAKAH MULTI-INVOICE ATAU SINGLE
+    const invoiceIds = JSON.parse(localStorage.getItem('invoice_ids') || '[]');
+    
+    if (invoiceIds.length > 0) {
+        // Multi-invoice: kirim array IDs
+        formData.append('invoice_ids', JSON.stringify(invoiceIds));
+    } else {
+        // Single invoice: kirim single ID (backward compatibility)
+        formData.append('invoice_id', window.currentInvoiceId);
+    }
+    
+    try {
+        const response = await fetch('backend/api/upload_payment_proof.php', {
+            method: 'POST',
+            body: formData,
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
         if (data.success) {
             closeModal();
             document.getElementById('notif').classList.remove('hidden');
             
             setTimeout(() => {
                 document.getElementById('notif').classList.add('hidden');
+                
+                // Bersihkan localStorage
                 localStorage.removeItem('invoice_id');
                 localStorage.removeItem('invoice_number');
+                localStorage.removeItem('invoice_ids');
+                localStorage.removeItem('invoices_data');
+                localStorage.removeItem('totalBayar');
+                localStorage.removeItem('paymentMethod');
+                localStorage.removeItem('courierMethod');
+                
                 window.location.href = "explore.html";
-            }, 4000);
+            }, 3000);
         } else {
             alert('Gagal upload: ' + data.message);
+            btnKirim.disabled = false;
+            btnKirim.textContent = 'Kirim Bukti';
         }
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Error:', error);
         alert('Terjadi kesalahan');
-    });
+        btnKirim.disabled = false;
+        btnKirim.textContent = 'Kirim Bukti';
+    }
 }
 
     // Script ini WAJIB ada di SETIAP halaman biar status login konsisten

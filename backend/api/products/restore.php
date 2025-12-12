@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized - Please login first']);
+    echo json_encode(['error' => 'Unauthorized']);
     exit();
 }
 
@@ -18,32 +18,32 @@ try {
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
     
-    if (!isset($data['id']) || empty($data['id'])) {
+    if (!isset($data['id'])) {
         throw new Exception('Product ID is required');
     }
     
     $product_id = intval($data['id']);
     
-    // Verify product belongs to this seller
-    $checkStmt = $conn->prepare("SELECT id, seller_id FROM products WHERE id = :id AND is_deleted = 0");
+    // Verify ownership
+    $checkStmt = $conn->prepare("SELECT seller_id FROM products WHERE id = :id AND is_deleted = 1");
     $checkStmt->execute(['id' => $product_id]);
     $product = $checkStmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$product) {
-        throw new Exception('Product not found');
+        throw new Exception('Product not found in trash');
     }
     
     if ($product['seller_id'] != $seller_id) {
         throw new Exception('Unauthorized');
     }
     
-    // SOFT DELETE: Tandai sebagai deleted
-    $updateStmt = $conn->prepare("UPDATE products SET is_deleted = 1 WHERE id = :id");
-    $updateStmt->execute(['id' => $product_id]);
+    // Restore product
+    $restoreStmt = $conn->prepare("UPDATE products SET is_deleted = 0 WHERE id = :id");
+    $restoreStmt->execute(['id' => $product_id]);
     
     echo json_encode([
         'success' => true,
-        'message' => 'Product moved to trash'
+        'message' => 'Product restored successfully'
     ]);
     
 } catch (Exception $e) {
