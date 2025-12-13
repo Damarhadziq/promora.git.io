@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 12 Des 2025 pada 11.24
+-- Waktu pembuatan: 13 Des 2025 pada 06.27
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.2.12
 
@@ -42,7 +42,7 @@ CREATE TABLE `admins` (
 --
 
 INSERT INTO `admins` (`id`, `username`, `password`, `full_name`, `email`, `created_at`, `last_login`) VALUES
-(1, 'admin', '$2y$10$2m1YAppY8XUUfV1ft957FOuKRuQF5iWgvM3JEMaYOIw2BOu3H9.he', 'Super Admin', 'admin@promora.com', '2025-11-27 14:13:41', '2025-12-12 16:53:37');
+(1, 'admin', '$2y$10$2m1YAppY8XUUfV1ft957FOuKRuQF5iWgvM3JEMaYOIw2BOu3H9.he', 'Super Admin', 'admin@promora.com', '2025-11-27 14:13:41', '2025-12-12 20:03:46');
 
 -- --------------------------------------------------------
 
@@ -101,23 +101,9 @@ CREATE TABLE `invoices` (
 --
 
 INSERT INTO `invoices` (`id`, `invoice_number`, `user_id`, `seller_id`, `total_price`, `total_fee`, `shipping_cost`, `grand_total`, `payment_method`, `courier_method`, `courier_estimate`, `payment_proof`, `status`, `shipping_status`, `admin_note`, `created_at`, `updated_at`) VALUES
-(1, 'INV-20251201-4F8F66', 1, 3, 315000, 26000, 8000, 349000, 'ewallet', 'gojek', '1-2 jam', NULL, 'pending', 'pending', NULL, '2025-12-01 16:19:03', '2025-12-01 16:19:03'),
-(2, 'INV-20251202-B7DA98', 1, 3, 200000, 18000, 56000, 274000, 'ewallet', 'jnt', '2-3 hari', 'payment_2_1764647082.png', 'rejected', 'pending', 'Tidak masuk', '2025-12-02 03:43:56', '2025-12-02 10:10:24'),
-(3, 'INV-20251202-1B5B81', 1, 3, 1020000, 34000, 56000, 1110000, 'transfer', 'jnt', '2-3 hari', NULL, 'pending', 'pending', NULL, '2025-12-02 05:36:20', '2025-12-02 05:36:20'),
-(4, 'INV-20251202-BFDB1E', 1, 3, 164000, 15000, 56000, 235000, 'qris', 'jnt', '2-3 hari', 'payment_4_1764655660.jpg', 'verified', 'processing', NULL, '2025-12-02 05:53:30', '2025-12-03 03:27:37'),
-(5, 'INV-20251203-245EC6', 1, 3, 340000, 34000, 40000, 414000, 'transfer', 'jnt', '2-3 hari', NULL, 'rejected', 'pending', 'Pembayaran melebihi batas waktu 24 jam', '2025-12-03 02:48:22', '2025-12-09 15:37:11'),
-(6, 'INV-20251203-CCE8D3', 1, 3, 371000, 19000, 40000, 430000, 'transfer', 'jnt', '2-3 hari', 'payment_6_1764730660.jpeg', 'verified', 'completed', NULL, '2025-12-03 02:57:10', '2025-12-03 03:58:17'),
-(7, 'INV-20251203-465947', 17, 3, 494000, 32000, 16000, 542000, 'qris', 'jnt', '2-3 hari', 'payment_7_1764739101.png', 'verified', 'pending', NULL, '2025-12-03 05:17:11', '2025-12-03 05:30:36'),
-(8, 'INV-20251203-E3EE50', 17, 18, 51000, 45000, 16000, 112000, 'transfer', 'jnt', '2-3 hari', 'payment_8_1764739736.png', 'verified', 'completed', NULL, '2025-12-03 05:28:37', '2025-12-03 05:32:00'),
-(9, 'INV-20251206-A54BF3', 19, 18, 10000, 30000, 8000, 48000, 'qris', 'gojek', '1-2 jam', 'payment_9_1765027274.png', 'verified', 'completed', NULL, '2025-12-06 13:20:23', '2025-12-06 13:31:26'),
-(10, 'INV-20251209-A1CADD', 17, 20, 800000, 35000, 16000, 851000, 'qris', 'jnt', '2-3 hari', 'payment_10_1765331305.png', 'waiting', 'pending', NULL, '2025-12-10 01:47:55', '2025-12-10 01:48:25'),
-(11, 'INV-20251212-31E516', 1, 20, 250000, 23000, 40000, 313000, 'transfer', 'jnt', '2-3 hari', 'payment_11_1765531324.jpg', 'verified', 'delivered', NULL, '2025-12-12 09:21:42', '2025-12-12 09:56:03'),
-(12, 'INV-20251212-7C584F', 1, 3, 200000, 18000, 8000, 226000, 'qris', 'jnt', '2-3 hari', NULL, 'pending', 'pending', NULL, '2025-12-12 09:30:10', '2025-12-12 09:30:10'),
-(13, 'INV-20251212-4A0AFE', 1, 20, 800000, 35000, 32000, 867000, 'qris', 'jnt', '2-3 hari', NULL, 'pending', 'pending', NULL, '2025-12-12 09:30:10', '2025-12-12 09:30:10'),
-(16, 'INV-20251212-00B322', 1, 20, 800000, 35000, 37709, 872709, 'transfer', 'jnt', '2-3 hari', NULL, 'pending', 'pending', NULL, '2025-12-12 09:48:12', '2025-12-12 09:48:12'),
-(17, 'INV-20251212-3B3216', 1, 3, 48600, 15000, 2291, 65891, 'transfer', 'jnt', '2-3 hari', NULL, 'pending', 'pending', NULL, '2025-12-12 09:48:12', '2025-12-12 09:48:12'),
-(18, 'INV-20251212-2ABF94', 1, 20, 800000, 35000, 32000, 867000, 'transfer', 'jnt', '2-3 hari', 'payment_1765533000_693be548528fb.jpg', 'verified', 'processing', NULL, '2025-12-12 09:49:37', '2025-12-12 09:56:09'),
-(19, 'INV-20251212-77EBAD', 1, 3, 200000, 18000, 8000, 226000, 'transfer', 'jnt', '2-3 hari', 'payment_1765533000_693be548528fb.jpg', 'verified', 'pending', NULL, '2025-12-12 09:49:37', '2025-12-12 09:54:08');
+(18, 'INV-20251212-2ABF94', 1, 20, 800000, 35000, 32000, 867000, 'transfer', 'jnt', '2-3 hari', 'payment_1765533000_693be548528fb.jpg', 'verified', 'completed', NULL, '2025-12-12 09:49:37', '2025-12-12 13:55:22'),
+(19, 'INV-20251212-77EBAD', 1, 3, 200000, 18000, 8000, 226000, 'transfer', 'jnt', '2-3 hari', 'payment_1765533000_693be548528fb.jpg', 'verified', 'completed', NULL, '2025-12-12 09:49:37', '2025-12-12 13:54:28'),
+(20, 'INV-20251212-A2AEF0', 1, 3, 200000, 18000, 40000, 258000, 'ewallet', 'jnt', '2-3 hari', 'payment_1765549384_693c254896da4.jpg', 'waiting', 'pending', NULL, '2025-12-12 14:22:51', '2025-12-12 14:23:04');
 
 -- --------------------------------------------------------
 
@@ -132,33 +118,18 @@ CREATE TABLE `invoice_items` (
   `quantity` int(11) NOT NULL,
   `price` int(11) NOT NULL,
   `fee` int(11) NOT NULL,
-  `subtotal` int(11) NOT NULL
+  `subtotal` int(11) NOT NULL,
+  `tier_at_purchase` enum('basic','bronze','silver','gold') DEFAULT 'basic'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `invoice_items`
 --
 
-INSERT INTO `invoice_items` (`id`, `invoice_id`, `product_id`, `quantity`, `price`, `fee`, `subtotal`) VALUES
-(1, 1, 4, 1, 315000, 26000, 341000),
-(2, 2, 7, 1, 200000, 18000, 218000),
-(3, 3, 15, 3, 340000, 34000, 1054000),
-(4, 4, 14, 4, 41000, 15000, 179000),
-(5, 5, 15, 1, 340000, 34000, 374000),
-(6, 6, 9, 2, 185500, 19000, 390000),
-(7, 7, 8, 1, 494000, 32000, 526000),
-(8, 8, 16, 1, 10000, 30000, 40000),
-(9, 8, 14, 1, 41000, 15000, 56000),
-(10, 9, 16, 1, 10000, 30000, 40000),
-(11, 10, 18, 1, 800000, 35000, 835000),
-(12, 11, 19, 1, 50000, 5000, 55000),
-(13, 11, 7, 1, 200000, 18000, 218000),
-(14, 12, 7, 1, 200000, 18000, 218000),
-(15, 13, 18, 1, 800000, 35000, 835000),
-(18, 16, 18, 1, 800000, 35000, 835000),
-(19, 17, 14, 1, 48600, 15000, 63600),
-(20, 18, 17, 1, 800000, 35000, 835000),
-(21, 19, 7, 1, 200000, 18000, 218000);
+INSERT INTO `invoice_items` (`id`, `invoice_id`, `product_id`, `quantity`, `price`, `fee`, `subtotal`, `tier_at_purchase`) VALUES
+(20, 18, 17, 1, 800000, 35000, 835000, 'basic'),
+(21, 19, 7, 1, 200000, 18000, 218000, 'silver'),
+(22, 20, 7, 1, 200000, 18000, 218000, 'gold');
 
 -- --------------------------------------------------------
 
@@ -200,7 +171,7 @@ INSERT INTO `products` (`id`, `name`, `brand`, `category`, `product_type`, `pric
 (4, 'Tas Hermes', 'Hermes', 'fashion', '', 315000, 630000, 50, 26000, 0, 1, '', 3, 'surabaya', './assets/img/1765528492_693bd3ac350a9_image0.jpg', NULL, NULL, NULL, NULL, '2025-11-26 20:47:21'),
 (5, 'Kacamata Evernoon', 'Zalora', 'aksesoris', 'Lokal', 1575000, 3500000, 55, 50000, 0, 0, NULL, 3, 'jakarta', './assets/img/Kacamata.png', NULL, NULL, NULL, NULL, '2025-11-26 20:47:21'),
 (6, 'Air Max Sneakers Limited Edition', 'Nike', 'fashion', 'Lokal', 648500, 1297000, 50, 35000, 0, 0, NULL, 3, 'jakarta', './assets/img/Nike Air Max Dn8 SE.png', NULL, NULL, NULL, NULL, '2025-11-26 20:47:21'),
-(7, 'Premium Cotton T-Shirt Pack', 'Uniqlo', '0', 'Lokal', 200000, 399000, 52, 18000, 2, 0, 'Deskripsi T-Shirt', 3, 'bandung', './assets/img/tshirt.png', NULL, NULL, NULL, NULL, '2025-11-26 20:47:42'),
+(7, 'Premium Cotton T-Shirt Pack', 'Uniqlo', '0', 'Lokal', 200000, 399000, 52, 18000, 1, 0, 'Deskripsi T-Shirt', 3, 'bandung', './assets/img/tshirt.png', NULL, NULL, NULL, NULL, '2025-11-26 20:47:42'),
 (8, 'Classic Backpack Large', 'Herschel', 'fashion', 'Lokal', 494000, 1029000, 48, 32000, 0, 0, 'Deskripsi Backpack', 3, 'surabaya', './assets/img/backpack.png', NULL, NULL, NULL, NULL, '2025-11-26 20:47:42'),
 (9, 'Matte Lipstick Collection', 'MAC', 'kecantikan', 'Lokal', 185500, 350000, 47, 19000, 0, 0, '0', 3, 'jakarta', './assets/img/1764170956_0_images.png', NULL, NULL, NULL, NULL, '2025-11-26 20:47:42'),
 (14, 'Gunting Mahal y', 'Lokal', 'elektronik', '', 48600, 54000, 10, 15000, 6, 0, 'Gunting', 3, 'Bangkok', './assets/img/1765528530_693bd3d24cbc9_image0.jpg', NULL, NULL, NULL, NULL, '2025-11-27 17:49:37'),
@@ -239,8 +210,9 @@ INSERT INTO `stores` (`id`, `user_id`, `store_name`, `description`, `logo`, `add
 (1, 3, 'Budi Bangkok', 'Melayani jastip mall Bangkok setiap hari. Trusted seller dengan pengalaman 3+ tahun.', 'logo_3_1764431890.jpeg', 'Jalan Pramuka, Wonosobo, Jawa Tengah, Jawa, 56311, Indonesia', -7.36042391, 109.90207672, '2025-11-27 12:18:45', '2025-12-12 07:57:01', 'gold', '2026-01-12 08:57:01'),
 (2, 2, 'fahrel jastip', 'Jasa Titip Bekasi Real', 'logo_2_1765521386.jpg', 'Jalan Karet Pasar Baru Barat VI, RW 03, Karet Tengsin, Tanah Abang, Jakarta Pusat, Daerah Khusus Ibukota Jakarta, Jawa, 10220, Indonesia', -6.20983427, 106.81633301, '2025-12-01 09:47:53', '2025-12-12 07:06:13', 'basic', NULL),
 (3, 18, 'Arvio Pramudya', 'JASA TITIP SEMARANG', 'logo_18_1764739425.png', 'Jalan Kanguru Utara III, RW 03, Gayamsari, Semarang, Central Java, Java, 50196, Indonesia', -6.99528390, 110.45230293, '2025-12-03 05:23:45', '2025-12-06 13:30:31', 'basic', NULL),
-(4, 20, 'handoko surya', 'Melayani jastip mall Bangkok setiap hari. Trusted seller dengan pengalaman 3+ tahun.', 'logo_20_1765028092.png', 'Kergon, Pekalongan, Central Java, Java, 51112, Indonesia', -6.89210532, 109.67095184, '2025-12-06 13:34:52', '2025-12-06 13:34:52', 'basic', NULL),
-(5, 21, 'Aliya Jastip', 'Melayani Jasa Titip di Jepang Hokaido', 'logo_21_1765373260.jpeg', 'Gang KH. Kaimin I, RW 10, Cipulir, Kebayoran Lama, South Jakarta, Special Capital Region of Jakarta, Java, 12230, Indonesia', -6.23998942, 106.76939324, '2025-12-10 13:27:40', '2025-12-11 10:51:55', 'silver', '2026-06-11 11:51:55');
+(4, 20, 'handoko surya', 'Melayani jastip mall Bangkok setiap hari. Trusted seller dengan pengalaman 3+ tahun.', 'logo_20_1765028092.png', 'Kergon, Pekalongan, Central Java, Java, 51112, Indonesia', -6.89210532, 109.67095184, '2025-12-06 13:34:52', '2025-12-12 13:57:12', 'bronze', '2026-12-12 14:57:12'),
+(5, 21, 'Aliya Jastip', 'Melayani Jasa Titip di Jepang Hokaido', 'logo_21_1765373260.jpeg', 'Gang KH. Kaimin I, RW 10, Cipulir, Kebayoran Lama, South Jakarta, Special Capital Region of Jakarta, Java, 12230, Indonesia', -6.23998942, 106.76939324, '2025-12-10 13:27:40', '2025-12-11 10:51:55', 'silver', '2026-06-11 11:51:55'),
+(6, 6, 'Ghulam Jastip', 'Jastip ke ghulam yukk, semua negara ada', 'logo_6_1765549986.jpg', 'Jalan Setiabudi III, RW 03, Setiabudi, Jakarta Selatan, Daerah Khusus Ibukota Jakarta, Jawa, 10220, Indonesia', -6.20758373, 106.82575464, '2025-12-12 14:33:06', '2025-12-12 14:34:42', 'gold', '2026-01-12 15:34:42');
 
 -- --------------------------------------------------------
 
@@ -272,7 +244,9 @@ CREATE TABLE `subscriptions` (
 
 INSERT INTO `subscriptions` (`id`, `user_id`, `store_id`, `package_tier`, `duration_months`, `price`, `total_price`, `payment_method`, `payment_proof`, `status`, `admin_note`, `starts_at`, `expires_at`, `created_at`, `updated_at`) VALUES
 (1, 21, 5, 'silver', 6, 99000, 594000, 'bca', 'payment_5_1765445899_693a910bbcaa1.jpeg', 'verified', 'Pembayaran terverifikasi', '2025-12-11 11:51:55', '2026-06-11 11:51:55', '2025-12-11 09:38:19', '2025-12-11 10:51:55'),
-(2, 3, 1, 'gold', 1, 199000, 199000, 'bca', 'payment_1_1765526167_693bca9798871.png', 'verified', 'Pembayaran terverifikasi', '2025-12-12 08:57:01', '2026-01-12 08:57:01', '2025-12-12 07:56:07', '2025-12-12 07:57:01');
+(2, 3, 1, 'gold', 1, 199000, 199000, 'bca', 'payment_1_1765526167_693bca9798871.png', 'verified', 'Pembayaran terverifikasi', '2025-12-12 08:57:01', '2026-01-12 08:57:01', '2025-12-12 07:56:07', '2025-12-12 07:57:01'),
+(3, 20, 4, 'bronze', 12, 49000, 588000, 'ovo', 'payment_4_1765547805_693c1f1d576f6.jpg', 'verified', 'Pembayaran terverifikasi', '2025-12-12 14:57:12', '2026-12-12 14:57:12', '2025-12-12 13:56:45', '2025-12-12 13:57:12'),
+(4, 6, 6, 'gold', 1, 199000, 199000, 'dana', 'payment_6_1765550039_693c27d7eebad.jpg', 'verified', 'Pembayaran terverifikasi', '2025-12-12 15:34:42', '2026-01-12 15:34:42', '2025-12-12 14:33:59', '2025-12-12 14:34:42');
 
 -- --------------------------------------------------------
 
@@ -311,7 +285,7 @@ INSERT INTO `users` (`id`, `first_name`, `last_name`, `email`, `username`, `phon
 (3, 'Budi', 'Santoso', 'Budisantoso123@gmail.com', 'budisantoso', '+629812039201', NULL, NULL, NULL, NULL, NULL, 1, '2025-11-27 16:48:02', 1, NULL, '$2y$10$lF9H5OYszSNt/TiWuNbNoenuHTNInNKhJYgLyI1Rb63GQM62SxAI.', 'seller', '2025-11-26 13:30:52'),
 (4, 'Rahma', 'Nadia', 'nadia@gmail.com', 'rahmanadia', '+629509204', NULL, NULL, NULL, NULL, 'uploads/ktp/KTP_6927daef5b000_1764219631.png', 0, NULL, NULL, NULL, '$2y$10$P8GLbIElTbTxEGA61eHbtu3j.jy4gLh8Pah529D0db2N2xM2Qhk3q', 'seller', '2025-11-27 05:00:31'),
 (5, 'farah', 'farah', 'farah@gmail.com', 'farah', '+629129824924', NULL, NULL, NULL, NULL, 'uploads/ktp/KTP_6927dbfddbd9e_1764219901.jpeg', 1, '2025-12-10 05:10:11', 1, NULL, '$2y$10$nChI7rdb01cZRAYwg3487.0NpalkCtq/XJ15LMjNdHBgUD1x23H8.', 'seller', '2025-11-27 05:05:01'),
-(6, 'ghulam', 'jaizun', 'ghulam@gmail.com', 'ghulamun', '0897294294', NULL, NULL, NULL, NULL, 'uploads/ktp/KTP_6927de8a5bb5a_1764220554.png', 1, '2025-11-27 16:21:55', 1, NULL, '$2y$10$VfvPZa7CSoV4o.n8LEMcQO9q3mn1.OMJCf4O5xwbv/dlP0NRA.yRK', 'seller', '2025-11-27 05:15:54'),
+(6, 'ghulam', 'jaizun', 'ghulam@gmail.com', 'ghulamun', '089898989', NULL, NULL, NULL, NULL, 'uploads/ktp/KTP_6927de8a5bb5a_1764220554.png', 1, '2025-11-27 16:21:55', 1, NULL, '$2y$10$VfvPZa7CSoV4o.n8LEMcQO9q3mn1.OMJCf4O5xwbv/dlP0NRA.yRK', 'seller', '2025-11-27 05:15:54'),
 (7, 'Basyam', 'Walidani', 'basyam@gmail.com', 'basyam', '+62879719279e', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, '$2y$10$NxmTKSAeQqle9cdZQYuGu.BKnaSRXJTgUel6X18S7u4RCNCvvQ5Oi', 'customer', '2025-11-28 17:13:02'),
 (8, 'Agis', 'Putri', 'agis@gmail.com', 'agis', '08926846284', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, '$2y$10$6zEz9CeRnzTy7JXlMfaP6eag2GzYlC.TTlL0ZHTPrgVyWE.5/tJde', 'customer', '2025-11-28 17:15:55'),
 (10, 'aditya', 'juanda', 'aditya@gmail.com', 'adit', '+6289427638', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, '$2y$10$50fXKeooM0xP/o4LGJtkd.4alVvBrIVUjZVKhbZKzsv5azc356s.q', 'customer', '2025-11-28 17:29:32'),
@@ -407,19 +381,19 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT untuk tabel `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT untuk tabel `invoices`
 --
 ALTER TABLE `invoices`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT untuk tabel `invoice_items`
 --
 ALTER TABLE `invoice_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT untuk tabel `products`
@@ -431,13 +405,13 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT untuk tabel `stores`
 --
 ALTER TABLE `stores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT untuk tabel `subscriptions`
 --
 ALTER TABLE `subscriptions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT untuk tabel `users`
