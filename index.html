@@ -79,39 +79,91 @@
         </div>
       </nav>
 
-    <!-- Hero Section -->
-    <section class="gradient-bg text-white py-16" id="home">
-      <div class="max-w-7xl mx-auto px-6">
-        <div class="flex items-center justify-between">
-          <div class="flex-1">
-            <h1 class="text-5xl font-bold mb-4 leading-tight">
-              Temukan Promo &<br />Jastip Terpercaya di<br />Promora
-            </h1>
-            <p class="text-lg mb-8 opacity-90">
-              Promora adalah aplikasi jasa titip yang terpercaya<br />dengan
-              produk original 100%
-            </p>
-            <div class="flex space-x-4">
-              <a href="lamanLogin.html"><button
-                class="bg-white text-purple-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100">
-                Get Started
-              </button></a>
-              <a href="lamanLogin.html"><button
-                class="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-purple-600">
-                See us used
-              </button></a>
+<!-- Hero Section -->
+<section class="relative py-8 overflow-hidden" id="home" style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="flex items-center justify-between gap-12">
+      <!-- Left Content -->
+      <div class="flex-1 z-10">
+        <div class="inline-flex items-center gap-2 bg-white rounded-full px-4 py-2 shadow-sm mb-6">
+          <span class="text-purple-600">✨</span>
+          <span class="text-sm font-medium text-gray-700">Gold Seller Exclusive</span>
+        </div>
+        
+        <h1 class="text-5xl font-bold mb-6 leading-tight text-gray-900">
+          Exclusive Deals from<br />Our Top Seller!
+        </h1>
+        
+        <p class="text-lg mb-8 text-gray-600">
+          Discover premium products at great prices – Only for a limited<br />time.
+        </p>
+        
+        <div class="flex items-center gap-6 mb-8">
+          <button class="bg-purple-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-purple-700 transition shadow-lg shadow-purple-200">
+            Up to 20% Off Today!
+          </button>
+          <span class="text-gray-600 font-medium">Limited Stock Available</span>
+        </div>
+        
+        <div class="flex gap-4">
+          <button onclick="window.location.href='explore.html'" class="bg-purple-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-purple-700 transition">
+            Shop Now
+          </button>
+          <button onclick="window.location.href='explore.html'" class="border-2 border-purple-600 text-purple-600 px-8 py-3 rounded-full font-semibold hover:bg-purple-50 transition">
+            See All Deals
+          </button>
+        </div>
+      </div>
+      
+      <!-- Right Content - Animated Cards -->
+      <div class="flex-1 relative" style="height: 450px;">
+        <div id="card-container" class="relative w-full h-full">
+          <!-- Card 1 -->
+          <div class="product-card-hero absolute bg-white rounded-3xl shadow-2xl p-6 transition-all duration-700 ease-in-out" 
+               style="width: 280px; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+            <div class="relative mb-4">
+              <img src="./assets/img/watch.jpeg" alt="Premium Luxury Watch" 
+                   class="w-full h-48 object-cover rounded-2xl" 
+                   onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'" />
+              <span class="absolute top-3 right-3 bg-purple-600 text-white text-sm font-bold px-3 py-1 rounded-full">-25%</span>
             </div>
+            <h3 class="font-bold text-lg mb-2 text-gray-900">Premium Luxury Watch</h3>
+            <p class="text-sm text-gray-400 line-through mb-1">Rp 5.980.000</p>
+            <p class="text-2xl font-bold text-purple-600">Rp 4.485.000</p>
           </div>
-          <div class="flex-1 flex justify-end">
-            <img
-              src="./assets/img/HeroSection.jpg"
-              style="height: 350px; width: auto; border-radius: 16px"
-            />
+          
+          <!-- Card 2 -->
+          <div class="product-card-hero absolute bg-white rounded-3xl shadow-2xl p-6 transition-all duration-700 ease-in-out" 
+               style="width: 280px; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+            <div class="relative mb-4">
+              <img src="./assets/img/perfume.jpeg" alt="Designer Perfume" 
+                   class="w-full h-48 object-cover rounded-2xl" 
+                   onerror="this.src='https://images.unsplash.com/photo-1541643600914-78b084683601?w=400'" />
+              <span class="absolute top-3 right-3 bg-purple-600 text-white text-sm font-bold px-3 py-1 rounded-full">-26%</span>
+            </div>
+            <h3 class="font-bold text-lg mb-2 text-gray-900">Designer Perfume</h3>
+            <p class="text-sm text-gray-400 line-through mb-1">Rp 1.800.000</p>
+            <p class="text-2xl font-bold text-purple-600">Rp 1.335.000</p>
+          </div>
+          
+          <!-- Card 3 -->
+          <div class="product-card-hero absolute bg-white rounded-3xl shadow-2xl p-6 transition-all duration-700 ease-in-out" 
+               style="width: 280px; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+            <div class="relative mb-4">
+              <img src="./assets/img/handbag.jpeg" alt="Luxury Handbag" 
+                   class="w-full h-48 object-cover rounded-2xl" 
+                   onerror="this.src='https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400'" />
+              <span class="absolute top-3 right-3 bg-purple-600 text-white text-sm font-bold px-3 py-1 rounded-full">-25%</span>
+            </div>
+            <h3 class="font-bold text-lg mb-2 text-gray-900">Luxury Handbag</h3>
+            <p class="text-sm text-gray-400 line-through mb-1">Rp 9.000.000</p>
+            <p class="text-2xl font-bold text-purple-600">Rp 6.750.000</p>
           </div>
         </div>
       </div>
-    </section>
-
+    </div>
+  </div>
+</section>
     <!-- Promo Hari Ini -->
     <section class="py-16 bg-white">
       <div class="max-w-7xl mx-auto px-6">

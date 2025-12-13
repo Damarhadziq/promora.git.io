@@ -320,6 +320,48 @@ async function logout() {
         window.location.href = 'index.html';
     }
 }
+
+// Hero Cards Animation
+function animateHeroCards() {
+    const cards = document.querySelectorAll('.product-card-hero');
+    if (cards.length !== 3) return;
+    
+    let currentIndex = 0;
+    
+    // Posisi untuk setiap card
+    const positions = [
+        { top: '50%', left: '50%', transform: 'translate(-50%, -50%) scale(1)', zIndex: 3, opacity: 1 },
+        { top: '50%', left: '70%', transform: 'translate(-50%, -50%) scale(0.85) rotate(5deg)', zIndex: 2, opacity: 0.7 },
+        { top: '50%', left: '30%', transform: 'translate(-50%, -50%) scale(0.85) rotate(-5deg)', zIndex: 1, opacity: 0.7 }
+    ];
+    
+    function updatePositions() {
+        cards.forEach((card, index) => {
+            const posIndex = (index - currentIndex + 3) % 3;
+            const pos = positions[posIndex];
+            
+            card.style.top = pos.top;
+            card.style.left = pos.left;
+            card.style.transform = pos.transform;
+            card.style.zIndex = pos.zIndex;
+            card.style.opacity = pos.opacity;
+        });
+        
+        currentIndex = (currentIndex + 1) % 3;
+    }
+    
+    // Set initial positions
+    updatePositions();
+    
+    // Rotate cards every 3 seconds
+    setInterval(updatePositions, 3000);
+}
+
+// Start animation when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(animateHeroCards, 500);
+});
+
 // Dropdown toggle
 document.getElementById('avatar-button')?.addEventListener('click', function(e) {
     e.stopPropagation();
